@@ -70,7 +70,7 @@ jobs:
       if: always() && steps.pythonfilter.outcome == 'success'
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.0.2'
+        ruby-version: '3.3.8'
         bundler-cache: true
     - name: Install deps
       if: always() && steps.pythonfilter.outcome == 'success'
