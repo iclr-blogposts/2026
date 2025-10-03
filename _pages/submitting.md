@@ -44,21 +44,21 @@ Small mistakes here can have very hard-to-debug consequences.**
 
 ### Contents
 
-- [A more open process](#a-more-open-process)
-- [Template](#template)
-- [Contents](#contents)
-- [Quickstart](#quickstart)
-- [Download the Blog Repository](#download-the-blog-repository)
-- [Creating a Blog Post](#creating-a-blog-post)
-- [Local serving](#local-serving)
-  - [Method 1: Using Docker](#method-1-using-docker)
-  - [Method 2: Using Jekyll Manually](#method-2-using-jekyll-manually)
-    - [Installation](#installation)
-    - [Manual Serving](#manual-serving)
-- [Submitting your Blog Post](#submitting-your-blog-post)
-- [Reviewing Process](#reviewing-process)
-- [Camera-ready](#camera-ready)
-- [Full guide coming soon!](#full-guide-coming-soon)
+- [Please note: we are currently updating the repo and workflows. Full submission guide coming soon!](#please-note-we-are-currently-updating-the-repo-and-workflows-full-submission-guide-coming-soon)
+  - [A more open process](#a-more-open-process)
+  - [Template](#template)
+  - [Contents](#contents)
+  - [Quickstart](#quickstart)
+  - [Download the Blog Repository](#download-the-blog-repository)
+  - [Creating a Blog Post](#creating-a-blog-post)
+  - [Local serving](#local-serving)
+    - [Devcontainer](#devcontainer)
+    - [Prequisites](#prequisites)
+    - [Entering the devcontainer](#entering-the-devcontainer)
+    - [Previewing your Blog Post](#previewing-your-blog-post)
+  - [Submitting your Blog Post](#submitting-your-blog-post)
+  - [Reviewing Process](#reviewing-process)
+  - [Camera-ready](#camera-ready)
 
 ### Quickstart
 
@@ -80,9 +80,7 @@ For more details about any of these steps, please refer to the appropriate secti
    Read the [relevant section](#creating-a-blog-post) for more details.
    **Make sure to omit any identifying information for the review process.**
 
-3. To render your website locally, you can build a docker container via `$ ./bin/docker_run.sh` to serve your website locally.
-   Alternatively, you can setup your local environment to render the website via conventional `$ bundle exec jekyll serve --future` commands.
-   More information for both of these configuratoins can be found in the [Local Serving](#local-serving) section.
+3. To render your website locally, we highly recommend the use of VSCode [`devcontainers`](https://code.visualstudio.com/docs/devcontainers/containers). Make sure to have [Docker](https://docs.docker.com/engine/install/) installed for this to work. Once the devcontainer is entered, a webserver on `localhost:8080` should be automatically started and you can preview your blog post on `localhost:8080/2026/blog/2026/[SUBMISSION-NAME]`. More information about the local setup can be found in the [Local Serving](#local-serving) section.
 
 4. To submit your website, create a pull request to the main repository. Make sure that this PR's title is `_posts/2026-04-27-[SUBMISSION NAME]`. This will trigger a GitHub Action that will build your blogpost and write the host's URL in a comment to your PR.
 
@@ -234,97 +232,26 @@ Everything you have done so far has been in Markdown, but this is not the same f
 You'll now need to build your static web site (which is done using Jekyll), and then _serve_ it on some local webserver in order to view it properly.
 We will now discuss how you can _serve_ your blog site locally, so you can visualize your work before you open a pull request on the staging website so you can submit it to the ICLR venue.
 
-#### Method 1: Using Docker
+#### Devcontainer
 
-To render your website locally, we follow the instructions for [Local setup using Docker (Recommended on Windows)](https://github.com/iclr-blogposts/iclr-blogposts.github.io/blob/master/README.md#local-setup-using-docker-recommended-on-windows), but specifically you will need to create your own docker container rather than pull it from Dockerhub (because we modified the Gemfile).
+The easiest way and the only method we officially support is via VSCode [`devcontainer`](https://code.visualstudio.com/docs/devcontainers/containers). A `devcontainer` is a docker container meant for local development.
 
-Create and run the Docker image:
+#### Prequisites
 
-```bash
-./bin/docker_run.sh
-```
+Make sure to have the following tools installed:
+1. [Docker](https://docs.docker.com/engine/install/)
+2. [VSCode](https://code.visualstudio.com/)
+3. [Devcontainer Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
 
-Remove the `Gemfile.lock` file if prompted.
-This will create a docker image labeled as `al-folio:latest`.
-Don't use `dockerhub_run.sh`; this may result in issues with missing jekyll dependencies.
+#### Entering the devcontainer
 
-#### Method 2: Using Jekyll Manually
+Once the extension is installed, VSCode should automatically prompt you to open the folder within the devcontainer once you open the repository within vscode. If this does not happen automatically, you can use the command palette (`Ctrl + P` / `Cmd + P`) and enter `>Dev Containers: Reopen in Container`.
 
-For users wishing to not use a Docker container, you can install Jekyll directly to your computer and build the site using Jekyll directly.
-This is done at your own risk, as there are many potential points of error!
-Follow the instructions for rendering the website via the conventional method of `$ bundle exec jekyll serve --future`
+#### Previewing your Blog Post
 
-##### Installation
-
-You will need to manually install Jekyll which will vary based on your operating system.
-The instructions here are only for convenience - you are responsible for making sure it works on your system and we are not liable for potential issues that occur when adding your submissions to our repo!
-
-**Ubuntu/Debian**
-
-1. Install Ruby
-
-   ```bash
-   sudo apt install ruby-full
-   ```
-
-2. Once installed, add the following to your `.bashrc` or whatever terminal startup script you may use (this is important because otherwise gem may complain about needing sudo permission to install packages):
-
-   ```bash
-   export GEM_HOME="$HOME/.gem"
-   export PATH="$HOME/.gem/bin:$PATH"
-   ```
-
-3. Install Jekyll and Bundler:
-
-   ```bash
-   gem install jekyll bundler
-   ```
-
-**MacOS and Windows**
-
-Mac and Windows users can find relevant guides for installing Jekyll here:
-
-- [Windows guide](https://jekyllrb.com/docs/installation/windows/)
-- [MacOS guide](https://jekyllrb.com/docs/installation/macos/)
-
-##### Manual Serving
-
-Once you've installed jekyll and all of the dependencies, you can now serve the webpage on your local machine for development purposes using the `bundle exec jekyll serve` command.
-
-You may first need to install any project dependencies. In your terminal, from the directory containing the Jekyll project run:
-
-```bash
-bundle install
-```
-
-This will install any plugins required by the project.
-To serve the webpage locally, from your terminal, in the directory containing the Jekyll project run:
-
-```bash
-bundle exec jekyll serve --future --port=8080 --host=0.0.0.0
-```
-
-You should see something along the lines of:
-
-```
-> bundle exec jekyll serve
-Configuration file: /home/$USER/blog_post_repo/_config.yml
-            Source: /home/$USER/blog_post_repo
-       Destination: /home/$USER/blog_post_repo/_site
- Incremental build: disabled. Enable with --incremental
-      Generating...
-       Jekyll Feed: Generating feed for posts
-
-        ... you may see a lot of stuff in here related to images ...
-
-                    done in 0.426 seconds.
- Auto-regeneration: enabled for '/home/$USER/blog_post_repo'
-    Server address: http://0.0.0.0:8080/2026/
-  Server running... press ctrl-c to stop.
-```
-
-If you see this, you've successfully served your web page locally!
-You can access it at server address specified, in this case `http://0.0.0.0:8080/2026/` (and the blog posts should once again be viewable at the `blog/` endpoint).
+The devcontainer direct starts serving the website on `localhost:8080/2026/` and you may find your blog post under `localhost:8080/2026/blog/2026/[SUBMISSION-NAME]`.
+Crucially, if the files contain errors the build process may fail and no server may be started.
+In that case, you may restart the server manually using `bundle exec jekyll serve --future`. Make sure to use this command from **within** the devcontainer.
 
 ### Submitting your Blog Post
 

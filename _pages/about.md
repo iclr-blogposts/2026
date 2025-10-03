@@ -108,7 +108,6 @@ For other inquiries, reach us via email at: [iclr-blogpost-track@googlegroups.co
   {% include people_horizontal.html name="Nicholas Gao" affiliation="CuspAI" url="" img="assets/img/organizers/ng.jpg" %}
   {% include people_horizontal.html name="Jonas Köhler" affiliation="CuspAI" url="" img="assets/img/organizers/jk.jpg" %}
   {% include people_horizontal.html name="David Dobre" affiliation="Mila, Université de Montréal" url="" img="assets/img/organizers/dd.jpg" %}
-  {% include people_horizontal.html name="Mehrnaz Mofakhami" affiliation="Mila, Université de Montréal" url="" img="assets/img/organizers/mm.jpg" %}
 </div>
 
 ## References
