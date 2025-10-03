@@ -40,7 +40,7 @@ for pr in $prs; do
     fork_ref=$(gh api repos/$OWNER/$REPO/pulls/$pr --jq '.head.ref')
 
     git fetch https://github.com/$fork_owner/$fork_repo.git "$fork_ref:$fork_owner-$fork_ref"
-    git merge --no-edit --allow-unrelated-histories "$fork_owner-$fork_ref"
+    git merge --no-edit "$fork_owner-$fork_ref"
   else
     echo "❌ Skipping PR #$pr (state=$state)"
   fi
