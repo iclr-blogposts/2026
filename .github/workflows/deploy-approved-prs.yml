@@ -65,6 +65,9 @@ jobs:
           }
 
           console.log(`Found ${approvedPRs.length} approved PRs with passing checks:`, approvedPRs.map(pr => `#${pr.number}: ${pr.title}`));
+
+          // Set the output for GitHub Actions
+          core.setOutput('result', JSON.stringify(approvedPRs));
           return approvedPRs;
 
     - name: Merge approved PRs
