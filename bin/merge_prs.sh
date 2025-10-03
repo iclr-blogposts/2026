@@ -19,19 +19,16 @@ prs=$(gh pr list --repo "$OWNER/$REPO" --state open --json number \
   | jq -r '.[].number')
 
 for pr in $prs; do
-  state=$(gh api graphql -f query="
-  { repository(owner: \"$OWNER\", name: \"$REPO\") {
-      pullRequest(number: $pr) {
-        headRefOid
-        headRepositoryOwner { login }
-        headRepository { name }
-        headRefName
-        headRef { target { ... on Commit { statusCheckRollup { state } } } }
-      }
-    }
-  }" | jq -r '.data.repository.pullRequest.headRef.target.statusCheckRollup.state')
+  # Get PR status using the checks API (works better with forks)
+  state=$(gh pr checks "$pr" --repo "$OWNER/$REPO" --json state --jq '.[0].state // "UNKNOWN"' 2>/dev/null || echo "UNKNOWN")
+  
+  # If checks API doesn't work, try the commit status API
+  if [ "$state" = "UNKNOWN" ] || [ "$state" = "null" ]; then
+    head_sha=$(gh pr view "$pr" --repo "$OWNER/$REPO" --json headRefOid --jq '.headRefOid')
+    state=$(gh api repos/"$OWNER"/"$REPO"/commits/"$head_sha"/status --jq '.state // "UNKNOWN"' 2>/dev/null || echo "UNKNOWN")
+  fi
 
-  if [ "$state" = "SUCCESS" ]; then
+  if [ "$state" = "SUCCESS" ] || [ "$state" = "success" ]; then
     echo "✅ Merging PR #$pr"
     
     # 4. Fetch head branch (works even if from fork)
