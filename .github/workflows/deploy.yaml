@@ -30,6 +30,7 @@ on:
       - "!FAQ.md"
       - "!INSTALL.md"
       - "!README.md"
+  workflow_dispatch:  # Allow manual triggering
   workflow_run:
     workflows: ["filter-files"]
     types:
