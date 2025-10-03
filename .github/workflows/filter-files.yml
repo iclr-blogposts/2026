@@ -15,7 +15,7 @@ jobs:
     # if: contains(github.event.pull_request.labels.*.name, 'submission')  
     # if: ${{ github.event.label.name == 'submission' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 15
     outputs:
       offendingfiles: ${{ steps.pythonfilter.outputs.offendingfiles }}
 
