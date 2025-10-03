@@ -52,10 +52,10 @@ jobs:
       if: ${{ steps.filter.outputs.changed == 'true' }}
       # todo read from step below
       run: |
-        FILTEROUT=$(python3 bin/filterpaths.py $SLUG ${{ steps.filter.outputs.changed_files }} | tail -1)
+        FILTEROUT=$(python3 bin/filter_paths.py $SLUG ${{ steps.filter.outputs.changed_files }} | tail -1)
         echo "offendingfiles=$FILTEROUT" >> $GITHUB_OUTPUT
         mkdir site_out
-        python3 bin/filterpaths.py $SLUG ${{ steps.filter.outputs.changed_files }}
+        python3 bin/filter_paths.py $SLUG ${{ steps.filter.outputs.changed_files }}
     #- uses: actions/github-script@v6
     #  if: always() && steps.pythonfilter.outcome == 'failure'
     #  with:
