@@ -7,17 +7,11 @@ nav: true
 nav_order: 3
 ---
 
-## Please note: we are currently updating the repo and workflows. Full submission guide coming soon! 
-
-If you want to start building your site now, we will mostly be following the process from the last iteration as described below, but please be aware that **we are not yet accepting pull requests**, and you may need to update your fork before submitting any pull requests with your submission.
-
------
-
 ### A more open process
 
 As with the previous edition of the Blog Post track, we forgo the requirement for total anonymity.
 The blog posts **must be anonymized for the review process**, but users will submit their anonymized blog posts via a pull request to the blog track's repository (in addition to a submission on OpenReview).
-The pull request will trigger an automated pipeline that will build and deploy your post onto a website dedicated to the reviewing process.
+The pull request will trigger an automated pipeline that will build and deploy your post onto a website.
 
 <!-- The post will be merged into the staging repository, where it will be deployed to a separate Github Pages website.  -->
 
@@ -44,21 +38,20 @@ Small mistakes here can have very hard-to-debug consequences.**
 
 ### Contents
 
-- [Please note: we are currently updating the repo and workflows. Full submission guide coming soon!](#please-note-we-are-currently-updating-the-repo-and-workflows-full-submission-guide-coming-soon)
-  - [A more open process](#a-more-open-process)
-  - [Template](#template)
-  - [Contents](#contents)
-  - [Quickstart](#quickstart)
-  - [Download the Blog Repository](#download-the-blog-repository)
-  - [Creating a Blog Post](#creating-a-blog-post)
-  - [Local serving](#local-serving)
-    - [Devcontainer](#devcontainer)
-    - [Prequisites](#prequisites)
-    - [Entering the devcontainer](#entering-the-devcontainer)
-    - [Previewing your Blog Post](#previewing-your-blog-post)
-  - [Submitting your Blog Post](#submitting-your-blog-post)
-  - [Reviewing Process](#reviewing-process)
-  - [Camera-ready](#camera-ready)
+- [A more open process](#a-more-open-process)
+- [Template](#template)
+- [Contents](#contents)
+- [Quickstart](#quickstart)
+- [Download the Blog Repository](#download-the-blog-repository)
+- [Creating a Blog Post](#creating-a-blog-post)
+- [Local serving](#local-serving)
+  - [Devcontainer](#devcontainer)
+  - [Prequisites](#prequisites)
+  - [Entering the devcontainer](#entering-the-devcontainer)
+  - [Previewing your Blog Post](#previewing-your-blog-post)
+- [Submitting your Blog Post](#submitting-your-blog-post)
+- [Reviewing Process](#reviewing-process)
+- [Camera-ready](#camera-ready)
 
 ### Quickstart
 
@@ -275,8 +268,8 @@ To submit your blog post:
    Fill in the checklist provided in the PR template. The title of your pull request should be
    exactly the name of your markdown/html file.
    - i.e. `_posts/2026-04-27-[SUBMISSION NAME].md` would require a PR name `2026-04-27-[SUBMISSION NAME]`
-4. **(TBD - will be set up soon!)** Your post will automatically run two pipelines: one to verify that you have not modified any other
-   file in the repo, and another that will create a unique URL for your contributed blog post.
+4. Your post will automatically run two pipelines: one to verify that you have not modified any other
+   file in the repo, and another that will push it to a public URL of the format `https://iclr-blogposts.github.io/2026/blog/2026/[SUBMISSION NAME]/`.
    - Verify that everything looks correct in the given URL.
    - If the pipelines failed, check if it was because of improper formatting (i.e. you modified
      restricted files). If this is the case, fix the issues. If the issue persist, please ping one of the repo admins.
