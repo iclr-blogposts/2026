@@ -64,6 +64,8 @@ jobs:
         run: |
           git checkout main
           bash bin/merge_prs.sh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Update _config.yml ⚙️
         uses: fjogeleit/yaml-update-action@main
         with:
