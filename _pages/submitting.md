@@ -268,6 +268,7 @@ To submit your blog post:
      - interactive HTML figures added to `assets/html/2026-04-27-[SUBMISSION NAME]/`
      - citations in a bibtex file in `assets/bibliography/2026-04-27-[SUBMISSION NAME].bib`
    - Have a short 2-3 sentence abstract in the `description` field of your front-matter ([example](https://github.com/iclr-blogposts/2026/blob/main/_posts/2026-04-27-distill-example.md?plain=1#L4-L6))
+      - Please make sure to not include special characters like `"` in your description since it may cause the bibliography to not render correctly. 
    - Have a table of contents, formatted using the `toc` field of your front-matter ([example](https://github.com/iclr-blogposts/2026/blob/main/_posts/2026-04-27-distill-example.md?plain=1#L36-L47))
    - Your bibliography uses a `.bibtex` file as per the sample post
 3. Open a pull request against the `main` branch of the [2026 repo](https://github.com/iclr-blogposts/2026).
