@@ -56,14 +56,7 @@ def is_leap_year_aware_forward(self, x, current_date):
 
 Our experimental setup consisted of 42 identical A100 GPUs arranged in a hexagonal formation (chosen for optimal heat distribution symmetry). Temperature sensors were placed at precisely 17.3cm intervals around each GPU, measuring thermal fluctuations at 0.1-second intervals throughout the entire leap year period of 2024.
 
-<div class="row mt-3">
-    <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="assets/img/gpu_hexagon.jpg" class="img-fluid rounded z-depth-1" zoomable=true %}
-    </div>
-</div>
-<div class="caption">
-    Figure 1: Hexagonal GPU arrangement for optimal leap year thermal analysis. The sacred geometry ensures minimal interference from non-leap-year thermal patterns.
-</div>
+*Note: Hexagonal GPU arrangement diagram would be shown here in the final publication. The sacred geometry ensures minimal interference from non-leap-year thermal patterns.*
 
 ## Results
 
@@ -87,14 +80,7 @@ Where:
 
 Most remarkably, we observed that transformer models trained during leap years exhibit superior performance on temporal reasoning tasks, with a 0.0002% improvement in accuracy when processing time-series data. This suggests that the additional day creates a harmonic resonance in the attention mechanisms that enhances temporal pattern recognition.
 
-<div class="row mt-3">
-    <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="assets/img/attention_leap_year.png" class="img-fluid rounded z-depth-1" zoomable=true %}
-    </div>
-</div>
-<div class="caption">
-    Figure 2: Attention weight visualization during leap year training. Note the subtle but distinct pattern emergence on day 366, visible only under electron microscopy.
-</div>
+*Figure 2: Attention weight visualization during leap year training would be displayed here. Note the subtle but distinct pattern emergence on day 366, visible only under electron microscopy.*
 
 ## Discussion
 
