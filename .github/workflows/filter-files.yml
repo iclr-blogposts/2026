@@ -91,7 +91,10 @@ jobs:
         echo "DEPLOY_BRANCH=gh-pages" >> $GITHUB_OUTPUT
     - name: Build website 
       if: always() && steps.pythonfilter.outcome == 'success'
-      run:  yes | bash bin/build --verbose ${{ steps.setup.outputs.NO_PUSH }}
+      run: |
+          sudo apt-get update && sudo apt-get install -y imagemagick
+          pip3 install --upgrade nbconvert
+          yes | bash bin/build --verbose ${{ steps.setup.outputs.NO_PUSH }}
                     --src ${{ steps.setup.outputs.SRC_BRANCH }} 
                     --deploy ${{ steps.setup.outputs.DEPLOY_BRANCH }} 
                     --slug ${{env.SLUG}}-${{ github.event.number }}
