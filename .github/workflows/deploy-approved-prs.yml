@@ -1,0 +1,141 @@
+name: Deploy Approved PRs to GitHub Pages
+
+on:
+  check_run:
+    types: [completed]
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  deploy-merged-prs:
+    runs-on: ubuntu-latest
+    if: github.event.check_run.conclusion == 'success' || github.event_name == 'workflow_dispatch'
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
+
+    - name: Configure Git
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+
+    - name: Create temporary branch from main
+      run: |
+        git checkout -b temp-deploy-$(date +%s)
+        git reset --hard origin/main
+
+    - name: Get all open PRs with passing checks
+      id: get-prs
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const { data: pulls } = await github.rest.pulls.list({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            state: 'open'
+          });
+
+          const approvedPRs = [];
+
+          for (const pr of pulls) {
+            // Check if required checks are passing
+            const { data: checkRuns } = await github.rest.checks.listForRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: pr.head.sha
+            });
+
+            const deploySiteCheck = checkRuns.check_runs.find(check => check.name === 'deploy');
+            const filterFilesCheck = checkRuns.check_runs.find(check => check.name === 'Detect what files changed');
+
+            const deploySitePassing = deploySiteCheck && deploySiteCheck.conclusion === 'success';
+            const filterFilesPassing = filterFilesCheck && filterFilesCheck.conclusion === 'success';
+
+            if (deploySitePassing && filterFilesPassing) {
+              approvedPRs.push({
+                number: pr.number,
+                head_sha: pr.head.sha,
+                head_ref: pr.head.ref,
+                head_repo_url: pr.head.repo.clone_url,
+                head_repo_owner: pr.head.repo.owner.login,
+                title: pr.title
+              });
+            }
+          }
+
+          console.log(`Found ${approvedPRs.length} approved PRs with passing checks:`, approvedPRs.map(pr => `#${pr.number}: ${pr.title}`));
+
+          // Set the output for GitHub Actions
+          core.setOutput('result', JSON.stringify(approvedPRs));
+          return approvedPRs;
+
+    - name: Merge approved PRs
+      if: fromJson(steps.get-prs.outputs.result).length > 0
+      run: |
+        echo "Merging approved PRs with passing checks..."
+        echo '${{ steps.get-prs.outputs.result }}' | jq -r '.[] | "\(.number) \(.head_repo_url) \(.head_ref) \(.head_repo_owner)"' | while read pr_number repo_url head_ref repo_owner; do
+          echo "Fetching and merging PR #$pr_number from $repo_owner/$head_ref"
+
+          # For forks, fetch from the fork's repo URL
+          if [ "$repo_owner" != "${{ github.repository_owner }}" ]; then
+            echo "  📁 Fork detected: fetching from $repo_url"
+            git fetch "$repo_url" "$head_ref:fork-$pr_number"
+            git merge fork-$pr_number --no-ff -m "Merge PR #$pr_number from fork for deployment"
+          else
+            echo "  🏠 Same repo: using origin"
+            git fetch origin pull/$pr_number/head:pr-$pr_number
+            git merge pr-$pr_number --no-ff -m "Merge PR #$pr_number for deployment"
+          fi
+        done
+
+    - name: Setup Ruby 💎
+      if: fromJson(steps.get-prs.outputs.result).length > 0
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: "3.3.5"
+        bundler-cache: true
+
+    - name: Setup Python 🐍
+      if: fromJson(steps.get-prs.outputs.result).length > 0
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.13"
+        cache: "pip"
+
+    - name: Update _config.yml ⚙️
+      if: fromJson(steps.get-prs.outputs.result).length > 0
+      uses: fjogeleit/yaml-update-action@main
+      with:
+        commitChange: false
+        valueFile: "_config.yml"
+        propertyPath: "giscus.repo"
+        value: ${{ github.repository }}
+
+    - name: Install and Build 🔧
+      if: fromJson(steps.get-prs.outputs.result).length > 0
+      run: |
+        sudo apt-get update && sudo apt-get install -y imagemagick
+        pip3 install --upgrade nbconvert
+        export JEKYLL_ENV=production
+        bundle exec jekyll build
+
+    - name: Purge unused CSS 🧹
+      if: fromJson(steps.get-prs.outputs.result).length > 0
+      run: |
+        npm install -g purgecss
+        purgecss -c purgecss.config.js
+
+    - name: Deploy to GitHub Pages
+      if: fromJson(steps.get-prs.outputs.result).length > 0
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        folder: _site
+
+    - name: Clean up temporary branch
+      if: always()
+      run: |
+        git checkout main
+        git branch -D temp-deploy-$(date +%s) || true
