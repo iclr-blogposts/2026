@@ -1,14 +1,14 @@
 name: Deploy Approved PRs to GitHub Pages
 
 on:
-  check_suite:
+  check_run:
     types: [completed]
   workflow_dispatch:  # Allow manual triggering
 
 jobs:
   deploy-merged-prs:
     runs-on: ubuntu-latest
-    if: github.event.check_suite.conclusion == 'success' || github.event_name == 'workflow_dispatch'
+    if: github.event.check_run.conclusion == 'success' || github.event_name == 'workflow_dispatch'
 
     steps:
     - name: Checkout repository
