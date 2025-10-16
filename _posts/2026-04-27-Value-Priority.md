@@ -40,17 +40,23 @@ bibliography: 2026-04-27-Value-Priority.bib
 #     for hyperlinks within the post to work correctly.
 #   - please use this format rather than manually creating a markdown table of contents.
 toc:
-  - name: Equations
-  - name: Images and Figures
+  - name: Introduction
+  - name: Dilemmas and Conflicts in LLMs
     subsections:
-      - name: Interactive Figures
-  - name: Citations
-  - name: Footnotes
-  - name: Code Blocks
-  - name: Diagrams
-  - name: Tweets
-  - name: Layouts
-  - name: Other Typography?
+      - name: Instruction Conflicts
+      - name: Information Conflicts
+      - name: Ethics Dilemmas
+      - name: Value Dilemmas
+      - name: Preference Dilemmas
+  - name: Formalizing Instruction and Value Priority
+    subsections:
+      - name: A Directed Graph for Priority
+      - name: The Dynamic and Paradoxical Nature of the Priority Graph
+  - name: Jailbreaking with Priority Hacking
+  - name: Active Connection with the Real World
+  - name: The Philosophical Intractability of Conflicts
+  - name: Conclusion
+
 
 # Below is an example of injecting additional post-specific styles.
 # This is used in the 'Layouts' section of this post.
@@ -72,7 +78,8 @@ _styles: >
   }
 ---
 
-Note: please use the table of contents as defined in the front matter rather than the traditional markdown styling.
+
+
 
 ## Introduction
 
@@ -119,7 +126,13 @@ Ultimately, however, some dilemmas and conflicts may be philosophically irreduci
 
 
 
-***
+
+
+
+
+
+
+
 
 ## Dilemmas and Conflicts in LLMs
 
@@ -241,7 +254,15 @@ How should the LLM judge a story that is character-driven with an ambiguous endi
 How should the LLM evaluate an artwork that is highly abstract with vibrant colors but lacks realistic detail? If it rates the artwork highly, it aligns with Human 1's preferences but misaligns with Human 2's. This illustrates value pluralism in aesthetic judgment, where no universal standard exists. Should the LLM be trained to reflect a single, widely accepted aesthetic preference, potentially marginalizing niche tastes? Or should multiple LLMs be developed, each tailored to different artistic values (e.g., one for abstract art enthusiasts, another for realism advocates), allowing users to select a judge that matches their preferences? The latter approach respects diverse aesthetic values but complicates implementation, requiring clear governance to manage multiple models and ensure equitable access.
 
 
-***
+
+
+
+
+
+
+
+
+
 
 ## Formalizing Instruction and Value Priority
 
@@ -275,7 +296,14 @@ For instance, a user working as a creative writer might establish a context wher
 <!-- Furthermore, the priority relationships often lack **transitivity**, meaning the graph is not guaranteed to be acyclic. A model might learn that Safety $\succ$ Helpfulness and Helpfulness $\succ$ Brevity. However, a crisis context could establish that Brevity $\succ$ Safety is necessary. This creates a cycle (e.g., $A_1 \succ A_2 \succ A_3 \succ A_1$), representing a paradox that the model cannot resolve through simple prioritization. The potential for such cycles highlights the difficulty in achieving universal, consistent alignment. -->
 
 
-***
+
+
+
+
+
+
+
+
 
 ## Jailbreaking with Priority Hacking
 
@@ -294,7 +322,7 @@ Here, the adversary establishes a context ($C_{adv}$) of an **investigative jour
 
 
 
-***
+
 
 
 ## Active Connection with the Real World
@@ -312,7 +340,11 @@ This concept, also referred to as a **runtime verification mechanism**, would se
 By actively communicating with the real world to verify its operational context, an LLM can move from being a naive instruction follower to a more robust and trustworthy agent that critically evaluates the instructions it receives.
 
 
-***
+
+
+
+
+
 
 
 ##   The Philosophical Intractability of Conflicts
