@@ -72,22 +72,23 @@ often assume uniform reporting across all days, while real-world data exhibit sy
 weekend underreporting with Monday spikes. Ward et al. (2022) <d-cite
 key="ward_robust_2022"></d-cite> demonstrated that such discrepancies—seemingly minor
 reporting delays—can bias parameter estimates by over 40% and cause credible interval
-coverage to drop from the nominal 95% to below 60%. When the simulator cannot represent
-patterns present in observations, neural networks trained on simulated data face
-out-of-distribution inputs, undermining posterior inference reliability. Understanding
-and addressing model misspecification is therefore essential for trustworthy
-simulation-based inference in real-world applications.
+coverage to drop from the nominal 95% to below 60%.
+
+When the simulator cannot represent patterns present in observations, neural networks
+trained on simulated data face out-of-distribution inputs, undermining posterior
+inference reliability. Understanding and addressing model misspecification is therefore
+essential for trustworthy simulation-based inference in real-world applications.
 
 The sensitivity of neural networks to OOD data underscores the importance of developing
 robust methods for detecting and addressing model misspecification. This blog post
-provides an overview of recent advances in this area. We begin with a concrete running
-example that will illustrate key concepts throughout, then formalize the definition of
-model misspecification in SBI. We review four categories of methods for addressing
-misspecification and conclude with open challenges.
+provides an overview of recent advances in this area, beginning with a concrete running
+example that illustrates key concepts throughout, then formalizing the definition of
+model misspecification in SBI. The post reviews four categories of methods for addressing
+misspecification and concludes with open challenges.
 
 ## A Concrete Example: SIR Model with Weekend Reporting Delay
 
-Before formalizing these concepts, we introduce a concrete running example: the Susceptible-Infected-Recovered (SIR) epidemic model with weekend reporting delays <d-cite key="ward_robust_2022"></d-cite>. The SIR model tracks disease spread using infection rate $\beta$ and recovery rate $\gamma$ (determining $R_0 = \beta/\gamma$). In the clean simulator, infection reports occur uniformly across all days. However, real-world data often exhibit systematic patterns—here, a fraction $\alpha$ of weekend infections go unreported until Monday, creating characteristic weekly oscillations.
+Before formalizing these concepts, we introduce a concrete running example: the Susceptible-Infected-Recovered (SIR) epidemic model with weekend reporting delays <d-cite key="ward_robust_2022"></d-cite>. The SIR model tracks disease spread using infection rate $\beta$, recovery rate $\gamma$, and reproduction number $R_0 = \beta/\gamma$. In the clean simulator, infection reports occur uniformly across all days. However, real-world data often exhibit systematic patterns—here, a fraction $\alpha$ of weekend infections go unreported until Monday, creating characteristic weekly oscillations.
 
 {% include figure.html path="assets/img/2026-04-27-model-misspecification-in-sbi/sir_figure.png" class="img-fluid" %}
 <div class="caption">
@@ -135,7 +136,7 @@ observed data using a distance metric and accepting only those parameters that g
 simulation very close to the observed data. When the data is high-dimensional, it is
 common to use hand-crafted or learned summary statistics. However, under
 misspecification, the posterior in ABC does not concentrate on the true parameters but
-instead on "pseudotrue" parameters that minimize discrepancies between simulated and
+instead on *pseudotrue* parameters that minimize discrepancies between simulated and
 observed summary statistics. This leads to biased posteriors and unreliable credible
 intervals. The choice of summary statistics is central to this problem, as they
 determine how well simulated data align with observed data. While foundational for
@@ -174,7 +175,7 @@ workflow:
 Prior misspecification is a general challenge in Bayesian inference and can be addressed
 with standard Bayesian workflow tools like prior predictive checks <d-cite
 key="gelman_bayesian_2020"></d-cite>. It has received less attention in the SBI-specific
-literature, with only brief discussions in works like Wehenkel & Gamella et al. (2023)
+literature, with only brief discussions in works like Wehenkel & Gamella et al. (2024)
 <d-cite key="wehenkel_addressing_2024"></d-cite>.
 
 Note that even with well-specified simulator and prior, the inference algorithm itself
@@ -189,7 +190,7 @@ accuracy assuming the simulator is correct.
 
 The primary focus of most work on model misspecification in the SBI literature, and of
 this post, is the first case: detecting and mitigating simulator-related
-misspecification. In the remainder of this post, we provide an overview of these
+misspecification. The remainder of this post provides an overview of these
 approaches.
 
 ## Mitigating Model Misspecification in SBI
@@ -205,7 +206,7 @@ and limitations, which we summarize below.
 
 {% include figure.html path="assets/img/2026-04-27-model-misspecification-in-sbi/ward_et_al.png" class="img-fluid" %}
 <div class="caption">
-    Figure 1 (adapted from <d-cite key="ward_robust_2022"></d-cite>): Visualization of the robust neural posterior estimation (RNPE) framework.
+    Figure 2 (adapted from <d-cite key="ward_robust_2022"></d-cite>): Visualization of the robust neural posterior estimation (RNPE) framework.
 </div>
 
 Ward et al. (2022) <d-cite key="ward_robust_2022"></d-cite> propose **Robust Neural Posterior Estimation (RNPE)**, an extension
@@ -239,11 +240,11 @@ Applied to the SIR weekend delay example, RNPE would use a spike-and-slab error 
 
 {% include figure.html path="assets/img/2026-04-27-model-misspecification-in-sbi/schmitt_et_al.png" class="img-fluid" %}
 <div class="caption">
-    Figure 2 (adapted from <d-cite key="schmitt_detecting_2024"></d-cite>): Simulated data is used to train a neural network to map into a latent space designed to detect misspecification. At inference time, the observed data is embedded mapped into the latent space to detect misspecification.
+    Figure 3 (adapted from <d-cite key="schmitt_detecting_2024"></d-cite>): Simulated data is used to train a neural network to map into a latent space designed to detect misspecification. At inference time, the observed data is embedded mapped into the latent space to detect misspecification.
 </div>
 
 Schmitt et al. (2024) <d-cite key="schmitt_detecting_2024"></d-cite> focus on
-_detecting_ misspecification using learned summary statistics. Their method employs a
+_detecting_ misspecification using learned summary statistics. The method employs a
 summary network, $h_\psi(\mathbf{x})$, to encode both observed and simulated data into a
 structured summary space, typically following a multivariate Gaussian distribution.
 Discrepancies between distributions in this space are quantified using metrics like
@@ -271,7 +272,7 @@ $x_o$. However, its performance depends on the design of the summary network and
 choice of divergence metric. While effective for detecting misspecification, it does not
 directly correct for it, instead providing insights for iterative simulator refinement.
 
-For the SIR weekend delay example, beyond prior predictive checks that would visually reveal the Monday spikes, practitioners could apply embedding-based detection to the six summary statistics (mean, median, maximum, day of maximum, day when half of cumulative infections reached, and autocorrelation) or train an unconditional normalizing flow over these statistics. Both approaches would quantitatively flag the observed data as out-of-distribution, signaling that the simulator fails to capture systematic patterns present in real epidemic data.
+For the SIR weekend delay example, practitioners could apply embedding-based detection to summary statistics (mean, median, maximum, day of maximum, day when half of cumulative infections reached, and autocorrelation) or train an unconditional normalizing flow over these statistics. Both approaches would quantitatively flag the observed data as out-of-distribution, signaling that the simulator fails to capture systematic patterns present in real epidemic data.
 
 Beyond the embedding-based approach described above, another practical option for
 detection is to learn the marginal distribution $p(\mathbf{x})$ directly using density
@@ -312,7 +313,7 @@ how and where misspecification is mitigated.
 
 {% include figure.html path="assets/img/2026-04-27-model-misspecification-in-sbi/wehenkel_gamella_et_al.png" class="img-fluid" %}
 <div class="caption">
-    Figure 3 (adapted from <d-cite key="wehenkel_addressing_2024"></d-cite>): Visualization of ROPE: The top line shows the standard NPE approach of learning an embedding network and a posterior estimator. Additionally, a calibration set is used to fine-tune the embedding network for embedding observed real-world data, and to learn an optimal transport mapping. At inference time, the OT mapping is used to obtain a misspecification-robust posterior estimate as a weighted sum of NPE posteriors.
+    Figure 4 (adapted from <d-cite key="wehenkel_addressing_2024"></d-cite>): Visualization of ROPE: The top line shows the standard NPE approach of learning an embedding network and a posterior estimator. Additionally, a calibration set is used to fine-tune the embedding network for embedding observed real-world data, and to learn an optimal transport mapping. At inference time, the OT mapping is used to obtain a misspecification-robust posterior estimate as a weighted sum of NPE posteriors.
 </div>
 
 Wehenkel & Gamella et al. (2024) <d-cite key="wehenkel_addressing_2024"></d-cite>
@@ -359,7 +360,7 @@ performed on individual observations in isolation, and the posterior for one obs
 depends on which others appear in the batch.
 
 Addressing this limitation, Senouf et al. (2025) <d-cite
-key="senouf_frisbi_2025a"></d-cite> introduced FRISBI, which makes the approach fully
+key="senouf_inductive_2025a"></d-cite> introduced FRISBI, which makes the approach fully
 inductive and amortized by shifting OT computation from test time to training time.
 During training, FRISBI uses mini-batch optimal transport on the calibration set to
 learn aligned embeddings, then trains a conditional normalizing flow to approximate the
@@ -379,7 +380,7 @@ However, the diversity of definitions, notations, and evaluation settings across
 works highlights the need for a unified framework to define and compare methods.
 Similarly, the varying hyperparameter choices, methodological complexity, and absence of
 standardized benchmarks make it challenging for practitioners to navigate and apply
-these approaches effectively. Recognizing these challenges, we provide practical guidance
+these approaches effectively. Recognizing these challenges, the following section provides practical guidance
 for choosing among the available methods based on the specifics of the inference problem.
 
 ## Practical Considerations
@@ -396,12 +397,13 @@ and the `BayesFlow` package
 
 For correction, the methods reviewed above address different scenarios. RNPE is most
 effective when misspecification structure can be characterized and data dimensionality is
-moderate, offering interpretability through the learned error model. Robust summary
-statistics scale better to high-dimensional data when misspecification structure is
-unclear, though they sacrifice amortization. ROPE and FRISBI leverage optimal transport
-for domain alignment when calibration data (real observations with ground-truth
-parameters) is available: ROPE is transductive and operates on batches, while FRISBI is
-fully inductive and amortized, making it more scalable for per-sample inference.
+moderate, offering interpretability through the learned error model. Methods learning
+robust summary statistics scale better to high-dimensional data when misspecification
+structure is unclear, though they sacrifice amortization. ROPE and FRISBI leverage
+optimal transport for domain alignment when calibration data (real observations with
+ground-truth parameters) is available: ROPE is transductive and operates on batches,
+while FRISBI is fully inductive and amortized, making it more scalable for per-sample
+inference.
 
 The table below summarizes key characteristics to guide method selection:
 
@@ -419,8 +421,8 @@ The table below summarizes key characteristics to guide method selection:
 The recent works outlined above have made significant progress in addressing model
 misspecification in simulation-based inference (SBI), introducing methods for detecting
 and mitigating its effects. However, the problem of model misspecification in SBI is far
-from being fully resolved. While these methods offer valuable insights and tools, we
-highlight key challenges that need to be addressed to further advance the field:
+from being fully resolved. While these methods offer valuable insights and tools, several
+key challenges remain that need to be addressed to further advance the field:
 
 1. **Better Methods for Detecting and Addressing Model Misspecification:** While recent
    methods have improved our ability to diagnose and mitigate model misspecification,
@@ -431,31 +433,30 @@ highlight key challenges that need to be addressed to further advance the field:
    nature of the misspecification. A key challenge is to develop more flexible and
    scalable methods that can:
 
-   - Detect misspecification in a principled and data-driven manner, without relying on
+   - detect misspecification in a principled and data-driven manner, without relying on
      predefined summary statistics or manual tuning.
-   - Provide interpretable diagnostics that help practitioners understand the sources
+   - provide interpretable diagnostics that help practitioners understand the sources
      and consequences of misspecification in their models.
-   - Offer robust mitigation strategies that work across different types of
+   - offer robust mitigation strategies that work across different types of
      misspecification, without requiring large amounts of additional data or
      computationally expensive corrections.
 
 2. **A Common and Precise Definition of Model Misspecification in SBI:** As highlighted
    in this post, model misspecification in SBI can arise from different sources,
-   including mismatches between the simulator and the true data-generating process,
-   prior misspecification, and errors introduced by the inference procedure itself. A
-   common and formally precise definition of these different cases is essential for
-   unifying the field. Such a framework would provide clarity for researchers and
-   practitioners, enabling a more systematic comparison of methods and their
-   applicability to specific types of model misspecification.
+   including mismatches between the simulator and the true data-generating process and
+   prior misspecification. A common and formally precise definition of these different
+   cases is essential for unifying the field. Such a framework would provide clarity for
+   researchers and practitioners, enabling a more systematic comparison of methods and
+   their applicability to specific types of model misspecification.
 
 3. **Common Benchmarking Tasks for Evaluating Methods:** Another obstacle to progress in
    addressing model misspecification is the lack of an established set of benchmarking
-   tasks tailored to the different cases of model misspecification. While current
-   evaluations often focus on specific scenarios or datasets, limiting the
-   generalizability of conclusions, there are promising developments. For instance,
-   Wehenkel & Gamella et al. <d-cite key="wehenkel_addressing_2024"></d-cite> re-used
-   tasks proposed by Ward et al. <d-cite key="ward_robust_2022"></d-cite> and introduced
-   several new tasks designed to probe different aspects of model misspecification.
+   tasks tailored to the different cases of model misspecification. Current
+   evaluations often focus on specific scenarios or datasets, limiting generalizability.
+   However, there are promising developments. For instance, Wehenkel & Gamella et al.
+   <d-cite key="wehenkel_addressing_2024"></d-cite> re-used tasks proposed by Ward et al.
+   <d-cite key="ward_robust_2022"></d-cite> and introduced several new tasks designed to
+   probe different aspects of model misspecification.
    These efforts provide a valuable starting point, but they need to be integrated into
    a common benchmarking framework and made accessible through an open-source software
    platform. Such a framework would enable researchers to rigorously test new methods
@@ -463,16 +464,20 @@ highlight key challenges that need to be addressed to further advance the field:
    comparisons and encouraging the development of approaches robust across diverse
    settings.
 
-4. **Practical Guidelines for Detecting and Addressing Model Misspecification:** For SBI
-   to be widely adopted in practice, there is a need for clear guidelines or a
-   practitioner's guide on how to detect and address model misspecification, e.g.,
-   similar to a Bayesian workflow as introduced in <d-cite
-   key="gelman_bayesian_2020"></d-cite>. Such a guide should include recommendations for
-   diagnosing model misspecification using available tools, selecting appropriate
-   mitigation methods, and interpreting posterior results under potential
-   misspecification. This would help bridge the gap between theoretical advancements and
-   real-world applications, ensuring that practitioners can confidently apply SBI
-   methods in the presence of model misspecification.
+4. **Comprehensive Practical Guidelines for Model Misspecification:** While initial
+   guidance exists (such as the practical considerations outlined above and in <d-cite
+   key="deistler_simulationbased_2025a"></d-cite>), the field would benefit from a
+   comprehensive, dedicated workflow study on model misspecification in SBI, similar in
+   scope to the Bayesian workflow introduced by Gelman et al. <d-cite
+   key="gelman_bayesian_2020"></d-cite>. The research landscape on model misspecification
+   in SBI remains relatively young, and existing guidance covers only limited aspects of
+   the problem. A dedicated study systematically investigating the various effects of
+   different types of misspecification, their detection, and appropriate mitigation
+   strategies would provide practitioners with actionable decision frameworks. Such a
+   workflow should include concrete recommendations for diagnosing misspecification using
+   available tools, selecting appropriate methods based on problem characteristics, and
+   interpreting posterior results under potential misspecification, helping bridge the gap
+   between theoretical advances and reliable real-world applications.
 
 Addressing these challenges will pave the way for more robust and practical SBI methods
 capable of handling model misspecification effectively. A unified framework, rigorous
