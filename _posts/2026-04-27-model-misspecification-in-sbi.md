@@ -45,6 +45,7 @@ toc:
     - name: Detecting Model Misspecification with Learned Summary Statistics
     - name: Learning Misspecification Robust Summary Statistics
     - name: Addressing Misspecification with Optimal Transport
+  - name: Practical Considerations
   - name: Open challenges
 ---
 
@@ -270,6 +271,16 @@ $x_o$. However, its performance depends on the design of the summary network and
 choice of divergence metric. While effective for detecting misspecification, it does not
 directly correct for it, instead providing insights for iterative simulator refinement.
 
+In practice, detection can be approached in two ways. The first approach learns an
+unconditional normalizing flow to model the marginal distribution $p(\mathbf{x})$ from
+training data, then evaluates whether observed data $\mathbf{x}_o$ has anomalously low
+log-probability under the flow, indicating out-of-distribution data. This flow-based
+approach is conceptually simple but limited to relatively low-dimensional data. The
+second approach, described above, learns a Gaussian embedding space and uses divergence
+metrics like MMD to detect distributional shifts. The embedding approach scales better to
+higher-dimensional data including time series. Both methods are now implemented in the
+`sbi` Python package, making them readily accessible to practitioners.
+
 ### Learning Misspecification-Robust Summary Statistics
 
 Huang & Bharti et al. (2023) <d-cite key="huang_learning_2023"></d-cite> propose a
@@ -349,8 +360,23 @@ quantification against the ability to extract meaningful parameter constraints (
 
 While conceptually elegant and flexible, this method relies on access to calibration
 data—observed data with known ground-truth parameters—which may not be available in
-fields like cosmology or neuroscience. This reliance on calibration data limits its
-applicability to specific use cases.
+fields like cosmology or neuroscience. Additionally, ROPE is transductive: it requires a
+batch of test observations to solve the optimal transport problem at inference time,
+meaning (i) inference cannot be performed on individual observations in isolation, (ii)
+simulator access and OT computation are needed at test time, and (iii) the posterior for
+one observation depends on which others appear in the batch.
+
+Addressing this limitation, Senouf et al. (2025) <d-cite key="senouf_frisbi_2025a"></d-cite>
+introduced FRISBI (Flow-based Robust Inductive Simulation-Based Inference), which makes
+the approach fully inductive and amortized. FRISBI retains the core idea of OT-based
+domain alignment but shifts the OT computation from test time to training time. During
+training, it learns a real-data encoder aligned with simulated embeddings using
+mini-batch optimal transport on the calibration set, then trains a conditional
+normalizing flow to approximate the resulting mixture posterior. At inference, obtaining
+a robust posterior for a new observation requires only a single forward pass through the
+encoder and flow—no OT computation, no simulator calls, and no dependence on other test
+observations. This makes FRISBI significantly more scalable and practical while
+preserving the robustness properties of ROPE.
 
 ### Summary of Approaches
 
@@ -365,9 +391,38 @@ However, the diversity of definitions, notations, and evaluation settings across
 works highlights the need for a unified framework to define and compare methods.
 Similarly, the varying hyperparameter choices, methodological complexity, and absence of
 standardized benchmarks make it challenging for practitioners to navigate and apply
-these approaches effectively. These gaps motivate the need for common definitions,
-accessible benchmarks, and practical user guides, which we explore in the following
-section.
+these approaches effectively. Recognizing these challenges, we provide practical guidance
+for choosing among the available methods based on the specifics of the inference problem.
+
+## Practical Considerations
+
+The choice of method depends on the application, data characteristics, and available
+resources. For detection, practitioners can start with prior predictive checks—the
+most interpretable diagnostic. Quantitative approaches include flow-based detection
+(learning $p(\mathbf{x})$ via normalizing flows, limited to low dimensions) or
+embedding-based detection (using learned summary spaces with divergence metrics,
+scalable to higher dimensions). Both are implemented in the `sbi` Python package
+([documentation](https://sbi.readthedocs.io/en/latest/how_to_guide/18_model_misspecification.html)).
+
+For correction, the methods reviewed above address different scenarios. RNPE is most
+effective when misspecification structure can be characterized and data dimensionality is
+moderate, offering interpretability through the learned error model. Robust summary
+statistics scale better to high-dimensional data when misspecification structure is
+unclear, though they sacrifice amortization. ROPE and FRISBI leverage optimal transport
+for domain alignment when calibration data (real observations with ground-truth
+parameters) is available: ROPE is transductive and operates on batches, while FRISBI is
+fully inductive and amortized, making it more scalable for per-sample inference.
+
+The table below summarizes key characteristics to guide method selection:
+
+| Method | Primary Goal | Calibration Data? | Amortized? | Data Dimensionality | Best For |
+|--------|--------------|-------------------|------------|---------------------|----------|
+| **RNPE** | Correct via error model | No | Yes | Low-Medium ($<$50D) | Known error structure, interpretability |
+| **Detection (Flow)** | Identify misspecification | No | Yes | Low ($<$30D) | Diagnostics, low-dim data |
+| **Detection (Embedding)** | Identify misspecification | No | Yes | Medium-High | Diagnostics, scalable detection |
+| **Robust Summary Stats** | Learn implicit robustness | Partial (observed $\mathbf{x}_o$) | No | High ($>$50D) | High-dim data, unclear misspecification |
+| **ROPE** | Align distributions (transductive) | Yes (small set) | No | Any | Calibration data, batch inference |
+| **FRISBI** | Align distributions (inductive) | Yes (small set) | Yes | Any | Calibration data, per-sample inference |
 
 ## Open Challenges
 
