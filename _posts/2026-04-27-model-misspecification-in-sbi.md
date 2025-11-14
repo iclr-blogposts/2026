@@ -273,15 +273,13 @@ directly correct for it, instead providing insights for iterative simulator refi
 
 For the SIR weekend delay example, beyond prior predictive checks that would visually reveal the Monday spikes, practitioners could apply embedding-based detection to the six summary statistics (mean, median, maximum, day of maximum, day when half of cumulative infections reached, and autocorrelation) or train an unconditional normalizing flow over these statistics. Both approaches would quantitatively flag the observed data as out-of-distribution, signaling that the simulator fails to capture systematic patterns present in real epidemic data.
 
-In practice, detection can be approached in two ways. The first approach learns an
-unconditional normalizing flow to model the marginal distribution $p(\mathbf{x})$ from
-training data, then evaluates whether observed data $\mathbf{x}_o$ has anomalously low
-log-probability under the flow, indicating out-of-distribution data. This flow-based
-approach is conceptually simple but limited to relatively low-dimensional data. The
-second approach, described above, learns a Gaussian embedding space and uses divergence
-metrics like MMD to detect distributional shifts. The embedding approach scales better to
-higher-dimensional data including time series. Both methods are now implemented in the
-`sbi` Python package, making them readily accessible to practitioners.
+Beyond the embedding-based approach described above, another practical option for
+detection is to learn the marginal distribution $p(\mathbf{x})$ directly using density
+estimation—for instance, via normalizing flows. Trained on simulated data, the learned
+density can then evaluate whether observed data $\mathbf{x}_o$ has anomalously low
+log-probability, flagging it as out-of-distribution. This density-based approach is
+conceptually straightforward but limited to relatively low-dimensional data, whereas the
+embedding approach scales better to higher dimensions including time series. 
 
 ### Learning Misspecification-Robust Summary Statistics
 
@@ -392,7 +390,9 @@ most interpretable diagnostic. Quantitative approaches include flow-based detect
 (learning $p(\mathbf{x})$ via normalizing flows, limited to low dimensions) or
 embedding-based detection (using learned summary spaces with divergence metrics,
 scalable to higher dimensions). Both are implemented in the `sbi` Python package
-([documentation](https://sbi.readthedocs.io/en/latest/how_to_guide/18_model_misspecification.html)).
+([documentation](https://sbi.readthedocs.io/en/latest/how_to_guide/18_model_misspecification.html))
+and the `BayesFlow` package
+([documentation](https://bayesflow.org/stable-legacy/_examples/Model_Misspecification.html)).
 
 For correction, the methods reviewed above address different scenarios. RNPE is most
 effective when misspecification structure can be characterized and data dimensionality is
