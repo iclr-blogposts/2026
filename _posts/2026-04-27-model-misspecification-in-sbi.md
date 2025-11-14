@@ -38,7 +38,8 @@ toc:
   - name: Defining model misspecification
     subsections:
     - name: Model Misspecification in Simulation-Based Inference
-  - name: Recent advances for addressing model misspecification in SBI
+  - name: A Concrete Example - SIR Model with Weekend Reporting Delay
+  - name: Addressing model misspecification in SBI
     subsections:
     - name: Learning explicit mismatch models
     - name: Detecting Model Misspecification with Learned Summary Statistics
@@ -47,43 +48,50 @@ toc:
   - name: Open challenges
 ---
 
+Consider an epidemiologist using simulation-based inference to estimate disease
+transmission parameters from daily case count data. The simulator models infection and
+recovery dynamics with uniform reporting across all days of the week. However, real-world
+data exhibit a systematic pattern: weekend case counts are underreported, with the
+backlog appearing as Monday spikes. This seemingly minor discrepancy—just a reporting
+delay—creates a mismatch between the simulator and reality. The consequences can be
+severe: parameter estimates biased by over 40%, credible intervals that fail to cover
+true values, and posterior predictive checks that reveal systematic discrepancies between
+simulated and observed data. This is model misspecification in simulation-based inference.
+
 Simulation-based inference (SBI) provides a powerful framework for applying Bayesian
-inference to study complex systems where direct likelihood computation is infeasible <d-cite key="cranmer_frontier_2020"></d-cite>. By using simulated data to approximate
+inference to study complex systems where direct likelihood computation is infeasible
+<d-cite key="cranmer_frontier_2020"></d-cite>. By using simulated data to approximate
 posterior distributions, SBI has found applications across diverse scientific fields,
 including neuroscience, physics, climate science, and epidemiology <d-cite
 key="goncalves_training_2020,brehmer_simulationbased_2020,watson-parris_model_2021,witt_simulationbased_2020"></d-cite>.
-However, these methods often assume that the simulator is a faithful representation of
-the true data-generating process. In practice, this assumption is frequently violated,
-leading to model misspecification. In this blog post, we provide an overview of the
-currently available approaches to detect and mitigate model misspecification in SBI, and
-discuss open challenges.
+However, these methods rely on a critical assumption: that the simulator faithfully
+represents the true data-generating process. When this assumption is violated, the
+resulting model misspecification can undermine the reliability of inference.
 
-In standard Bayesian inference, model misspecification can lead to biased or misleading
-posterior estimates. However, in _neural_ SBI, the problem is particularly severe
-because the posterior or likelihood is approximated using neural networks trained on
-simulated data. Neural networks are known to produce arbitrarily incorrect predictions
-when probed with out-of-distribution (OOD) data <d-cite
-key="szegedy_intriguing_2014"></d-cite>, and in a misspecified simulator, the observed
-data $\mathbf{x}_o$ is effectively OOD relative to the training distribution. This can
-lead to highly unreliable posterior estimates, distorted uncertainty quantification, and
-incorrect scientific conclusions.
+The problem is particularly acute in _neural_ SBI, where posterior distributions or
+likelihoods are approximated using neural networks trained on simulated data. Neural
+networks are known to produce arbitrarily incorrect predictions when probed with
+out-of-distribution (OOD) data <d-cite key="szegedy_intriguing_2014"></d-cite>. In a
+misspecified simulator, observed data $\mathbf{x}_o$ is effectively OOD relative to the
+training distribution, leading to unreliable posterior estimates, distorted uncertainty
+quantification, and potentially incorrect scientific conclusions.
 
-An illustrative example of model misspecification is provided by Ward et al. (2022)
-<d-cite key="ward_robust_2022"></d-cite> using a simplified version of the Susceptible,
-Infected, Recovered (SIR) model. This simulator estimates key parameters such as the
-infection rate $\beta$ and recovery rate $\gamma$, with observations summarized by
-metrics like the maximum number of infections, timing of peak infection, and
-autocorrelation. Misspecification is introduced through a delay in weekend infection
-counts, with cases shifted to the following Monday. This subtle mismatch between real
-and simulated data structures can lead to biased posterior estimates and unreliable
-uncertainty quantification in neural SBI, as highlighted by Cannon et al. (2022)<d-cite
-key="cannon_investigating_2022"></d-cite>.
+The sensitivity of neural networks to OOD data underscores the importance of developing
+robust methods for detecting and addressing model misspecification. This blog post
+provides an overview of recent advances in this area. We begin with a concrete running
+example, then formalize the definition of model misspecification in SBI. We review four
+categories of methods for addressing misspecification and conclude with open challenges.
 
-The sensitivity of neural networks to OOD data underscores the importance of robust
-diagnostics and addressing model misspecification is crucial for ensuring the
-reliability of SBI in real-world applications. Below, we comment on the definition
-of model misspecification in the context of SBI, reviews recent methods to detect and
-mitigate its effects, and outlines open challenges for future research.
+## A Concrete Example: SIR Model with Weekend Reporting Delay
+
+To ground the discussion, we use a concrete running example: the Susceptible-Infected-Recovered (SIR) epidemic model with weekend reporting delays <d-cite key="ward_robust_2022"></d-cite>. The SIR model tracks disease spread using infection rate $\beta$ and recovery rate $\gamma$ (determining $R_0 = \beta/\gamma$). In the clean simulator, infection reports occur uniformly across all days. However, real-world data often exhibit systematic patterns—here, a fraction $\alpha$ of weekend infections go unreported until Monday, creating characteristic weekly oscillations.
+
+{% include figure.html path="assets/img/2026-04-27-model-misspecification-in-sbi/sir_figure.png" class="img-fluid" %}
+<div class="caption">
+    <strong>Figure 1:</strong> Model misspecification in SIR epidemic inference. <strong>Panel A</strong> (left) shows the SIR model structure and an example trajectory with weekend reporting delays—observed data (red dashed) exhibit Monday spikes versus the true curve (solid red). <strong>Panel B</strong> (middle) displays posterior distributions for $\beta$ and $\gamma$ when NPE trained on clean simulations encounters no misspecification (α=0%, dark blue) versus mild misspecification (α=20%, light blue). True values marked with red dashed lines. <strong>Panel C</strong> (right) shows posterior predictive checks with 90% credible intervals. The posteriors shift and broaden under misspecification, and predictions fail to capture systematic patterns in the observations.
+</div>
+
+When neural posterior estimation (NPE) is trained on clean simulations but encounters observations with weekend delays, the network faces out-of-distribution data. Figure 1 demonstrates the consequences: even with mild misspecification (α=20%), the posterior shifts away from true parameters, uncertainty increases substantially, and posterior predictive samples fail to capture the systematic Monday spikes. This illustrates why addressing model misspecification is critical—seemingly minor data-generating discrepancies can substantially degrade inference quality.
 
 ## Defining Model Misspecification
 
