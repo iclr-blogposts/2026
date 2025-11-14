@@ -35,10 +35,10 @@ bibliography: 2026-04-27-model-misspecification-in-sbi.bib
 #   - please use this format rather than manually creating a markdown table of contents.
 toc:
   - name: Introduction
+  - name: A Concrete Example - SIR Model with Weekend Reporting Delay
   - name: Defining model misspecification
     subsections:
     - name: Model Misspecification in Simulation-Based Inference
-  - name: A Concrete Example - SIR Model with Weekend Reporting Delay
   - name: Mitigating model misspecification in SBI
     subsections:
     - name: Learning explicit mismatch models
@@ -109,11 +109,13 @@ this problem arises when the true data-generating process cannot be captured wit
 family of distributions defined by the model. Walker (2013) provides a foundational
 definition <d-cite key="walker_bayesian_2013"></d-cite>:
 
-A statistical model $p(\mathbf{x}_s | \theta)$ that relates a parameter of interest
-$\theta \in \Theta$ to a conditional distribution over simulated observations
-$\mathbf{x}_s$ is said to be misspecified if the true data-generating process
-$p(\mathbf{x}_o)$ of the real observations $\mathbf{x}_o \sim p(\mathbf{x}_o)$ does not
-belong to the family of distributions $\{p(\mathbf{x}_s | \theta); \theta \in \Theta\}$.
+<blockquote>
+  A statistical model $p(\mathbf{x}_s | \theta)$ that relates a parameter of interest
+  $\theta \in \Theta$ to a conditional distribution over simulated observations
+  $\mathbf{x}_s$ is said to be misspecified if the true data-generating process
+  $p(\mathbf{x}_o)$ of the real observations $\mathbf{x}_o \sim p(\mathbf{x}_o)$ does not
+  belong to the family of distributions $\{p(\mathbf{x}_s | \theta); \theta \in \Theta\}$.
+</blockquote>
 
 This structural definition provides a theoretical basis for understanding model
 misspecification but does not fully address its practical implications in SBI workflows.
@@ -126,39 +128,22 @@ classical Bayesian inference, where the likelihood function is explicit, simulat
 SBI may introduce subtle discrepancies that propagate through the inference pipeline,
 resulting in biased posterior estimates.
 
-#### Model Misspecification in Approximate Bayesian Computation
+Model misspecification in SBI was first systematically addressed by Frazier et al. (2020)
+<d-cite key="frazier_model_2019"></d-cite> in the context of Approximate Bayesian
+Computation (ABC). However, this post focuses on _neural_ SBI methods, where the problem
+becomes particularly acute. Neural SBI methods use neural networks to approximate
+posterior distributions (or likelihoods or likelihood ratios) based on simulations. A
+popular approach is neural posterior estimation (NPE, <d-cite
+key="papamakarios_fast_2016"></d-cite>), where a neural network learns a parametric
+approximation of the posterior distribution (e.g., a mixture of Gaussians, a normalizing
+flow, or a diffusion model) using simulated data. However, neural networks trained on
+simulations can fail catastrophically when applied to observed data that lie outside the
+training distribution—producing arbitrarily incorrect predictions with overconfident
+uncertainty estimates. This issue has been systematically studied by Cannon et al. (2022)
+<d-cite key="cannon_investigating_2022"></d-cite>.
 
-The issue of model misspecification in SBI was first systematically addressed by Frazier
-et al. (2020) <d-cite key="frazier_model_2019"></d-cite> in the context of Approximate
-Bayesian Computation (ABC, <d-cite key="sisson_handbook_2018"></d-cite>). The general
-approach of ABC is to obtain approximate posterior samples by comparing simulated and
-observed data using a distance metric and accepting only those parameters that generate
-simulation very close to the observed data. When the data is high-dimensional, it is
-common to use hand-crafted or learned summary statistics. However, under
-misspecification, the posterior in ABC does not concentrate on the true parameters but
-instead on *pseudotrue* parameters that minimize discrepancies between simulated and
-observed summary statistics. This leads to biased posteriors and unreliable credible
-intervals. The choice of summary statistics is central to this problem, as they
-determine how well simulated data align with observed data. While foundational for
-understanding misspecification, ABC's reliance on handcrafted summary statistics limits
-its relevance to neural SBI methods, which use neural networks for feature extraction.
-
-#### Model Misspecification in Neural SBI
-
-Neural SBI methods eliminate the need for manually chosen summary statistics by using
-neural networks to approximate posterior distributions (or likelihoods or likelihood
-ratios) based on simulations. A popular neural SBI method is neural posterior estimation
-(NPE, <d-cite key="papamakarios_fast_2016"></d-cite>), where a neural network is used to
-learn a parametric approximation of the posterior distribution (e.g., a mixture of
-Gaussians, a normalizing flow, or a diffusion model) using simulated data. However, this
-flexibility introduces new vulnerabilities. Neural networks trained on simulations can
-fail catastrophically when applied to observed data that lie outside the training
-distribution. This issue has been systematically studied by Cannon et al. (2022) in the
-context of neural SBI <d-cite key="cannon_investigating_2022"></d-cite>.
-
-However, before we dive into the methods to mitigate misspecification in SBI, it is
-important to distinguish between different sources of misspecification in the neural SBI
-workflow:
+Before reviewing methods to mitigate misspecification in neural SBI, it is important to
+distinguish between different sources of misspecification in the workflow:
 
 1. **Misspecification of the Simulator:** The true data-generating process does not
    belong to the family of distributions induced by the simulator. This corresponds to
