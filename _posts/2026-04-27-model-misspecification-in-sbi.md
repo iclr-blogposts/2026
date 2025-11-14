@@ -39,7 +39,7 @@ toc:
     subsections:
     - name: Model Misspecification in Simulation-Based Inference
   - name: A Concrete Example - SIR Model with Weekend Reporting Delay
-  - name: Addressing model misspecification in SBI
+  - name: Mitigating model misspecification in SBI
     subsections:
     - name: Learning explicit mismatch models
     - name: Detecting Model Misspecification with Learned Summary Statistics
@@ -54,7 +54,7 @@ inference to study complex systems where direct likelihood computation is infeas
 <d-cite key="cranmer_frontier_2020"></d-cite>. By using simulated data to approximate
 posterior distributions, SBI has found applications across diverse scientific fields,
 including neuroscience, physics, climate science, and epidemiology <d-cite
-key="goncalves_training_2020,brehmer_simulationbased_2020,watson-parris_model_2021,witt_simulationbased_2020"></d-cite>.
+key="goncalves_training_2020,brehmer_simulationbased_2020,mckinley2014simulation"></d-cite>.
 However, these methods rely on a critical assumption: that the simulator faithfully
 represents the true data-generating process. When this assumption is violated, the
 resulting model misspecification can undermine the reliability of inference.
@@ -155,8 +155,8 @@ fail catastrophically when applied to observed data that lie outside the trainin
 distribution. This issue has been systematically studied by Cannon et al. (2022) in the
 context of neural SBI <d-cite key="cannon_investigating_2022"></d-cite>.
 
-However, before we dive into the methods to mitigate misspecification in SBI, let us
-note that there are at least three different sources of inaccuracies in the neural SBI
+However, before we dive into the methods to mitigate misspecification in SBI, it is
+important to distinguish between different sources of misspecification in the neural SBI
 workflow:
 
 1. **Misspecification of the Simulator:** The true data-generating process does not
@@ -165,38 +165,34 @@ workflow:
    example, if a simulator lacks the capacity to model key features of the observed
    data, the resulting posterior may fail to capture the true parameter values
    accurately.
-2. **Misspecification of the Prior**: Misspecification can also occur when the prior
+2. **Misspecification of the Prior:** Misspecification can also occur when the prior
    used in the inference process does not incorporate the "true parameter" underlying
    the data-generating process. Prior mismatch can distort posterior estimates, leading
    to inferences that reflect artifacts of the assumed prior rather than the true
    underlying process.
-3. **Errors in the Inference Procedure**: Even if the simulator and prior are correctly
-   specified, the inference algorithm itself may introduce errors, such as
-   systematically biased posteriors or uncalibrated uncertainty estimates, e.g., due
-   to underfitting or overfitting during neural-network training.
 
-The third case reflects a general challenge in neural SBI. Efforts to address these
-issues include calibration tests such as simulation-based calibration <d-cite
-key="talts_validating_2020"></d-cite>, expected coverage diagnostics <d-cite
-key="deistler_truncated_2022,miller_truncated_2021a"></d-cite>, and classifier-based
-calibration tests <d-cite
-key="zhao_diagnostics_2021,linhart_lc2st_2024"></d-cite>. These tools focus on
-validating posterior accuracy and uncertainty quantification, and are usually assuming
-that prior and the simulator are well-specified.
+Prior misspecification is a general challenge in Bayesian inference and can be addressed
+with standard Bayesian workflow tools like prior predictive checks <d-cite
+key="gelman_bayesian_2020"></d-cite>. It has received less attention in the SBI-specific
+literature, with only brief discussions in works like Wehenkel & Gamella et al. (2023)
+<d-cite key="wehenkel_addressing_2024"></d-cite>.
 
-The second case of prior misspecification is a general challenge in the Bayesian
-inference and can be addressed with standard Bayesian workflow tools like prior
-predictive checks <d-cite key="gelman_bayesian_2020"></d-cite>. Therefore, it has
-received less attention in the SBI specific literature, with only brief discussions in
-works like Wehenkel & Gamella et al. (2023) <d-cite
-key="wehenkel_addressing_2024"></d-cite>.
+Note that even with well-specified simulator and prior, the inference algorithm itself
+may introduce errors—such as systematically biased posteriors or uncalibrated
+uncertainty estimates due to neural network training issues. These implementation quality
+concerns are typically addressed through calibration tests such as simulation-based
+calibration <d-cite key="talts_validating_2020"></d-cite>, expected coverage diagnostics
+<d-cite key="deistler_truncated_2022,miller_truncated_2021a"></d-cite>, and
+classifier-based calibration <d-cite
+key="zhao_diagnostics_2021,linhart_lc2st_2024"></d-cite>, which validate posterior
+accuracy assuming the simulator is correct.
 
-Thus, the primary focus of most work on model misspecification in the SBI literature is
-the first case, with the aim of detecting and mitigating simulator-related
-misspecification. In the remainder of this post, we will give an overview of these
+The primary focus of most work on model misspecification in the SBI literature, and of
+this post, is the first case: detecting and mitigating simulator-related
+misspecification. In the remainder of this post, we provide an overview of these
 approaches.
 
-## Addressing Model Misspecification in SBI
+## Mitigating Model Misspecification in SBI
 
 Recent works have introduced a range of methods to address model misspecification in
 simulation-based inference (SBI). These approaches can be broadly categorized into four
