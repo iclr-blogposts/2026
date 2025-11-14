@@ -96,6 +96,8 @@ Before formalizing these concepts, we introduce a concrete running example: the 
 
 When neural posterior estimation (NPE) is trained on clean simulations but encounters observations with weekend delays, the network faces out-of-distribution data. Figure 1 demonstrates the consequences: even with mild misspecification (α=20%), the posterior shifts away from true parameters, uncertainty increases substantially, and posterior predictive samples fail to capture the systematic Monday spikes.
 
+**Note on the example:** This scenario is designed for pedagogical illustration—in practice, if the weekend reporting delay were known, practitioners would explicitly model it in the simulator. The methods discussed below address situations where the source or structure of misspecification is unknown, difficult to model, or where the goal is to develop robust inference procedures that can handle unanticipated discrepancies.
+
 Having seen the practical impact of misspecification in this example, we now turn to formal definitions and a systematic review of approaches for addressing this challenge.
 
 ## Defining Model Misspecification
@@ -235,6 +237,8 @@ generalize to all misspecification scenarios. Furthermore, the approach is
 computationally intensive, requiring additional inference steps, and is most effective
 in low-dimensional data spaces.
 
+Applied to the SIR weekend delay example, RNPE would use a spike-and-slab error model to explicitly capture the Monday aggregation effect—modeling weekend observations as a mixture between the true (latent) value and Monday's spike. Ward et al. demonstrated that this approach successfully "denoised" the Monday aggregation back to weekend values, recovering parameter estimates within 5% of ground truth compared to 40% bias with standard NPE.
+
 ### Detecting Misspecification with Learned Summary Statistics
 
 {% include figure.html path="assets/img/2026-04-27-model-misspecification-in-sbi/schmitt_et_al.png" class="img-fluid" %}
@@ -270,6 +274,8 @@ applied to new observed data without re-training because the training does not d
 $x_o$. However, its performance depends on the design of the summary network and the
 choice of divergence metric. While effective for detecting misspecification, it does not
 directly correct for it, instead providing insights for iterative simulator refinement.
+
+For the SIR weekend delay example, beyond prior predictive checks that would visually reveal the Monday spikes, practitioners could apply embedding-based detection to the six summary statistics (mean, median, maximum, day of maximum, day when half of cumulative infections reached, and autocorrelation) or train an unconditional normalizing flow over these statistics. Both approaches would quantitatively flag the observed data as out-of-distribution, signaling that the simulator fails to capture systematic patterns present in real epidemic data.
 
 In practice, detection can be approached in two ways. The first approach learns an
 unconditional normalizing flow to model the marginal distribution $p(\mathbf{x})$ from
@@ -357,6 +363,8 @@ the posterior, potentially leading to overly broad parameter estimates. Selectin
 appropriately is therefore crucial, as it balances reliability and uncertainty
 quantification against the ability to extract meaningful parameter constraints (see
 <d-cite key="wehenkel_addressing_2024"></d-cite> for heuristics).
+
+Applied to the SIR weekend delay, ROPE or FRISBI would leverage a calibration dataset—perhaps real outbreak time series where ground-truth transmission parameters ($\beta$, $\gamma$) were measured via contact tracing. The optimal transport would learn to align the Monday spikes in real data with the weekend patterns in simulations, effectively learning how to map between the misspecified and true data distributions. For a new outbreak, this learned alignment would automatically correct the posterior, yielding more accurate parameter estimates than standard NPE despite the simulator's inability to produce weekend delays.
 
 While conceptually elegant and flexible, this method relies on access to calibration
 data—observed data with known ground-truth parameters—which may not be available in
