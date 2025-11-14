@@ -1,0 +1,215 @@
+@misc{cannon_investigating_2022,
+  title = {Investigating the {{Impact}} of {{Model Misspecification}} in {{Neural Simulation-based Inference}}},
+  author = {Cannon, Patrick and Ward, Daniel and Schmon, Sebastian M.},
+  year = {2022},
+  month = sep,
+  number = {arXiv:2209.01845},
+  eprint = {2209.01845},
+  primaryclass = {cs, stat},
+  publisher = {arXiv},
+  doi = {10.48550/arXiv.2209.01845},
+  urldate = {2022-10-17},
+  abstract = {Aided by advances in neural density estimation, considerable progress has been made in recent years towards a suite of simulation-based inference (SBI) methods capable of performing flexible, black-box, approximate Bayesian inference for stochastic simulation models. While it has been demonstrated that neural SBI methods can provide accurate posterior approximations, the simulation studies establishing these results have considered only well-specified problems -- that is, where the model and the data generating process coincide exactly. However, the behaviour of such algorithms in the case of model misspecification has received little attention. In this work, we provide the first comprehensive study of the behaviour of neural SBI algorithms in the presence of various forms of model misspecification. We find that misspecification can have a profoundly deleterious effect on performance. Some mitigation strategies are explored, but no approach tested prevents failure in all cases. We conclude that new approaches are required to address model misspecification if neural SBI algorithms are to be relied upon to derive accurate scientific conclusions.},
+  archiveprefix = {arXiv},
+  keywords = {Computer Science - Machine Learning,Statistics - Computation,Statistics - Machine Learning}
+}
+
+@article{cranmer_frontier_2020,
+  title = {The Frontier of Simulation-Based Inference},
+  author = {Cranmer, Kyle and Brehmer, Johann and Louppe, Gilles},
+  year = {2020},
+  month = dec,
+  journal = {Proceedings of the National Academy of Sciences},
+  volume = {117},
+  number = {48},
+  pages = {30055--30062},
+  publisher = {Proceedings of the National Academy of Sciences},
+  doi = {10.1073/pnas.1912789117},
+  urldate = {2022-11-15},
+  abstract = {Many domains of science have developed complex simulations to describe phenomena of interest. While these simulations provide high-fidelity models, they are poorly suited for inference and lead to challenging inverse problems. We review the rapidly developing field of simulation-based inference and identify the forces giving additional momentum to the field. Finally, we describe how the frontier is expanding so that a broad audience can appreciate the profound influence these developments may have on science.}
+}
+
+@article{deistler_truncated_2022,
+  title = {Truncated Proposals for Scalable and Hassle-Free Simulation-Based Inference},
+  author = {Deistler, Michael and Goncalves, Pedro J. and Macke, Jakob H.},
+  year = {2022},
+  month = dec,
+  journal = {Advances in Neural Information Processing Systems},
+  volume = {35},
+  pages = {23135--23149},
+  urldate = {2024-06-04},
+  langid = {english}
+}
+
+@misc{frazier_model_2019,
+  title = {Model {{Misspecification}} in {{ABC}}: {{Consequences}} and {{Diagnostics}}},
+  shorttitle = {Model {{Misspecification}} in {{ABC}}},
+  author = {Frazier, David T. and Robert, Christian P. and Rousseau, Judith},
+  year = {2019},
+  month = jul,
+  eprint = {1708.01974},
+  primaryclass = {math, q-fin, stat},
+  doi = {10.1111/369--7412/20/82421},
+  urldate = {2022-05-30},
+  abstract = {We analyze the behavior of approximate Bayesian computation (ABC) when the model generating the simulated data differs from the actual data generating process; i.e., when the data simulator in ABC is misspecified. We demonstrate both theoretically and in simple, but practically relevant, examples that when the model is misspecified different versions of ABC can yield substantially different results. Our theoretical results demonstrate that even though the model is misspecified, under regularity conditions, the accept/reject ABC approach concentrates posterior mass on an appropriately defined pseudo-true parameter value. However, under model misspecification the ABC posterior does not yield credible sets with valid frequentist coverage and has non-standard asymptotic behavior. In addition, we examine the theoretical behavior of the popular local regression adjustment to ABC under model misspecification and demonstrate that this approach concentrates posterior mass on a completely different pseudo-true value than accept/reject ABC. Using our theoretical results, we suggest two approaches to diagnose model misspecification in ABC. All theoretical results and diagnostics are illustrated in a simple running example.},
+  archiveprefix = {arXiv},
+  langid = {english},
+  keywords = {Economics - General Economics,Mathematics - Statistics Theory,Statistics - Methodology}
+}
+
+@misc{huang_learning_2023,
+  title = {Learning {{Robust Statistics}} for {{Simulation-based Inference}} under {{Model Misspecification}}},
+  author = {Huang, Daolang and Bharti, Ayush and Souza, Amauri and Acerbi, Luigi and Kaski, Samuel},
+  year = {2023},
+  month = may,
+  number = {arXiv:2305.15871},
+  eprint = {2305.15871},
+  primaryclass = {cs, stat},
+  publisher = {arXiv},
+  urldate = {2023-05-30},
+  abstract = {Simulation-based inference (SBI) methods such as approximate Bayesian computation (ABC), synthetic likelihood, and neural posterior estimation (NPE) rely on simulating statistics to infer parameters of intractable likelihood models. However, such methods are known to yield untrustworthy and misleading inference outcomes under model misspecification, thus hindering their widespread applicability. In this work, we propose the first general approach to handle model misspecification that works across different classes of SBI methods. Leveraging the fact that the choice of statistics determines the degree of misspecification in SBI, we introduce a regularized loss function that penalises those statistics that increase the mismatch between the data and the model. Taking NPE and ABC as use cases, we demonstrate the superior performance of our method on high-dimensional time-series models that are artificially misspecified. We also apply our method to real data from the field of radio propagation where the model is known to be misspecified. We show empirically that the method yields robust inference in misspecified scenarios, whilst still being accurate when the model is well-specified.},
+  archiveprefix = {arXiv},
+  keywords = {Computer Science - Machine Learning,Statistics - Computation,Statistics - Machine Learning}
+}
+
+@inproceedings{linhart_lc2st_2024,
+  title = {L-{{C2ST}}: Local Diagnostics for Posterior Approximations in Simulation-Based Inference},
+  shorttitle = {L-{{C2ST}}},
+  booktitle = {Proceedings of the 37th {{International Conference}} on {{Neural Information Processing Systems}}},
+  author = {Linhart, Julia and Gramfort, Alexandre and Rodrigues, Pedro L. C.},
+  year = {2024},
+  month = may,
+  series = {{{NIPS}} '23},
+  pages = {56384--56410},
+  publisher = {Curran Associates Inc.},
+  address = {Red Hook, NY, USA},
+  urldate = {2024-07-10},
+  abstract = {Many recent works in simulation-based inference (SBI) rely on deep generative models to approximate complex, high-dimensional posterior distributions. However, evaluating whether or not these approximations can be trusted remains a challenge. Most approaches evaluate the posterior estimator only in expectation over the observation space. This limits their interpretability and is not sufficient to identify for which observations the approximation can be trusted or should be improved. Building upon the well-known classifier two-sample test (C2ST), we introduce {$\ell$}-C2ST, a new method that allows for a local evaluation of the posterior estimator at any given observation. It offers theoretically grounded and easy to interpret - e.g. graphical - diagnostics, and unlike C2ST, does not require access to samples from the true posterior. In the case of normalizing flow-based posterior estimators, {$\ell$}-C2ST can be specialized to offer better statistical power, while being computationally more efficient. On standard SBI benchmarks, {$\ell$}-C2ST provides comparable results to C2ST and outperforms alternative local approaches such as coverage tests based on highest predictive density (HPD). We further highlight the importance of local evaluation and the benefit of interpretability of {$\ell$}-C2ST on a challenging application from computational neuroscience.}
+}
+
+@inproceedings{miller_truncated_2021a,
+  title = {Truncated {{Marginal Neural Ratio Estimation}}},
+  booktitle = {Advances in {{Neural Information Processing Systems}}},
+  author = {Miller, Benjamin K and Cole, Alex and Forr{\'e}, Patrick and Louppe, Gilles and Weniger, Christoph},
+  year = {2021},
+  volume = {34},
+  pages = {129--143},
+  publisher = {Curran Associates, Inc.},
+  urldate = {2022-11-15},
+  abstract = {Parametric stochastic simulators are ubiquitous in science, often featuring high-dimensional input parameters and/or an intractable likelihood. Performing Bayesian parameter inference in this context can be challenging. We present a neural simulation-based inference algorithm which simultaneously offers simulation efficiency and fast empirical posterior testability, which is unique among modern algorithms. Our approach is simulation efficient by simultaneously estimating low-dimensional marginal posteriors instead of the joint posterior and by proposing simulations targeted to an observation of interest via a prior suitably truncated by an indicator function.  Furthermore, by estimating a locally amortized posterior our algorithm enables efficient empirical tests of the robustness of the inference results. Since scientists cannot access the ground truth, these tests are necessary for trusting inference in real-world applications. We perform experiments on a marginalized version of the simulation-based inference benchmark and two complex and narrow posteriors, highlighting the simulator efficiency of our algorithm as well as the quality of the estimated marginal posteriors.}
+}
+
+@inproceedings{papamakarios_fast_2016,
+  title = {Fast {\textbackslash}epsilon -Free {{Inference}} of {{Simulation Models}} with {{Bayesian Conditional Density Estimation}}},
+  booktitle = {Advances in {{Neural Information Processing Systems}}},
+  author = {Papamakarios, George and Murray, Iain},
+  year = {2016},
+  volume = {29},
+  publisher = {Curran Associates, Inc.},
+  urldate = {2024-11-22},
+  abstract = {Many statistical models can be simulated forwards but have intractable likelihoods. Approximate Bayesian Computation (ABC) methods are used to infer properties of these models from data. Traditionally these methods approximate the posterior over parameters by conditioning on data being inside an {$\varepsilon$}-ball around the observed data, which is only correct in the limit {$\varepsilon\rightarrow$}0. Monte Carlo methods can then draw samples from the approximate posterior to approximate predictions or error bars on parameters. These algorithms critically slow down as {$\varepsilon\rightarrow$}0, and in practice draw samples from a broader distribution than the posterior. We propose a new approach to likelihood-free inference based on Bayesian conditional density estimation. Preliminary inferences based on limited simulation data are used to guide later simulations. In some cases, learning an accurate parametric representation of the entire true posterior distribution requires fewer model simulations than Monte Carlo ABC methods need to produce a single sample from an approximate posterior.}
+}
+
+@misc{schmitt_detecting_2024,
+  title = {Detecting {{Model Misspecification}} in {{Amortized Bayesian Inference}} with {{Neural Networks}}: {{An Extended Investigation}}},
+  shorttitle = {Detecting {{Model Misspecification}} in {{Amortized Bayesian Inference}} with {{Neural Networks}}},
+  author = {Schmitt, Marvin and B{\"u}rkner, Paul-Christian and K{\"o}the, Ullrich and Radev, Stefan T.},
+  year = {2024},
+  month = jun,
+  number = {arXiv:2406.03154},
+  eprint = {2406.03154},
+  primaryclass = {cs},
+  publisher = {arXiv},
+  urldate = {2024-06-06},
+  abstract = {Recent advances in probabilistic deep learning enable efficient amortized Bayesian inference in settings where the likelihood function is only implicitly defined by a simulation program (simulation-based inference; SBI). But how faithful is such inference if the simulation represents reality somewhat inaccurately, that is, if the true system behavior at test time deviates from the one seen during training? We conceptualize the types of such model misspecification arising in SBI and systematically investigate how the performance of neural posterior approximators gradually deteriorates as a consequence, making inference results less and less trustworthy. To notify users about this problem, we propose a new misspecification measure that can be trained in an unsupervised fashion (i.e., without training data from the true distribution) and reliably detects model misspecification at test time. Our experiments clearly demonstrate the utility of our new measure both on toy examples with an analytical ground-truth and on representative scientific tasks in cell biology, cognitive decision making, disease outbreak dynamics, and computer vision. We show how the proposed misspecification test warns users about suspicious outputs, raises an alarm when predictions are not trustworthy, and guides model designers in their search for better simulators.},
+  archiveprefix = {arXiv}
+}
+
+@misc{szegedy_intriguing_2014,
+  title = {Intriguing Properties of Neural Networks},
+  author = {Szegedy, Christian and Zaremba, Wojciech and Sutskever, Ilya and Bruna, Joan and Erhan, Dumitru and Goodfellow, Ian and Fergus, Rob},
+  year = {2014},
+  month = feb,
+  number = {arXiv:1312.6199},
+  eprint = {1312.6199},
+  publisher = {arXiv},
+  doi = {10.48550/arXiv.1312.6199},
+  urldate = {2024-11-22},
+  abstract = {Deep neural networks are highly expressive models that have recently achieved state of the art performance on speech and visual recognition tasks. While their expressiveness is the reason they succeed, it also causes them to learn uninterpretable solutions that could have counter-intuitive properties. In this paper we report two such properties. First, we find that there is no distinction between individual high level units and random linear combinations of high level units, according to various methods of unit analysis. It suggests that it is the space, rather than the individual units, that contains of the semantic information in the high layers of neural networks. Second, we find that deep neural networks learn input-output mappings that are fairly discontinuous to a significant extend. We can cause the network to misclassify an image by applying a certain imperceptible perturbation, which is found by maximizing the network's prediction error. In addition, the specific nature of these perturbations is not a random artifact of learning: the same perturbation can cause a different network, that was trained on a different subset of the dataset, to misclassify the same input.},
+  archiveprefix = {arXiv}
+}
+
+@misc{talts_validating_2020,
+  title = {Validating {{Bayesian Inference Algorithms}} with {{Simulation-Based Calibration}}},
+  author = {Talts, Sean and Betancourt, Michael and Simpson, Daniel and Vehtari, Aki and Gelman, Andrew},
+  year = {2020},
+  month = oct,
+  number = {arXiv:1804.06788},
+  eprint = {1804.06788},
+  primaryclass = {stat},
+  publisher = {arXiv},
+  doi = {10.48550/arXiv.1804.06788},
+  urldate = {2022-10-17},
+  abstract = {Verifying the correctness of Bayesian computation is challenging. This is especially true for complex models that are common in practice, as these require sophisticated model implementations and algorithms. In this paper we introduce {\textbackslash}emph\{simulation-based calibration\} (SBC), a general procedure for validating inferences from Bayesian algorithms capable of generating posterior samples. This procedure not only identifies inaccurate computation and inconsistencies in model implementations but also provides graphical summaries that can indicate the nature of the problems that arise. We argue that SBC is a critical part of a robust Bayesian workflow, as well as being a useful tool for those developing computational algorithms and statistical software.},
+  archiveprefix = {arXiv},
+  keywords = {Statistics - Methodology}
+}
+
+@article{walker_bayesian_2013,
+  title = {Bayesian Inference with Misspecified Models},
+  author = {Walker, Stephen G.},
+  year = {2013},
+  month = oct,
+  journal = {Journal of Statistical Planning and Inference},
+  volume = {143},
+  number = {10},
+  pages = {1621--1633},
+  issn = {0378-3758},
+  doi = {10.1016/j.jspi.2013.05.013},
+  urldate = {2024-11-22},
+  abstract = {This article reviews Bayesian inference from the perspective that the designated model is misspecified. This misspecification has implications in interpretation of objects, such as the prior distribution, which has been the cause of recent questioning of the appropriateness of Bayesian inference in this scenario. The main focus of this article is to establish the suitability of applying the Bayes update to a misspecified model, and relies on representation theorems for sequences of symmetric distributions; the identification of parameter values of interest; and the construction of sequences of distributions which act as the guesses as to where the next observation is coming from. A conclusion is that a clear identification of the fundamental starting point for the Bayesian is described.}
+}
+
+@misc{ward_robust_2022,
+  title = {Robust {{Neural Posterior Estimation}} and {{Statistical Model Criticism}}},
+  author = {Ward, Daniel and Cannon, Patrick and Beaumont, Mark and Fasiolo, Matteo and Schmon, Sebastian M.},
+  year = {2022},
+  month = oct,
+  number = {arXiv:2210.06564},
+  eprint = {2210.06564},
+  primaryclass = {cs, stat},
+  publisher = {arXiv},
+  doi = {10.48550/arXiv.2210.06564},
+  urldate = {2022-10-17},
+  abstract = {Computer simulations have proven a valuable tool for understanding complex phenomena across the sciences. However, the utility of simulators for modelling and forecasting purposes is often restricted by low data quality, as well as practical limits to model fidelity. In order to circumvent these difficulties, we argue that modellers must treat simulators as idealistic representations of the true data generating process, and consequently should thoughtfully consider the risk of model misspecification. In this work we revisit neural posterior estimation (NPE), a class of algorithms that enable black-box parameter inference in simulation models, and consider the implication of a simulation-to-reality gap. While recent works have demonstrated reliable performance of these methods, the analyses have been performed using synthetic data generated by the simulator model itself, and have therefore only addressed the well-specified case. In this paper, we find that the presence of misspecification, in contrast, leads to unreliable inference when NPE is used naively. As a remedy we argue that principled scientific inquiry with simulators should incorporate a model criticism component, to facilitate interpretable identification of misspecification and a robust inference component, to fit 'wrong but useful' models. We propose robust neural posterior estimation (RNPE), an extension of NPE to simultaneously achieve both these aims, through explicitly modelling the discrepancies between simulations and the observed data. We assess the approach on a range of artificially misspecified examples, and find RNPE performs well across the tasks, whereas naively using NPE leads to misleading and erratic posteriors.},
+  archiveprefix = {arXiv},
+  keywords = {Computer Science - Machine Learning,Statistics - Machine Learning,Statistics - Methodology}
+}
+
+@misc{wehenkel_addressing_2024,
+  title = {Addressing {{Misspecification}} in {{Simulation-based Inference}} through {{Data-driven Calibration}}},
+  author = {Wehenkel, Antoine and Gamella, Juan L. and Sener, Ozan and Behrmann, Jens and Sapiro, Guillermo and Cuturi, Marco and Jacobsen, J{\"o}rn-Henrik},
+  year = {2024},
+  month = may,
+  number = {arXiv:2405.08719},
+  eprint = {2405.08719},
+  publisher = {arXiv},
+  doi = {10.48550/arXiv.2405.08719},
+  urldate = {2024-11-19},
+  abstract = {Driven by steady progress in generative modeling, simulation-based inference (SBI) has enabled inference over stochastic simulators. However, recent work has demonstrated that model misspecification can harm SBI's reliability. This work introduces robust posterior estimation (ROPE), a framework that overcomes model misspecification with a small real-world calibration set of ground truth parameter measurements. We formalize the misspecification gap as the solution of an optimal transport problem between learned representations of real-world and simulated observations. Assuming the prior distribution over the parameters of interest is known and well-specified, our method offers a controllable balance between calibrated uncertainty and informative inference under all possible misspecifications of the simulator. Our empirical results on four synthetic tasks and two real-world problems demonstrate that ROPE outperforms baselines and consistently returns informative and calibrated credible intervals.},
+  archiveprefix = {arXiv}
+}
+
+@inproceedings{zhao_diagnostics_2021,
+  title = {Diagnostics for Conditional Density Models and {{Bayesian}} Inference Algorithms},
+  booktitle = {Proceedings of the {{Thirty-Seventh Conference}} on {{Uncertainty}} in {{Artificial Intelligence}}},
+  author = {Zhao, David and Dalmasso, Niccol{\`o} and Izbicki, Rafael and Lee, Ann B.},
+  year = {2021},
+  month = dec,
+  pages = {1830--1840},
+  publisher = {PMLR},
+  issn = {2640-3498},
+  urldate = {2024-11-21},
+  abstract = {There has been growing interest in the AI community for precise uncertainty quantification. Conditional density models f(y{\textbar}x), where x represents potentially high-dimensional features, are an integral part of uncertainty quantification in prediction and Bayesian inference. However, it is challenging to assess conditional density estimates and gain insight into modes of failure. While existing diagnostic tools can determine whether an approximated conditional density is compatible overall with a data sample, they lack a principled framework for identifying, locating, and interpreting the nature of statistically significant discrepancies over the entire feature space. In this paper, we present rigorous and easy-to-interpret diagnostics such as (i) the ``Local Coverage Test'' (LCT), which distinguishes an arbitrarily misspecified model from the true conditional density of the sample, and (ii) ``Amortized Local P-P plots'' (ALP) which can quickly provide interpretable graphical summaries of distributional differences at any location x in the feature space. Our validation procedures scale to high dimensions and can potentially adapt to any type of data at hand. We demonstrate the effectiveness of LCT and ALP through a simulated experiment and applications to prediction and parameter inference for image data.},
+  langid = {english}
+}

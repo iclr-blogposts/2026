@@ -1,7 +1,7 @@
 ---
 layout: distill
 title: Model Misspecification in Simulation-Based Inference - Recent Advances and Open Challenges
-description: Your blog post's abstract.
+description:
   Model misspecification is a critical challenge in simulation-based inference (SBI),
   particularly in neural SBI, where methods rely on simulated data to train neural
   networks. These methods often assume that simulators accurately represent the true
@@ -35,10 +35,10 @@ bibliography: 2026-04-27-model-misspecification-in-sbi.bib
 #   - please use this format rather than manually creating a markdown table of contents.
 toc:
   - name: Introduction
-  - name: Defining model misspecication
+  - name: Defining model misspecification
     subsections:
     - name: Model Misspecification in Simulation-Based Inference
-  - name: Recent advances for addressing model misspecication in SBI
+  - name: Recent advances for addressing model misspecification in SBI
     subsections:
     - name: Learning explicit mismatch models
     - name: Detecting Model Misspecification with Learned Summary Statistics
@@ -48,19 +48,25 @@ toc:
 ---
 
 Simulation-based inference (SBI) provides a powerful framework for applying Bayesian
-inference to study complex systems where direct likelihood computation is infeasible
-<d-cite key="cranmer_frontier_2020"></d-cite>. By using simulated data to approximate
-posterior 
-distributions, SBI has found applications across diverse scientific fields, including
-neuroscience, physics, and epidemiology. However, these methods often assume that the
-simulator is a faithful representation of the true data-generating process. In practice,
-this assumption is frequently violated, leading to model misspecification.
+inference to study complex systems where direct likelihood computation is infeasible <d-cite key="cranmer_frontier_2020"></d-cite>. By using simulated data to approximate
+posterior distributions, SBI has found applications across diverse scientific fields,
+including neuroscience, physics, climate science, and epidemiology <d-cite
+key="goncalves_training_2020,brehmer_simulationbased_2020,watson-parris_model_2021,witt_simulationbased_2020"></d-cite>.
+However, these methods often assume that the simulator is a faithful representation of
+the true data-generating process. In practice, this assumption is frequently violated,
+leading to model misspecification. In this blog post, we provide an overview of the
+currently available approaches to detect and mitigate model misspecification in SBI, and
+discuss open challenges.
 
-Model misspecification is particularly problematic in neural SBI, where neural networks
-are trained on simulated data but applied to real-world observations. When real-world
-observations differ significantly from the simulated data—-falling out-of-distribution
-(OOD)—-the predictions of neural networks can become arbitrarily inaccurate, as
-demonstrated in theoretical work <d-cite key="szegedy_intriguing_2014"></d-cite>.
+In standard Bayesian inference, model misspecification can lead to biased or misleading
+posterior estimates. However, in _neural_ SBI, the problem is particularly severe
+because the posterior or likelihood is approximated using neural networks trained on
+simulated data. Neural networks are known to produce arbitrarily incorrect predictions
+when probed with out-of-distribution (OOD) data <d-cite
+key="szegedy_intriguing_2014"></d-cite>, and in a misspecified simulator, the observed
+data $\mathbf{x}_o$ is effectively OOD relative to the training distribution. This can
+lead to highly unreliable posterior estimates, distorted uncertainty quantification, and
+incorrect scientific conclusions.
 
 An illustrative example of model misspecification is provided by Ward et al. (2022)
 <d-cite key="ward_robust_2022"></d-cite> using a simplified version of the Susceptible,
@@ -75,11 +81,11 @@ key="cannon_investigating_2022"></d-cite>.
 
 The sensitivity of neural networks to OOD data underscores the importance of robust
 diagnostics and addressing model misspecification is crucial for ensuring the
-reliability of SBI in real-world applications. This blog post comments on the definition
+reliability of SBI in real-world applications. Below, we comment on the definition
 of model misspecification in the context of SBI, reviews recent methods to detect and
 mitigate its effects, and outlines open challenges for future research.
 
-## Defining Model Misspecication
+## Defining Model Misspecification
 
 Model misspecification occurs when the assumptions of the model do not align with the
 true data-generating process, leading to unreliable inferences. In Bayesian inference,
@@ -108,13 +114,17 @@ resulting in biased posterior estimates.
 
 The issue of model misspecification in SBI was first systematically addressed by Frazier
 et al. (2020) <d-cite key="frazier_model_2019"></d-cite> in the context of Approximate
-Bayesian Computation (ABC, <d-cite key="sisson_handbook_"></d-cite>). Under
+Bayesian Computation (ABC, <d-cite key="sisson_handbook_2018"></d-cite>). The general
+approach of ABC is to obtain approximate posterior samples by comparing simulated and
+observed data using a distance metric and accepting only those parameters that generate
+simulation very close to the observed data. When the data is high-dimensional, it is
+common to use hand-crafted or learned summary statistics. However, under
 misspecification, the posterior in ABC does not concentrate on the true parameters but
-instead on “pseudotrue” parameters that minimize discrepancies between simulated and
+instead on "pseudotrue" parameters that minimize discrepancies between simulated and
 observed summary statistics. This leads to biased posteriors and unreliable credible
 intervals. The choice of summary statistics is central to this problem, as they
 determine how well simulated data align with observed data. While foundational for
-understanding misspecification, ABC’s reliance on handcrafted summary statistics limits
+understanding misspecification, ABC's reliance on handcrafted summary statistics limits
 its relevance to neural SBI methods, which use neural networks for feature extraction.
 
 #### Model Misspecification in Neural SBI
@@ -130,43 +140,46 @@ fail catastrophically when applied to observed data that lie outside the trainin
 distribution. This issue has been systematically studied by Cannon et al. (2022) in the
 context of neural SBI <d-cite key="cannon_investigating_2022"></d-cite>.
 
-More generally, model misspecification in SBI can arise from three distinct sources:
+However, before we dive into the methods to mitigate misspecification in SBI, let us
+note that there are at least three different sources of inaccuracies in the neural SBI
+workflow:
 
-1. **Mismatch Between True Data-Generating Process (DGP) and Simulator:** The true DGP
-   does not belong to the family of distributions induced by the simulator. This
-   corresponds to the classical Bayesian notion of misspecification described by Walker
-   (2013). For example, if a simulator lacks the capacity to model key features of the
-   observed data, the resulting posterior may fail to capture the true parameter values
+1. **Misspecification of the Simulator:** The true data-generating process does not
+   belong to the family of distributions induced by the simulator. This corresponds to
+   the classical Bayesian notion of misspecification described by Walker (2013). For
+   example, if a simulator lacks the capacity to model key features of the observed
+   data, the resulting posterior may fail to capture the true parameter values
    accurately.
-2. **Mismatch Between True Prior and Inference Prior**: Model misspecification can also
-   occur when the prior used in the inference process differs from the “true prior”
-   underlying the data-generating process. Prior mismatch can distort posterior
-estimates, leading to inferences that reflect artifacts of the assumed prior rather than
-the true underlying process.
+2. **Misspecification of the Prior**: Misspecification can also occur when the prior
+   used in the inference process does not incorporate the "true parameter" underlying
+   the data-generating process. Prior mismatch can distort posterior estimates, leading
+   to inferences that reflect artifacts of the assumed prior rather than the true
+   underlying process.
 3. **Errors in the Inference Procedure**: Even if the simulator and prior are correctly
    specified, the inference algorithm itself may introduce errors, such as
    systematically biased posteriors or uncalibrated uncertainty estimates, e.g., due
    to underfitting or overfitting during neural-network training.
 
-The third case is not specific to model misspecification but reflects broader challenges
-in neural SBI. Efforts to address these issues include calibration tests such as
-simulation-based calibration <d-cite key="talts_validating_2020"></d-cite>, expected
-coverage diagnostics <d-cite
+The third case reflects a general challenge in neural SBI. Efforts to address these
+issues include calibration tests such as simulation-based calibration <d-cite
+key="talts_validating_2020"></d-cite>, expected coverage diagnostics <d-cite
 key="deistler_truncated_2022,miller_truncated_2021a"></d-cite>, and classifier-based
 calibration tests <d-cite
 key="zhao_diagnostics_2021,linhart_lc2st_2024"></d-cite>. These tools focus on
-validating posterior accuracy and uncertainty quantification.
+validating posterior accuracy and uncertainty quantification, and are usually assuming
+that prior and the simulator are well-specified.
 
-The second case of prior misspecification has received little attention in the SBI
-literature, with only brief discussions in works like Wehenkel & Gamella et al. (2023) <d-cite key="wehenkel_addressing_2024"></d-cite>.
+The second case of prior misspecification is a general challenge in the Bayesian
+inference and can be addressed with standard Bayesian workflow tools like prior
+predictive checks <d-cite key="gelman_bayesian_2020"></d-cite>. Therefore, it has
+received less attention in the SBI specific literature, with only brief discussions in
+works like Wehenkel & Gamella et al. (2023) <d-cite
+key="wehenkel_addressing_2024"></d-cite>.
 
-The first case is the primary focus of most model misspecification papers in the SBI
-literature, which aim to detect and mitigate simulator-related misspecification. In the
-remainder of this post, we will give an overview of the existing approaches that mostly
-address the first case above.
-
-In the remainder of this post, we focus on the first case, as it is the primary focus of
-most work on model misspecification in SBI.
+Thus, the primary focus of most work on model misspecification in the SBI literature is
+the first case, with the aim of detecting and mitigating simulator-related
+misspecification. In the remainder of this post, we will give an overview of these
+approaches.
 
 ## Addressing Model Misspecification in SBI
 
@@ -224,11 +237,26 @@ Discrepancies between distributions in this space are quantified using metrics l
 Maximum Mean Discrepancy (MMD), with significant divergences indicating
 misspecification.
 
+The training procedure for this approach remains the same as in standard neural SBI
+methods except for an additional MMD term in the NPE loss function:
+
+$$
+\mathcal{L}_{\phi, \psi} = \mathcal{L}_{\text{inference}}(\phi) + \lambda \cdot
+\text{MMD}^2[p(h_{\psi}(\mathbf{x})), \mathcal{N}(\mathbf{0}, \mathbb{I})].
+$$
+
+Intuitively, the additional MMD loss term encourages the embedding network to obtain a
+Gaussian structure in the latent summary space, while not directly affecting the quality
+of the posterior estimation ensured by the standard NPE loss <d-cite
+key="schmitt_detecting_2024"></d-cite>. At inference time, the learned embedding network
+can then used to detect misspecification for unseen, e.g., observed, data points.
+
 This approach is adaptable to diverse data types and does not require explicit knowledge
-of the true data-generating process. However, its performance depends on the design of
-the summary network and the choice of divergence metric. While effective for detecting
-misspecification, it does not directly correct for it, instead providing insights for
-iterative simulator refinement.
+of the true data-generating process. Additionally, it is amortized, i.e., it can be
+applied to new observed data without re-training because the training does not depend on
+$x_o$. However, its performance depends on the design of the summary network and the
+choice of divergence metric. While effective for detecting misspecification, it does not
+directly correct for it, instead providing insights for iterative simulator refinement.
 
 ### Learning Misspecification-Robust Summary Statistics
 
@@ -300,7 +328,12 @@ An interesting property of this approach is that as $N_s$, the number of simulat
 samples, grows, the mixture posterior $\tilde{p}(\theta | \mathbf{x}_o)$ approaches the
 prior $p(\theta)$. This underconfidence property provides a mechanism to ensure that
 posterior estimates remain conservative and avoid overconfidence in the presence of
-severe misspecification.
+severe misspecification. However, this effect introduces a trade-off: while increasing
+$N_s$ improves robustness to misspecification, it also reduces the informativeness of
+the posterior, potentially leading to overly broad parameter estimates. Selecting $N_s$
+appropriately is therefore crucial, as it balances reliability and uncertainty
+quantification against the ability to extract meaningful parameter constraints (see
+<d-cite key="wehenkel_addressing_2024"></d-cite> for heuristics).
 
 While conceptually elegant and flexible, this method relies on access to calibration
 data—observed data with known ground-truth parameters—which may not be available in
@@ -330,9 +363,26 @@ The recent works outlined above have made significant progress in addressing mod
 misspecification in simulation-based inference (SBI), introducing methods for detecting
 and mitigating its effects. However, the problem of model misspecification in SBI is far
 from being fully resolved. While these methods offer valuable insights and tools, we
-highlight three key challenges that need to be addressed to further advance the field:
+highlight key challenges that need to be addressed to further advance the field:
 
-1. **A Common and Precise Definition of Model Misspecification in SBI:** As highlighted
+1. **Better Methods for Detecting and Addressing Model Misspecification:** While recent
+   methods have improved our ability to diagnose and mitigate model misspecification,
+   significant limitations remain. Many current techniques focus on specific aspects of
+   misspecification, such as identifying discrepancies in summary statistics or aligning
+   data distributions via optimal transport. However, these approaches often require
+   additional modeling assumptions, computational overhead, or prior knowledge about the
+   nature of the misspecification. A key challenge is to develop more flexible and
+   scalable methods that can:
+
+   - Detect misspecification in a principled and data-driven manner, without relying on
+     predefined summary statistics or manual tuning.
+   - Provide interpretable diagnostics that help practitioners understand the sources
+     and consequences of misspecification in their models.
+   - Offer robust mitigation strategies that work across different types of
+     misspecification, without requiring large amounts of additional data or
+     computationally expensive corrections.
+
+2. **A Common and Precise Definition of Model Misspecification in SBI:** As highlighted
    in this post, model misspecification in SBI can arise from different sources,
    including mismatches between the simulator and the true data-generating process,
    prior misspecification, and errors introduced by the inference procedure itself. A
@@ -341,7 +391,7 @@ highlight three key challenges that need to be addressed to further advance the 
    practitioners, enabling a more systematic comparison of methods and their
    applicability to specific types of model misspecification.
 
-2. **Common Benchmarking Tasks for Evaluating Methods:** Another obstacle to progress in
+3. **Common Benchmarking Tasks for Evaluating Methods:** Another obstacle to progress in
    addressing model misspecification is the lack of an established set of benchmarking
    tasks tailored to the different cases of model misspecification. While current
    evaluations often focus on specific scenarios or datasets, limiting the
@@ -356,14 +406,16 @@ highlight three key challenges that need to be addressed to further advance the 
    comparisons and encouraging the development of approaches robust across diverse
    settings.
 
-3. **Practical Guidelines for Detecting and Addressing Model Misspecification:** For SBI
+4. **Practical Guidelines for Detecting and Addressing Model Misspecification:** For SBI
    to be widely adopted in practice, there is a need for clear guidelines or a
-   practitioner's guide on how to detect and address model misspecification. Such a
-   guide should include recommendations for diagnosing model misspecification using
-   available tools, selecting appropriate mitigation methods, and interpreting posterior
-   results under potential misspecification. This would help bridge the gap between
-   theoretical advancements and real-world applications, ensuring that practitioners can
-   confidently apply SBI methods in the presence of model misspecification.
+   practitioner's guide on how to detect and address model misspecification, e.g.,
+   similar to a Bayesian workflow as introduced in <d-cite
+   key="gelman_bayesian_2020"></d-cite>. Such a guide should include recommendations for
+   diagnosing model misspecification using available tools, selecting appropriate
+   mitigation methods, and interpreting posterior results under potential
+   misspecification. This would help bridge the gap between theoretical advancements and
+   real-world applications, ensuring that practitioners can confidently apply SBI
+   methods in the presence of model misspecification.
 
 Addressing these challenges will pave the way for more robust and practical SBI methods
 capable of handling model misspecification effectively. A unified framework, rigorous
