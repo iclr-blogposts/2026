@@ -37,7 +37,7 @@ bibliography: 2026-04-27-model-misspecification-in-sbi.bib
 
 toc:
   - name: Introduction
-  - name: A Concrete Example: SIR Model with Weekend Reporting Delay
+  - name: A Concrete Example - SIR Model with Weekend Reporting Delay
   - name: Defining Model Misspecification
     subsections:
     - name: Model Misspecification in Simulation-Based Inference
@@ -81,7 +81,7 @@ surveys four categories of methods for addressing misspecification, discusses th
 assumptions and practical implications, and concludes with open challenges for the
 field.
 
-## A Concrete Example: SIR Model with Weekend Reporting Delay
+## A Concrete Example - SIR Model with Weekend Reporting Delay
 
 Before formalizing these concepts, we introduce a concrete running example: the
 Susceptible-Infected-Recovered (SIR) epidemic model with weekend reporting delays
