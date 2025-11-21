@@ -213,3 +213,130 @@
   abstract = {There has been growing interest in the AI community for precise uncertainty quantification. Conditional density models f(y{\textbar}x), where x represents potentially high-dimensional features, are an integral part of uncertainty quantification in prediction and Bayesian inference. However, it is challenging to assess conditional density estimates and gain insight into modes of failure. While existing diagnostic tools can determine whether an approximated conditional density is compatible overall with a data sample, they lack a principled framework for identifying, locating, and interpreting the nature of statistically significant discrepancies over the entire feature space. In this paper, we present rigorous and easy-to-interpret diagnostics such as (i) the ``Local Coverage Test'' (LCT), which distinguishes an arbitrarily misspecified model from the true conditional density of the sample, and (ii) ``Amortized Local P-P plots'' (ALP) which can quickly provide interpretable graphical summaries of distributional differences at any location x in the feature space. Our validation procedures scale to high dimensions and can potentially adapt to any type of data at hand. We demonstrate the effectiveness of LCT and ALP through a simulated experiment and applications to prediction and parameter inference for image data.},
   langid = {english}
 }
+
+@misc{senouf_inductive_2025a,
+  title = {Inductive {{Domain Transfer In Misspecified Simulation-Based Inference}}},
+  author = {Senouf, Ortal and Wehenkel, Antoine and {Vincent-Cuaz}, C{\'e}dric and Abb{\'e}, Emmanuel and Frossard, Pascal},
+  year = 2025,
+  month = oct,
+  number = {arXiv:2508.15593},
+  eprint = {2508.15593},
+  primaryclass = {cs},
+  publisher = {arXiv},
+  doi = {10.48550/arXiv.2508.15593},
+  urldate = {2025-11-14},
+  abstract = {Simulation-based inference (SBI) is a statistical inference approach for estimating latent parameters of a physical system when the likelihood is intractable but simulations are available. In practice, SBI is often hindered by model misspecification--the mismatch between simulated and real-world observations caused by inherent modeling simplifications. RoPE, a recent SBI approach, addresses this challenge through a two-stage domain transfer process that combines semi-supervised calibration with optimal transport (OT)-based distribution alignment. However, RoPE operates in a fully transductive setting, requiring access to a batch of test samples at inference time, which limits scalability and generalization. We propose here a fully inductive and amortized SBI framework that integrates calibration and distributional alignment into a single, end-to-end trainable model. Our method leverages mini-batch OT with a closed-form coupling to align real and simulated observations that correspond to the same latent parameters, using both paired calibration data and unpaired samples. A conditional normalizing flow is then trained to approximate the OT-induced posterior, enabling efficient inference without simulation access at test time. Across a range of synthetic and real-world benchmarks--including complex medical biomarker estimation--our approach matches or surpasses the performance of RoPE, as well as other standard SBI and non-SBI estimators, while offering improved scalability and applicability in challenging, misspecified environments.},
+  archiveprefix = {arXiv}
+}
+
+@book{sisson_handbook_2018,
+  title = {Handbook of {{Approximate Bayesian Computation}}},
+  author = {Sisson, Scott A. and Fan, Yanan and Beaumont, Mark},
+  year = 2018,
+  month = sep,
+  publisher = {CRC Press},
+  abstract = {As the world becomes increasingly complex, so do the statistical models required to analyse the challenging problems ahead. For the very first time in a single volume, the Handbook of Approximate Bayesian Computation (ABC) presents an extensive overview of the theory, practice and application of ABC methods. These simple, but powerful statistical techniques, take Bayesian statistics beyond the need to specify overly simplified models, to the setting where the model is defined only as a process that generates data. This process can be arbitrarily complex, to the point where standard Bayesian techniques based on working with tractable likelihood functions would not be viable. ABC methods finesse the problem of model complexity within the Bayesian framework by exploiting modern computational power, thereby permitting approximate Bayesian analyses of models that would otherwise be impossible to implement. The Handbook of ABC provides illuminating insight into the world of Bayesian modelling for intractable models for both experts and newcomers alike. It is an essential reference book for anyone interested in learning about and implementing ABC techniques to analyse complex models in the modern world.},
+  isbn = {978-1-351-64346-7},
+  langid = {english}
+}
+
+@article{goncalves_training_2020,
+  title = {Training Deep Neural Density Estimators to Identify Mechanistic Models of Neural Dynamics},
+  author = {Gon{\c c}alves, Pedro J and Lueckmann, Jan-Matthis and Deistler, Michael and Nonnenmacher, Marcel and {\"O}cal, Kaan and Bassetto, Giacomo and Chintaluri, Chaitanya and Podlaski, William F and Haddad, Sara A and Vogels, Tim P and Greenberg, David S and Macke, Jakob H},
+  editor = {Huguenard, John R and O'Leary, Timothy and Goldman, Mark S},
+  year = 2020,
+  month = sep,
+  journal = {eLife},
+  volume = {9},
+  pages = {e56261},
+  publisher = {eLife Sciences Publications, Ltd},
+  issn = {2050-084X},
+  doi = {10.7554/eLife.56261},
+  urldate = {2024-02-19},
+  abstract = {Mechanistic modeling in neuroscience aims to explain observed phenomena in terms of underlying causes. However, determining which model parameters agree with complex and stochastic neural data presents a significant challenge. We address this challenge with a machine learning tool which uses deep neural density estimators---trained using model simulations---to carry out Bayesian inference and retrieve the full space of parameters compatible with raw data or selected data features. Our method is scalable in parameters and data features and can rapidly analyze new data after initial training. We demonstrate the power and flexibility of our approach on receptive fields, ion channels, and Hodgkin--Huxley models. We also characterize the space of circuit configurations giving rise to rhythmic activity in the crustacean stomatogastric ganglion, and use these results to derive hypotheses for underlying compensation mechanisms. Our approach will help close the gap between data-driven and theory-driven models of neural dynamics.}
+}
+
+@incollection{brehmer_simulationbased_2020,
+  title = {Simulation-{{Based Inference Methods}} for {{Particle Physics}}},
+  booktitle = {Artificial {{Intelligence}} for {{High Energy Physics}}},
+  author = {Brehmer, Johann and Cranmer, Kyle},
+  year = 2020,
+  month = dec,
+  pages = {579--611},
+  publisher = {WORLD SCIENTIFIC},
+  doi = {10.1142/9789811234033_0016},
+  urldate = {2025-01-31},
+  isbn = {978-981-12-3402-6}
+}
+
+@article{mckinley2014simulation,
+  title={Simulation-based Bayesian inference for epidemic models},
+  author={McKinley, Trevelyan J and Ross, Joshua V and Deardon, Rob and Cook, Alex R},
+  journal={Computational Statistics \& Data Analysis},
+  volume={71},
+  pages={434--447},
+  year={2014},
+  publisher={Elsevier}
+}
+
+@misc{deistler_simulationbased_2025a,
+  title = {Simulation-{{Based Inference}}: {{A Practical Guide}}},
+  shorttitle = {Simulation-{{Based Inference}}},
+  author = {Deistler, Michael and Boelts, Jan and Steinbach, Peter and Moss, Guy and Moreau, Thomas and Gloeckler, Manuel and Rodrigues, Pedro L. C. and Linhart, Julia and Lappalainen, Janne K. and Miller, Benjamin Kurt and Gon{\c c}alves, Pedro J. and Lueckmann, Jan-Matthis and Schr{\"o}der, Cornelius and Macke, Jakob H.},
+  year = 2025,
+  month = aug,
+  number = {arXiv:2508.12939},
+  eprint = {2508.12939},
+  primaryclass = {stat},
+  publisher = {arXiv},
+  doi = {10.48550/arXiv.2508.12939},
+  urldate = {2025-09-08},
+  abstract = {A central challenge in many areas of science and engineering is to identify model parameters that are consistent with prior knowledge and empirical data. Bayesian inference offers a principled framework for this task, but can be computationally prohibitive when models are defined by stochastic simulators. Simulation-based Inference (SBI) is a suite of methods developed to overcome this limitation, which has enabled scientific discoveries in fields such as particle physics, astrophysics, and neuroscience. The core idea of SBI is to train neural networks on data generated by a simulator, without requiring access to likelihood evaluations. Once trained, inference is amortized: The neural network can rapidly perform Bayesian inference on empirical observations without requiring additional training or simulations. In this tutorial, we provide a practical guide for practitioners aiming to apply SBI methods. We outline a structured SBI workflow and offer practical guidelines and diagnostic tools for every stage of the process -- from setting up the simulator and prior, choosing and training inference networks, to performing inference and validating the results. We illustrate these steps through examples from astrophysics, psychophysics, and neuroscience. This tutorial empowers researchers to apply state-of-the-art SBI methods, facilitating efficient parameter inference for scientific discovery.},
+  archiveprefix = {arXiv}
+}
+
+@misc{gelman_bayesian_2020,
+  title = {Bayesian {{Workflow}}},
+  author = {Gelman, Andrew and Vehtari, Aki and Simpson, Daniel and Margossian, Charles C. and Carpenter, Bob and Yao, Yuling and Kennedy, Lauren and Gabry, Jonah and B{\"u}rkner, Paul-Christian and Modr{\'a}k, Martin},
+  year = 2020,
+  month = nov,
+  number = {arXiv:2011.01808},
+  eprint = {2011.01808},
+  primaryclass = {stat},
+  publisher = {arXiv},
+  doi = {10.48550/arXiv.2011.01808},
+  urldate = {2022-11-16},
+  abstract = {The Bayesian approach to data analysis provides a powerful way to handle uncertainty in all observations, model parameters, and model structure using probability theory. Probabilistic programming languages make it easier to specify and fit Bayesian models, but this still leaves us with many options regarding constructing, evaluating, and using these models, along with many remaining challenges in computation. Using Bayesian inference to solve real-world problems requires not only statistical skills, subject matter knowledge, and programming, but also awareness of the decisions made in the process of data analysis. All of these aspects can be understood as part of a tangled workflow of applied Bayesian statistics. Beyond inference, the workflow also includes iterative model building, model checking, validation and troubleshooting of computational problems, model understanding, and model comparison. We review all these aspects of workflow in the context of several examples, keeping in mind that in practice we will be fitting many models for any given problem, even if only a subset of them will ultimately be relevant for our conclusions.},
+  archiveprefix = {arXiv},
+  keywords = {Statistics - Methodology}
+}
+
+@inproceedings{bishop_learning_2025,
+  title = {Learning {{Likelihood-Free Reference Priors}}},
+  booktitle = {Forty-Second {{International Conference}} on {{Machine Learning}}},
+  author = {Bishop, Nicholas George and Ornia, Daniel Jarne and Dyer, Joel and Calinescu, Ani and Wooldridge, Michael J.},
+  year = 2025,
+  month = jun,
+  urldate = {2025-11-21},
+  abstract = {Simulation modeling offers a flexible approach to constructing high-fidelity synthetic representations of complex real-world systems. However, the increased complexity of such models introduces additional complications, for example when carrying out statistical inference procedures. This has motivated a large and growing literature on *likelihood-free* or *simulation-based* inference methods, which approximate (e.g., Bayesian) inference without assuming access to the simulator's intractable likelihood function. A hitherto neglected problem in the simulation-based Bayesian inference literature is the challenge of constructing minimally informative *reference priors* for complex simulation models. Such priors maximise an expected Kullback-Leibler distance from the prior to the posterior, thereby influencing posterior inferences minimally and enabling an ``objective'' approach to Bayesian inference that does not necessitate the incorporation of strong subjective prior beliefs. In this paper, we propose and test a selection of likelihood-free methods for learning reference priors for simulation models, using variational approximations to these priors and a variety of mutual information estimators. Our experiments demonstrate that good approximations to reference priors for simulation models are in this way attainable, providing a first step towards the development of likelihood-free objective Bayesian inference procedures.},
+  langid = {english}
+}
+
+@article{bockting_simulationbased_2024,
+  title = {Simulation-Based Prior Knowledge Elicitation for Parametric {{Bayesian}} Models},
+  author = {Bockting, Florence and Radev, Stefan T. and B{\"u}rkner, Paul-Christian},
+  year = 2024,
+  month = jul,
+  journal = {Scientific Reports},
+  volume = {14},
+  number = {1},
+  pages = {17330},
+  publisher = {Nature Publishing Group},
+  issn = {2045-2322},
+  doi = {10.1038/s41598-024-68090-7},
+  urldate = {2025-11-21},
+  abstract = {A central characteristic of Bayesian statistics is the ability to consistently incorporate prior knowledge into various modeling processes. In this paper, we focus on translating domain expert knowledge into corresponding prior distributions over model parameters, a process known as prior elicitation. Expert knowledge can manifest itself in diverse formats, including information about raw data, summary statistics, or model parameters. A major challenge for existing elicitation methods is how to effectively utilize all of these different formats in order to formulate prior distributions that align with the expert's expectations, regardless of the model structure. To address these challenges, we develop a simulation-based elicitation method that can learn the hyperparameters of potentially any parametric prior distribution from a wide spectrum of expert knowledge using stochastic gradient descent. We validate the effectiveness and robustness of our elicitation method in four representative simulation studies covering linear models, generalized linear models, and hierarchical models. Our results support the claim that our method is largely independent of the underlying model structure and adaptable to various elicitation techniques, including quantile-based, moment-based, and histogram-based methods.},
+  copyright = {2024 The Author(s)},
+  langid = {english}
+}
+
