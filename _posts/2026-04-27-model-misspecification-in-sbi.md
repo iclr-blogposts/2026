@@ -34,17 +34,18 @@ bibliography: 2026-04-27-model-misspecification-in-sbi.bib
 #   - make sure that TOC names match the actual section names
 #     for hyperlinks within the post to work correctly.
 #   - please use this format rather than manually creating a markdown table of contents.
+
 toc:
   - name: Introduction
-  - name: A Concrete Example - SIR Model with Weekend Reporting Delay
+  - name: A Concrete Example: SIR Model with Weekend Reporting Delay
   - name: Defining Model Misspecification
     subsections:
     - name: Model Misspecification in Simulation-Based Inference
   - name: Mitigating Model Misspecification in SBI
     subsections:
-    - name: Learning Explicit Mismatch Models
-    - name: Detecting Model Misspecification with Learned Summary Statistics
-    - name: Learning Misspecification Robust Summary Statistics
+    - name: Learning Explicit Misspecification Models
+    - name: Detecting Misspecification with Learned Summary Statistics
+    - name: Learning Misspecification-Robust Summary Statistics
     - name: Addressing Misspecification with Optimal Transport
   - name: Practical Implications for SBI Workflows
   - name: Open Challenges
@@ -97,7 +98,7 @@ characteristic weekly oscillations (Figure 1).
   <strong>A</strong>: Schematic SIR model and misspecification: a fraction α of weekend infections is reported on Monday.
   <strong>B</strong>: Example epidemic trajectory showing true S, I, R curves and observed infections with a weekend delay.
   <strong>C</strong>: SBI posterior samples for $(\beta, \gamma)$ for clean data (α = 0%, blue) and misspecified data (α=30%, orange), with true parameters marked.
-  <strong>D</strong>: Posterior predictive checks for both cases, illustrating how misspecification shifts and distorts the inferred dynamics.
+  <strong>D</strong>: Posterior predictive checks for both cases, illustrating how misspecification shifts and distorts the inferred dynamics. Results generated using the `sbi` package and specificatins from Cannon et al..
 </div>
 
 To infer infection parameters from observed data, a common SBI approach would be using
