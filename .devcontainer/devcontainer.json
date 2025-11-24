@@ -5,14 +5,12 @@
   "image": "mcr.microsoft.com/devcontainers/jekyll",
 
   // Features to add to the dev container. More info: https://containers.dev/features.
-  // "features": {
-  //   "ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
-  //     "packages": "build-essential,imagemagick,inotify-tools,jupyter-nbconvert,procps,ruby-full,zlib1g-dev"
-  //   },
-  //   "ghcr.io/devcontainers-contrib/features/prettier:1": {}
-  // },
-
-  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y inotify-tools imagemagick nodejs",
+  "features": {
+    "ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
+      "packages": "build-essential,imagemagick,inotify-tools,jupyter-nbconvert,procps,ruby-full,zlib1g-dev"
+    },
+    "ghcr.io/devcontainers-contrib/features/prettier:1": {}
+  },
 
   // Optionally: run jekyll serve automatically on container entering using the Docker entrypoint
   "postAttachCommand": "./bin/entry_point.sh",
