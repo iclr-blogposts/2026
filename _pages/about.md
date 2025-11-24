@@ -26,11 +26,13 @@ social: false # includes social icons at the bottom of the page
 
 ## Contents
 
+- [Key Dates](#key-dates)
+  - [Contents](#contents)
 - [ICLR 2026 Blogposts Track](#iclr-2026-blogposts-track)
   - [A Call for Blog Posts](#a-call-for-blog-posts)
-    - [Conflict of interest](#conflict-of-interest)
+      - [Conflict of interest](#conflict-of-interest)
   - [Publication](#publication)
-    - [Poster](#poster)
+      - [Poster](#poster)
   - [Submissions](#submissions)
   - [Contact](#contact)
   - [Organizers](#organizers)
