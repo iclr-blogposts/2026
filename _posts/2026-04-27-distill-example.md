@@ -197,6 +197,8 @@ Voila!
 
 ## Citations
 
+Recent advances in Large Language Models (LLMs), such as OpenAI's o1<d-cite key="jaech2024openai"></d-cite> and DeepSeek-R1<d-cite key="guo2025deepseek"></d-cite>, have demonstrated the remarkable effectiveness of large-scale Reinforcement Learning with Verifiable Rewards (RLVR) for challenging reasoning tasks in mathematics and coding. For smaller models in the 1-10B parameter range, researchers have increasingly turned to reinforcement learning to push performance boundaries beyond what distillation alone can achieve. Over the past year, we've seen a proliferation of methods attempting to stabilize and improve RL training for small language models (SLMs): multi-stage training pipelines, dynamic hyperparameter schedules, adaptive temperature controls, response length penalties, and various forms of data curation and filtering<d-cite key="li2025questa,min2024imitate,deepscaler2025,liu2025prorl,hu2025prorlv2,hu2025brorl"></d-cite>.
+
 Citations are then used in the article body with the `<d-cite>` tag.
 The key attribute is a reference to the id provided in the bibliography.
 The key attribute can take multiple ids, separated by commas.
