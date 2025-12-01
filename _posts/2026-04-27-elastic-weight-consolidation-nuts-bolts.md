@@ -34,7 +34,7 @@ In this blogpost, we present a theoretical support of the continual learning met
 
 ## Introduction
 
-Following are the notations used throughout this blogpost. Vectors and matrices are denoted in bold lowercase and bold uppercase, respectively. Superscript $^{\top}$ denotes matrix transpose. $\mathbb{E}[\cdot]$ denotes the expectation operator. An optimum value of a variable is denoted by adding a superscript $^{\star}$.
+Following are the notations used throughout this blogpost. Vectors and matrices are denoted in bold lowercase and bold uppercase, respectively. Superscript $^{\top}$ denotes matrix transpose. $$\mathbb{E}[\cdot]$$ denotes the expectation operator. An optimum value of a variable is denoted by adding a superscript $^{\star}$.
 
 Continual learning is a much desired attribute for neural networks. For example, if we train a model to distinguish between images of a cat and a dog (task 1), and subsequently train it again to distinguish between images of chair and table (task 2), the model should be able to retain its knowledge on task 1 even after learning task 2. In simple terms, our network model should be able to perform equally well on all seen tasks, even after learning new ones. Any degradation of performance on the previous tasks after learning new ones is fittingly termed as *catastrophic forgetting*. This sub-research area has seen an insurgence in works in recent times <d-cite key="kirkpatrick2017overcoming,zenke2017continual,li2017learning,aljundi2018memory"></d-cite>. Briefly, the continual learning scenarios can be categorized into following <d-cite key="van2019three"></d-cite>:
 
@@ -55,25 +55,9 @@ We highly recommend <d-cite key="van2019three,wiewel2019localizing"></d-cite> fo
     <strong>Possible configurations of</strong> $\boldsymbol{\theta}^\star_{\mathcal{A}}$. The shaded region represents a space of optimum $\boldsymbol{\theta}_{\mathcal{A}}$ with acceptable errors w.r.t. $\boldsymbol{\theta}^\star_{\mathcal{A}}$ for task $\mathcal{A}$.
 </div>
 
-Denote parameters of layers of a deep neural network (DNN) with $\boldsymbol{\theta}$. Training DNNs generates a mapping between the input distribution space and target distribution space. This is done by finding out an optimum 
+Denote parameters of layers of a deep neural network (DNN) with $\boldsymbol{\theta}$. Training DNNs generates a mapping between the input distribution space and target distribution space. This is done by finding out an optimum $$\boldsymbol{\theta} = \boldsymbol{\theta}^\star$$ which results in the least error in the training objective. It has been shown in earlier works <d-cite key="sussmann1992uniqueness"></d-cite> that such a mapping can be obtained with many configurations of $\boldsymbol{\theta}^\star$, represented in the figure above. The term *many configurations* can be interpreted as a solution space around the most optimum $\boldsymbol{\theta}$ with acceptable error in the learned mapping. Note that in figures to follow, the shaded ellipses represent the solution of individual tasks where as the overlapping region of multiple ellipses, marked by diagonal lines, represents the common solution space for all tasks.
 
-\begin{equation}
-\boldsymbol{\theta} = \boldsymbol{\theta}^\star
-\end{equation}
-
-which results in the least error in the training objective. It has been shown in earlier works <d-cite key="sussmann1992uniqueness"></d-cite> that such a mapping can be obtained with many configurations of $\boldsymbol{\theta}^\star$, represented in the figure above. The term *many configurations* can be interpreted as a solution space around the most optimum $\boldsymbol{\theta}$ with acceptable error in the learned mapping. Note that in figures to follow, the shaded ellipses represent the solution of individual tasks where as the overlapping region of multiple ellipses, marked by diagonal lines, represents the common solution space for all tasks.
-
-Let's begin with a simple case of two tasks, task $\mathcal{A}$ and task $\mathcal{B}$. To have a configuration of parameters that performs well for both $\mathcal{A}$ and $\mathcal{B}$, the network should be able to pick $\boldsymbol{\theta}$ from the overlapping region of the individual solution spaces (see Figure 2). This is with the assumption that there is always an overlapping region for the solution spaces of all tasks for the network to learn them sequentially. A case of four tasks has been illustrated in Figure 2. In the first instance, the network can learn any 
-
-\begin{equation}
-\boldsymbol{\theta} = \boldsymbol{\theta}_{\mathcal{A}}
-\end{equation}
-
-that performs well for task $\mathcal{A}$. But with the arrival of task $\mathcal{B}$, the network should pick up a 
-
-\begin{equation}
-\boldsymbol{\theta} = \boldsymbol{\theta}_{\mathcal{A}, \mathcal{B}}
-\end{equation}
+Let's begin with a simple case of two tasks, task $\mathcal{A}$ and task $\mathcal{B}$. To have a configuration of parameters that performs well for both $\mathcal{A}$ and $\mathcal{B}$, the network should be able to pick $\boldsymbol{\theta}$ from the overlapping region of the individual solution spaces (see Figure 2). This is with the assumption that there is always an overlapping region for the solution spaces of all tasks for the network to learn them sequentially. A case of four tasks has been illustrated in Figure 2. In the first instance, the network can learn any $$\boldsymbol{\theta} = \boldsymbol{\theta}_{\mathcal{A}}$$ that performs well for task $\mathcal{A}$. But with the arrival of task $\mathcal{B}$, the network should pick up a $$\boldsymbol{\theta} = \boldsymbol{\theta}_{\mathcal{A}, \mathcal{B}}$$.
 
 The next question that arrives is how can the network learn the a set of parameters that lies in this overlapping region. To this end, EWC presents a method of selective regularization of parameters $\boldsymbol{\theta}$. After learning $\mathcal{A}$, this regularization method identifies which parameters are important for $\mathcal{A}$, and then penalizes any change made to the network parameters according to their importance while learning $\mathcal{B}$.
 
@@ -94,7 +78,7 @@ To formulate the objective, we start by taking a Bayesian approach needed to est
 \underbrace{p(\boldsymbol{\theta}\mid\boldsymbol{\Sigma})}_{\text{posterior}} = \dfrac{\overbrace{p(\boldsymbol{\Sigma}\mid\boldsymbol{\theta})}^{\text{likelihood}}\overbrace{p(\boldsymbol{\theta})}^{\text{prior}}}{p(\boldsymbol{\Sigma})}
 \end{equation}
 
-Since maximizing a function is same as maximizing its logarithm, we take $\log(\cdot)$ of the above equation as follows:
+Since maximizing a function is same as maximizing its logarithm, we take $$\log(\cdot)$$ of the above equation as follows:
 
 \begin{equation}
 \log(p(\boldsymbol{\theta}\mid\boldsymbol{\Sigma})) = \log(p(\boldsymbol{\Sigma}\mid\boldsymbol{\theta})) +\log(p(\boldsymbol{\theta})) - \log(p(\boldsymbol{\Sigma}))
@@ -106,13 +90,7 @@ To train the neural network on $\boldsymbol{\Sigma}$, the objective function to 
 \text{argmax}_{\boldsymbol{\theta}}{\ell(\boldsymbol{\theta}) = \log(p(\boldsymbol{\theta}\mid\boldsymbol{\Sigma}))}
 \end{equation}
 
-For the case of given two independent tasks such that 
-
-\begin{equation}
-\boldsymbol{\Sigma} = \{\mathcal{A}, \mathcal{B}\}
-\end{equation}
-
-(with $\mathcal{B}$ appearing in sequence after $\mathcal{A}$), the log-posterior can be written as:
+For the case of given two independent tasks such that $$\boldsymbol{\Sigma} = \{\mathcal{A}, \mathcal{B}\}$$ (with $\mathcal{B}$ appearing in sequence after $\mathcal{A}$), the log-posterior can be written as:
 
 \begin{equation}
 \log(p(\boldsymbol{\theta}\mid\boldsymbol{\Sigma})) = \log(p(\mathcal{B}\mid\boldsymbol{\theta})) +\log(p(\boldsymbol{\theta}\mid\mathcal{A})) - \log(p(\mathcal{B}))
@@ -138,31 +116,21 @@ To begin with, compute the second order Taylor expansion of $\ell(\boldsymbol{\t
 \ell(\boldsymbol{\theta})\approx \ell(\boldsymbol{\theta}^\star_{\mathcal{A}}) +( \dfrac{\partial\ell(\boldsymbol{\theta})}{\partial\boldsymbol{\theta}}\mid_{\boldsymbol{\theta}^\star_{\mathcal{A}}}) + \dfrac{1}{2}(\boldsymbol{\theta} -\boldsymbol{ \theta}^\star_{\mathcal{A}})^\top(\dfrac{\partial^2\ell(\boldsymbol{\theta})}{\partial^2\boldsymbol{\theta}}\mid_{\boldsymbol{\theta}^\star_{\mathcal{A}}})(\boldsymbol{\theta} -\boldsymbol{ \theta}^\star_{\mathcal{A}}) + \text{(higher order terms)}
 \end{equation}
 
-Neglecting higher order terms and noting that 
+Neglecting higher order terms and noting that $$\dfrac{\partial\ell(\boldsymbol{\theta})}{\partial\boldsymbol{\theta}}\mid_{\boldsymbol{\theta}^\star_{\mathcal{A}}} = 0$$ (slope of tangent at peak), we have:
 
-\begin{equation}
-\dfrac{\partial\ell(\boldsymbol{\theta})}{\partial\boldsymbol{\theta}}\mid_{\boldsymbol{\theta}^\star_{\mathcal{A}}} = 0
-\end{equation}
-
-(slope of tangent at peak), we have:
 $$
-\begin{equation}
+\begin{align}
 \ell(\boldsymbol{\theta})\approx \ell(\boldsymbol{\theta}^\star_{\mathcal{A}}) + \dfrac{1}{2}(\boldsymbol{\theta} -\boldsymbol{ \theta}^\star_{\mathcal{A}})^\top\underbrace{(\dfrac{\partial^2\ell(\boldsymbol{\theta})}{\partial^2\boldsymbol{\theta}}\mid_{\boldsymbol{\theta}^\star_{\mathcal{A}}})}_{\text{Hessian}}(\boldsymbol{\theta} -\boldsymbol{\theta}^\star_{\mathcal{A}})
-\end{equation}
+\end{align}
 $$
+
 Using the log-posterior equation, we can write the above for task $\mathcal{A}$ as following:
 
 \begin{equation}
 \log(p(\boldsymbol{\theta}\mid\mathcal{A})) = \log(p(\boldsymbol{\theta}^\star_{\mathcal{A}}\mid\mathcal{A})) + \dfrac{1}{2}(\boldsymbol{\theta} -\boldsymbol{ \theta}^\star_{\mathcal{A}})^\top(\dfrac{\partial^2(\log(p(\boldsymbol{\theta}\mid\mathcal{A})))}{\partial^2\boldsymbol{\theta}}\mid_{\boldsymbol{\theta}^\star_{\mathcal{A}}})(\boldsymbol{\theta} -\boldsymbol{ \theta}^\star_{\mathcal{A}}) + \Delta
 \end{equation}
 
-where 
-
-\begin{equation}
-\Delta = \log(p(\boldsymbol{\theta}^\star_{\mathcal{A}}\mid\mathcal{A}))
-\end{equation}
-
-Next, write 
+where $$\Delta = \log(p(\boldsymbol{\theta}^\star_{\mathcal{A}}\mid\mathcal{A}))$$. Next, write 
 
 \begin{equation}
 (\dfrac{\partial^2(\log(p(\boldsymbol{\theta}\mid\mathcal{A})))}{\partial^2\boldsymbol{\theta}}\mid_{\boldsymbol{\theta}^\star_{\mathcal{A}}}) = -((-\dfrac{\partial^2(\log(p(\boldsymbol{\theta}\mid\mathcal{A})))}{\partial^2\boldsymbol{\theta}}\mid_{\boldsymbol{\theta}^\star_{\mathcal{A}}})^{-1})^{-1}
@@ -174,13 +142,7 @@ and replace it back in the equation to express the same in the standard form of 
 p(\boldsymbol{\theta}\mid\mathcal{A}) = \epsilon\exp(-\dfrac{1}{2}(\boldsymbol{\theta} -\boldsymbol{ \theta}^\star_{\mathcal{A}})^\top((-\dfrac{\partial^2(\log(p(\boldsymbol{\theta}\mid\mathcal{A})))}{\partial^2\boldsymbol{\theta}}\mid_{\boldsymbol{\theta}^\star_{\mathcal{A}}})^{-1})^{-1}(\boldsymbol{\theta} -\boldsymbol{ \theta}^\star_{\mathcal{A}}))
 \end{equation}
 
-where 
-
-\begin{equation}
-\epsilon = \exp(\Delta)
-\end{equation}
-
-is a constant. From this equation, it can be concluded that we have obtained the Laplace approximation of posterior pdf as:
+where $$\epsilon = \exp(\Delta)$$ is a constant. From this equation, it can be concluded that we have obtained the Laplace approximation of posterior pdf as:
 
 
 \begin{equation}
@@ -188,6 +150,7 @@ p(\boldsymbol{\theta}\mid\mathcal{A})\sim\mathcal{N}(\boldsymbol{ \theta}^\star_
 \end{equation}
 
 Notice the variance of the estimated normal distribution of $p(\boldsymbol{\theta}\mid\mathcal{A})$. Given $\boldsymbol{ \theta}^\star_{\mathcal{A}}$, the term $\log(p(\boldsymbol{\theta}\mid\mathcal{A}))$ represents the log-likelihood of posterior pdf $p(\boldsymbol{\theta}\mid\mathcal{A})$. Clearly, the term represents the inverse of **Fisher information matrix** (FIM), 
+
 $$
 \begin{equation}
 \mathbb{I}_{\mathcal{A}} = \mathbb{E}[-\dfrac{\partial^2(\log(p(\boldsymbol{\theta}\mid\mathcal{A})))}{\partial^2\boldsymbol{\theta}}\mid_{\boldsymbol{\theta}^\star_{\mathcal{A}}}]
@@ -200,18 +163,24 @@ Note that we obtain $\mathbb{I}_{\mathcal{A}}$ by using the Bayesian equation an
 p(\boldsymbol{\theta}\mid\mathcal{A})\sim\mathcal{N}(\boldsymbol{ \theta}^\star_{\mathcal{A}}, [\mathbb{I}_{\mathcal{A}}]^{-1})
 \end{equation}
 
-Further, as FIM can also be computed from first order derivatives, we can avoid the Hessian computed in the Taylor expansion using the following property <d-cite key="kay1993fundamentals"></d-cite>:$$
+Further, as FIM can also be computed from first order derivatives, we can avoid the Hessian computed in the Taylor expansion using the following property <d-cite key="kay1993fundamentals"></d-cite>:
+
+$$
 \begin{equation}
 \mathbb{I}_{\mathcal{A}} = \mathbb{E}[-\dfrac{\partial^2(\log(p(\boldsymbol{\theta}\mid\mathcal{A})))}{\partial^2\boldsymbol{\theta}}\mid_{\boldsymbol{\theta}^\star_{\mathcal{A}}}] = \mathbb{E}[(\dfrac{\partial(\log(p(\boldsymbol{\theta}\mid\mathcal{A})))}{\partial\boldsymbol{\theta}})(\dfrac{\partial(\log(p(\boldsymbol{\theta}\mid\mathcal{A})))}{\partial\boldsymbol{\theta}})^\top\mid_{\boldsymbol{\theta}^\star_{\mathcal{A}}}]
 \end{equation}
 $$
+
 Now, we can write the log-posterior equation as:
+
 $$
 \begin{equation}
 \log(p(\boldsymbol{\theta}\mid\boldsymbol{\Sigma})) = \log(p(\mathcal{B}\mid\boldsymbol{\theta})) +\dfrac{\lambda}{2}(\boldsymbol{\theta} -\boldsymbol{ \theta}^\star_{\mathcal{A}})^\top(\dfrac{\partial^2(\log(p(\boldsymbol{\theta}\mid\mathcal{A})))}{\partial^2\boldsymbol{\theta}}\mid_{\boldsymbol{\theta}^\star_{\mathcal{A}}})(\boldsymbol{\theta} -\boldsymbol{ \theta}^\star_{\mathcal{A}}) + \epsilon'
 \end{equation}
 $$
+
 where $\epsilon'$ accounts for all constants and $\lambda$ is a hyper-parameter introduced to have a trade off between learning $\mathcal{B}$ and not forgetting $\mathcal{A}$. Simplifying more, we have:
+
 $$
 \begin{equation}
 \log(p(\boldsymbol{\theta}\mid\boldsymbol{\Sigma})) = \log(p(\mathcal{B}\mid\boldsymbol{\theta})) - \dfrac{\lambda}{2}(\boldsymbol{\theta} - \boldsymbol{ \theta}^\star_{\mathcal{A}})^\top \mathbb{I}_{\mathcal{A}} (\boldsymbol{\theta} -  \boldsymbol{\theta}^\star_{\mathcal{A}}) + \epsilon'
