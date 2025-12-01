@@ -18,7 +18,7 @@ authors:
 #       name: Institution Name
 
 # must be the exact same name as your blogpost
-bibliography: 2026-04-27-useful_calibrated_uncertainties.bib
+bibliography: 2026-04-27-useful-calibrated-uncertainties.bib
 
 # Add a table of contents to your post.
 #   - make sure that TOC names match the actual section names
@@ -39,7 +39,7 @@ toc:
       - name: A Brief Retrospective
   - name: Closing Thoughts and Takeaways
 ---
-{% include figure.liquid path="assets/img/2026-04-27-useful_calibrated_uncertainties/confused.png" class="img-fluid z-depth-1" %}
+{% include figure.liquid path="assets/img/2026-04-27-useful-calibrated-uncertainties/confused.png" class="img-fluid z-depth-1" %}
 ## People Have a Fuzzy Impression of Calibration (in AI)
 
 The goal of this blogpost is to provide an intuitive and helpful guide on understanding the *practical usefulness* of a *well-calibrated* model, for practitioners/researchers in AI both familiar and unfamiliar with calibration. Anecdotally, when I tell researchers and practictioners from other domains that I work in uncertainty estimation, they often give remarks along the lines of "Oh so like calibration?" or "You mean probabilistic and Bayesian/Conformal stuff?". They seem to know of the research domain and associate it with vague motivations of "safety", "trustworthiness" and "reliability", but often have unclear senses of what it actually entails. Furthermore, even *within* the research domain people often have fuzzy impressions of the motivation for wanting a calibrated model. Papers on calibration are often written with one or two motivating paragraphs, before promptly moving onto the main algorithmic meat. Reading the literature thus becomes a way to learn about *how to better calibrate models* without really engaging concretely with *how, why and when calibrated models are useful*. 
@@ -101,7 +101,7 @@ $$
 
 In the binary case, how well calibrated a model is can be visualised using a reliability diagram <d-cite key="degroot1983comparison,NiculescuMizilCaruana2005"></d-cite> which plots the empirical frequency of $\text{event}$ (on average over $\text{conditions}$) given the predicted model probability $\pi$, i.e. visually comparing the left and right hand sides of Eq. \ref{eq:calib-natlang}. Practically, by binning predicted probabilities $\pi$, $P(\text{event} \mid  \pi  )$ can be estimated using the empirical frequency of $\text{event}$ within each bin.
 
-{% include figure.liquid path="assets/img/2026-04-27-useful_calibrated_uncertainties/reliability_diagrams.png" class="img-fluid z-depth-1" %}
+{% include figure.liquid path="assets/img/2026-04-27-useful-calibrated-uncertainties/reliability_diagrams.png" class="img-fluid z-depth-1" %}
 
 <div class="caption">
 Left: Reliability diagram showing over and under-confident models. Right: Practical reliability diagram where empirical frequencies are estimated using bins.
@@ -140,7 +140,7 @@ $$
 
 where we've abbreviated $\text{event}$ and $\text{conditions}$ to random variables $e$ and $c$ respectively. Intuitively, this means that for the predictions with $\pi$ equals to some value, say $0.7$, we can reliably expect $\text{event}$ to occur $70\%$ of the time. Consider a loss (or reward) function $\mathcal{L}(e,\pi)$ that depends on $\text{event}$ and the model's predicted probability. For example, the 0-1 multiclass classification loss for confidence calibration is 0 when $\text{event}$ occurs (correct prediction) and 1 when $\text{event}$ doesn't occur (misclassification). Intuitively, we can now rely on $\pi$ to calculate the *expected/average loss*. Consider confidence calibration where for some image classifier our binary model is assigning the predicted class probability $\pi=0.6$ of being correct for half of the input images $x$ and $\pi=0.4$ for the other half. If our model is well calibrated we can then reliably claim that it will have an average accuracy of $60\%$ on the first half and $40\%$ on the second half, leading to an overall accuracy of $50\%$, *without needing to compare its predictions to any ground truth labels $y$*. This is the sense in which a calibrated model is *reliable*.
 
-{% include figure.liquid path="assets/img/2026-04-27-useful_calibrated_uncertainties/calibration_illust.png" class="img-fluid z-depth-1" %}
+{% include figure.liquid path="assets/img/2026-04-27-useful-calibrated-uncertainties/calibration_illust.png" class="img-fluid z-depth-1" %}
 
 <div class="caption">
 Illustration of how a confidence-calibrated model allows estimation of expected accuracy from only inputs/conditions without needing events/labels.
@@ -191,7 +191,7 @@ Explore $\tau$ by varying it to maximise the estimated profit. You should observ
 
 <div class="l-page">
   <iframe
-    src="{{ 'assets/html/2026-04-27-useful_calibrated_uncertainties/loan_widget.html' | relative_url }}"
+    src="{{ 'assets/html/2026-04-27-useful-calibrated-uncertainties/loan_widget.html' | relative_url }}"
     frameborder="0"
     scrolling="no"
     height="600px"
@@ -204,7 +204,7 @@ Recall the motivating paragraph from *On Calibration of Modern Neural Networks* 
 
 > ... in automated health care, control should be passed on to human doctors when the confidence of a disease diagnosis network is low. 
 
-{% include figure.liquid path="assets/img/2026-04-27-useful_calibrated_uncertainties/selective_classification.png" class="img-fluid z-depth-1" %}
+{% include figure.liquid path="assets/img/2026-04-27-useful-calibrated-uncertainties/selective_classification.png" class="img-fluid z-depth-1" %}
 
 <div class="caption">
 Illustration automated medical diagnosis with selective classification where a prediction should be deferred to an expert if it is likely to be incorrect.
@@ -214,7 +214,7 @@ What the authors are actually describing here is selective classification <d-cit
 
 Consider our previous well-calibrated image classifier. Here we are focusing on the model of $P_\theta(\text{event of correct prediction}\mid \text{image})$ rather than the multi-class classifier $f_\phi(x)$ itself, which we assume has a constant accuracy of $50\%$. If we set $\tau = 0.5$, then we would abstain on the images with accuracy $40\%$ and boost the accuracy on the selected images to $60\%$. 
 
-{% include figure.liquid path="assets/img/2026-04-27-useful_calibrated_uncertainties/calibration_discrimination.png" class="img-fluid z-depth-1" %}
+{% include figure.liquid path="assets/img/2026-04-27-useful-calibrated-uncertainties/calibration_discrimination.png" class="img-fluid z-depth-1" %}
 
 <div class="caption">
 Illustration of how abstention can improve accuracy by rejection uncertain predictions.
@@ -222,7 +222,7 @@ Illustration of how abstention can improve accuracy by rejection uncertain predi
 
 However, if we consider another well-calibrated model that predicts $\pi=0.5$ for *all* images, then all predictions have tied confidence and we have no way to discriminate between correct and incorrect predictions. It is well-calibrated but its uncertainties are *useless* for abstaining on potential errors! The key here is that *calibration is related to the accuracy* ***averaged*** *over different inputs* $x$, and does not interrogate the model for each input individually. It only examines $\pi$ with respect to true probability $P(\text{event}\mid \pi)$, not with respect to true probability $P(\text{event}\mid \text{conditions})$.
 
-{% include figure.liquid path="assets/img/2026-04-27-useful_calibrated_uncertainties/cal_bad_disc.png" class="img-fluid z-depth-1" %}
+{% include figure.liquid path="assets/img/2026-04-27-useful-calibrated-uncertainties/cal_bad_disc.png" class="img-fluid z-depth-1" %}
 
 <div class="caption">
 Illustration of how a well-calibrated model with no discrimination ability cannot improve accuracy via abstention.
@@ -230,7 +230,7 @@ Illustration of how a well-calibrated model with no discrimination ability canno
 
 Conversely, if a different well-calibrated model for $\text{event}$ "correct prediction" is able to predict $\pi=0.8$ for a subset of half of the images where the classifier has accuracy $80\%$ and $\pi=0.2$ for the other half where accuracy is $20\%$, then the selected images will have an accuracy of $80\%$ when setting $\tau=0.5$. 
  
- {% include figure.liquid path="assets/img/2026-04-27-useful_calibrated_uncertainties/cal_better_disc.png" class="img-fluid z-depth-1" %}
+ {% include figure.liquid path="assets/img/2026-04-27-useful-calibrated-uncertainties/cal_better_disc.png" class="img-fluid z-depth-1" %}
 
 <div class="caption">
 Illustration of how a well-calibrated model with better discrimination ability can improve accuracy via abstention.
@@ -239,7 +239,7 @@ Illustration of how a well-calibrated model with better discrimination ability c
 Finally, if we consider an uncalibrated (overconfident) model that predicts $\pi=0.9$ for half of the images where the classifier has accuracy $80\%$ and $\pi=0.6$ for the other half where accuracy is $20\%$, then the selected images will have an accuracy of $80\%$ when setting $\tau=0.7$. In this case, despite being *uncalibrated*, the model is still able to effectively discriminate between correct and incorrect predictions and abstain on samples it is more likely to be incorrect on. However, in order to estimate the accuracy of selected images and thus reliably choose a threshold $\tau$ for deployment, we would need access to ground truth labels from a validation set. If you don't trust the calibration of your model, the only way to reliably determine its performance is to validate it against ground truth labels.
  
  
-{% include figure.liquid path="assets/img/2026-04-27-useful_calibrated_uncertainties/uncal_better_disc.png" class="img-fluid z-depth-1" %}
+{% include figure.liquid path="assets/img/2026-04-27-useful-calibrated-uncertainties/uncal_better_disc.png" class="img-fluid z-depth-1" %}
 
 
 <div class="caption">
@@ -392,7 +392,7 @@ Extending our previous interactive example of the bank deciding whether to issue
 
 <div class="l-page">
   <iframe
-    src="{{ 'assets/html/2026-04-27-useful_calibrated_uncertainties/loan_discrimination_widget.html' | relative_url }}"
+    src="{{ 'assets/html/2026-04-27-useful-calibrated-uncertainties/loan_discrimination_widget.html' | relative_url }}"
     frameborder="0"
     scrolling="no"
     height="600px"
