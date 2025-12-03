@@ -1,6 +1,6 @@
 ---
 layout: distill
-title: "Neural Audio Codecs: how to get audio into LLMs"
+title: "Neural audio codecs: how to get audio into LLMs"
 description: Your blog post's abstract.
   Please add your abstract or summary here and not in the main body of your text.
   Do not include math/latex or hyperlinks.
@@ -86,7 +86,12 @@ _styles: >
 
 As of October 2025, speech LLMs suck. Many LLMs have voice interfaces, but they usually work by transcribing your speech, generating the answer in text, and using text-to-speech to read the response out loud. That’s perfectly fine in many cases, but it’s a wrapper, not _real_ speech understanding. The model can’t hear the frustration in your voice and respond with empathy, it can’t emphasize important words in its answer, it cannot sense sarcasm, and so on.
 
-Yes, there _are_ LLMs ([Gemini](https://blog.google/technology/google-deepmind/gemini-2-5-native-audio/), [ChatGPT](https://openai.com/index/hello-gpt-4o/)’s Advanced Voice Mode, [Qwen](https://qwen.ai/blog?id=fdfbaf2907a36b7659a470c77fb135e381302028&from=research.research-list), [Moshi](https://moshi.chat/)) that understand and generate speech natively. But in practice, they’re either not as smart, or they behave like text model wrappers. Try asking any of them “Am I speaking in a low voice or a high voice?” in a high-pitched voice, and they won’t be able to tell you.
+Yes, there _are_ LLMs
+(Gemini 2.5 <d-cite key="gemini_2_5_native_audio" />,
+ChatGPT’s Advanced Voice Mode <d-cite key="DBLP:journals/corr/abs-2410-21276" />,
+Qwen <d-cite key="DBLP:journals/corr/abs-2509-17765" />,
+Moshi <d-cite key="DBLP:journals/corr/abs-2410-00037" />)
+that understand and generate speech natively. But in practice, they’re either not as smart, or they behave like text model wrappers. Try asking any of them “Am I speaking in a low voice or a high voice?” in a high-pitched voice, and they won’t be able to tell you.
 
 Clearly, speech LLMs lag behind text LLMs. But why? For text, we found out a few years ago that if you take a lot of text data, a big Transformer, and a lot of GPUs, you’ll get some pretty damn good text continuation models. Why can’t we just replace text with audio and get pretty damn good speech continuation models?
 
@@ -96,11 +101,11 @@ As a teaser, here’s what happens when you try to do that naively (warning, lou
 
 We’ll have a look at why audio is harder to model than text and how we can make it easier with _neural audio codecs_, the de-facto standard way of getting audio into and out of LLMs. With a codec, we can turn audio into larger discrete _tokens_, train models to predict continuations for these tokens, and then decode those back into audio: see animation above.
 
-Kyutai folks have done a lot of work in this space, which is part of the reason I chose to cover this topic. We’ll start from the basics and build up all the way to [Mimi](https://huggingface.co/kyutai/mimi), our neural audio codec. It was originally developed for [Moshi](https://arxiv.org/abs/2410.00037) and later adopted by others for their models, notably [Sesame’s CSM](https://www.sesame.com/research/crossing_the_uncanny_valley_of_voice).
+We’ll start from the basics and build up all the way to Mimi, a modern neural audio codec originally developed for Moshi <d-cite key="DBLP:journals/corr/abs-2410-00037" /> and later adopted by others for their models, notably Sesame’s CSM <d-cite key="sesame_uncanny_valley_voice" />.
 
 ## Text is easy
 
-To [tokenize](https://platform.openai.com/docs/concepts/tokens#tokens) text, everybody uses a technique called byte-pair encoding and rarely changes the tokenizer: OpenAI has been using [the same tokenizer](https://github.com/openai/tiktoken/blob/2ab6d3706d557b560b200be48e6a32324682c9a3/tiktoken/model.py#L8-L16C17) since GPT-4o, an ancient model if you count in LLM years.
+To tokenize text, everybody uses a technique called byte-pair encoding and rarely changes the tokenizer: OpenAI has been using [the same tokenizer](https://github.com/openai/tiktoken/blob/2ab6d3706d557b560b200be48e6a32324682c9a3/tiktoken/model.py#L8-L16C17) since GPT-4o <d-cite key="DBLP:journals/corr/abs-2410-21276">, an ancient model if you count in LLM years.
 
 <!-- <FigureWithCaption src={"assets/img/2026-04-27-neural-audio-codecs/image.png"}>
   A random text from Wikipedia tokenized via the GPT-4o tokenizer
@@ -109,8 +114,8 @@ To [tokenize](https://platform.openai.com/docs/concepts/tokens#tokens) text, eve
 
 You can even get decent results without tokenizing text at all, just predicting individual
 characters. One of the first posts that got me excited about machine learning was
-Andrej Karpathy’s [RNN effectiveness](https://karpathy.github.io/2015/05/21/rnn-effectiveness/)
-blog post from 2015. Karpathy trains a three-layer LSTM on a single GPU and gets
+Andrej Karpathy’s RNN effectiveness blog post <d-cite key="unreasonable_rnns" /> from 2015.
+Karpathy trains a three-layer LSTM on a single GPU and gets
 it to generate decent-looking code and LaTeX:
 
 <div class="row mt-3">
@@ -122,8 +127,8 @@ it to generate decent-looking code and LaTeX:
     </div>
 </div>
 
-Remember this was ten years ago, back when we didn’t even know that [attention is all we need](https://en.wikipedia.org/wiki/Attention_Is_All_You_Need).
-Now compare Karpathy’s results to a sample from [WaveNet](https://deepmind.google/discover/blog/wavenet-a-generative-model-for-raw-audio/), a model DeepMind published a year later:
+Remember this was ten years ago, back when we didn’t even know that attention is all we need <d-cite key="DBLP:journals/corr/VaswaniSPUJGKP17" />.
+Now compare Karpathy’s results to a sample from WaveNet <d-cite key="DBLP:conf/ssw/OordDZSVGKSK16" />, a model DeepMind published a year later:
 
 {% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/speaker-1.wav" controls=true class="audio-sample" %}
 
@@ -143,11 +148,11 @@ So instead of running the model to predict the samples one-by-one directly, we�
 
 But first, let’s get a baseline model by generating audio sample by sample, like WaveNet does. The code for all of these experiments is open-source! [Link to code omitted for anonymization, reading the code is not necessary for understanding the blog post.] I forked Andrej Karpathy’s [nanoGPT](https://github.com/karpathy/nanoGPT) repo, a simple implementation of GPT-2.
 
-Text and audio are kind of the same from the perspective of the language model: it’s just tokens in, tokens out. The only thing we need to do is to quantize the continuous values of the samples into discrete buckets. Like WaveNet, we’ll use the ["μ-law algorithm"](https://en.wikipedia.org/wiki/%CE%9C-law_algorithm) to get 256 buckets. We’ll treat those as 256 possible tokens.
+Text and audio are kind of the same from the perspective of the language model: it’s just tokens in, tokens out. The only thing we need to do is to quantize the continuous values of the samples into discrete buckets. Like WaveNet, we’ll use the "μ-law algorithm" <d-cite key="ITU-G711" /> to get 256 buckets. We’ll treat those as 256 possible tokens.
 
-Let’s train a language model on audio tokenized like this. For the dataset, we’ll use the [Libri-Light](https://ai.meta.com/tools/libri-light/) dataset, following AudioLM <d-cite key="DBLP:journals/taslp/BorsosMVKPSRTGTZ23" />. Its train split contains 50k hours in total, but we’ll go with 1000 hours for this experiment. With this sample-by-sample tokenization, we end up with a dataset of 53 GB.
+Let’s train a language model on audio tokenized like this. For the dataset, we’ll use the Libri-Light dataset <d-cite key="DBLP:conf/icassp/KahnRZKXMKLCFLS20" />, following AudioLM <d-cite key="DBLP:journals/taslp/BorsosMVKPSRTGTZ23" />. Its train split contains 50k hours in total, but we’ll go with 1000 hours for this experiment. With this sample-by-sample tokenization, we end up with a dataset of 53 GB.
 
-We train a small-ish transformer of 151.28M parameters, about the size of the [smallest GPT-2 variant](https://openai.com/index/better-language-models/). When we sample from the model, it makes babbling sounds (warning, loud at times!):
+We train a small-ish transformer of 151.28M parameters, about the size of the smallest GPT-2 variant <d-cite key="radford2019language" />. When we sample from the model, it makes babbling sounds (warning, loud at times!):
 
 {% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/20250925_140600_3.wav" controls=true class="audio-sample" %}
 
@@ -178,7 +183,7 @@ First, let’s train a regular autoencoder to encode the images into two-dimensi
 
 {% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/vq_images_unquantized_v2.mp4" class="img-fluid rounded z-depth-1"  controls=true muted=true autoplay=true %}
 <div class="caption">
-  Training a regular autoencoder on Fashion MNIST
+  Training a regular autoencoder on Fashion-MNIST
 </div>
 
 Each frame shows one batch of training, with some batches skipped. The little images are the autoencoder’s reconstructions for the images in the batch. I’ve added colors for the three classes (t-shirt/top=blue trousers=yellow, pullover=purple), but the autoencoder doesn’t get a class as input – the space just naturally clusters by class. Let's zoom in on a few reconstructions:
