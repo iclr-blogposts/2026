@@ -1,0 +1,717 @@
+---
+layout: distill
+title: Sample Blog Post
+description: Your blog post's abstract.
+  Please add your abstract or summary here and not in the main body of your text.
+  Do not include math/latex or hyperlinks.
+date: 2026-04-27
+future: true
+htmlwidgets: true
+hidden: true
+
+# Mermaid diagrams
+mermaid:
+  enabled: true
+  zoomable: true
+
+# Anonymize when submitting
+# authors:
+#   - name: Anonymous
+
+authors:
+  - name: Albert Einstein
+    url: "https://en.wikipedia.org/wiki/Albert_Einstein"
+    affiliations:
+      name: IAS, Princeton
+  - name: Boris Podolsky
+    url: "https://en.wikipedia.org/wiki/Boris_Podolsky"
+    affiliations:
+      name: IAS, Princeton
+  - name: Nathan Rosen
+    url: "https://en.wikipedia.org/wiki/Nathan_Rosen"
+    affiliations:
+      name: IAS, Princeton
+
+# must be the exact same name as your blogpost
+bibliography: 2026-04-27-distill-example.bib
+
+# Add a table of contents to your post.
+#   - make sure that TOC names match the actual section names
+#     for hyperlinks within the post to work correctly.
+#   - please use this format rather than manually creating a markdown table of contents.
+toc:
+  - name: Equations
+  - name: Images and Figures
+    subsections:
+      - name: Interactive Figures
+  - name: Citations
+  - name: Footnotes
+  - name: Code Blocks
+  - name: Diagrams
+  - name: Tweets
+  - name: Layouts
+  - name: Other Typography?
+
+# Below is an example of injecting additional post-specific styles.
+# This is used in the 'Layouts' section of this post.
+# If you use this post as a template, delete this _styles block.
+_styles: >
+  .fake-img {
+    background: #bbb;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 12px;
+  }
+  .fake-img p {
+    font-family: monospace;
+    color: white;
+    text-align: left;
+    margin: 12px 0;
+    text-align: center;
+    font-size: 16px;
+  }
+---
+
+
+import FigureWithCaption from "@/components/codec-explainer/FigureWithCaption";
+import AudioPlayer from "@/components/codec-explainer/AudioPlayer";
+
+# Neural audio codecs: how to get audio into LLMs
+
+<div className="text-gray-500">
+<div className="text-right mb-2">_Václav Volhejn_</div>
+
+_Thank you for the valuable feedback on the drafts: Chung-Ming Chien, Moritz Boehle, Richard Hladík, Eugene Kharitonov, Patrick Perez, and Tom Sláma._
+_I’d also like to thank the rest of the Kyutai team for the the research discussions without which this article could not exist._
+
+</div>
+
+{% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/codecIntro.mp4" class="img-fluid rounded z-depth-1" controls=true %}
+
+<FigureWithCaption src={"assets/codec-explainer/codecIntro.mp4"}>
+  The plan: sandwich a language model in an audio encoder/decoder pair (=neural
+  audio codec), allowing it to predict audio continuations.
+</FigureWithCaption>
+
+As of October 2025, speech LLMs suck. Many LLMs have voice interfaces, but they usually work by transcribing your speech, generating the answer in text, and using text-to-speech to read the response out loud. That’s perfectly fine in many cases (see [Unmute](https://unmute.sh/)), but it’s a wrapper, not _real_ speech understanding. The model can’t hear the frustration in your voice and respond with empathy, it can’t emphasize important words in its answer, it cannot sense sarcasm, and so on.
+
+Yes, there _are_ LLMs ([Gemini](https://blog.google/technology/google-deepmind/gemini-2-5-native-audio/), [ChatGPT](https://openai.com/index/hello-gpt-4o/)’s Advanced Voice Mode, [Qwen](https://qwen.ai/blog?id=fdfbaf2907a36b7659a470c77fb135e381302028&from=research.research-list), [Moshi](https://moshi.chat/)) that understand and generate speech natively. But in practice, they’re either not as smart, or they behave like text model wrappers. Try asking any of them “Am I speaking in a low voice or a high voice?” in a high-pitched voice, and they won’t be able to tell you.
+
+Clearly, speech LLMs lag behind text LLMs. But why? For text, we found out a few years ago that if you take a lot of text data, a big Transformer, and a lot of GPUs, you’ll get some pretty damn good text continuation models. Why can’t we just replace text with audio and get pretty damn good speech continuation models?
+
+As a teaser, here’s what happens when you try to do that naively (warning, loud):
+
+<AudioPlayer src="assets/codec-explainer/nightmare-fuel-20lufs.wav" />
+
+{% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/nightmare-fuel-20lufs.wav" class="img-fluid rounded z-depth-1" controls=true %}
+
+We’ll have a look at why audio is harder to model than text and how we can make it easier with _neural audio codecs_, the de-facto standard way of getting audio into and out of LLMs. With a codec, we can turn audio into larger discrete _tokens_, train models to predict continuations for these tokens, and then decode those back into audio: see animation above.
+
+Kyutai folks have done a lot of work in this space, which is part of the reason I chose to cover this topic. We’ll start from the basics and build up all the way to [Mimi](https://huggingface.co/kyutai/mimi), our neural audio codec. It was originally developed for [Moshi](https://arxiv.org/abs/2410.00037) and later adopted by others for their models, notably [Sesame’s CSM](https://www.sesame.com/research/crossing_the_uncanny_valley_of_voice).
+
+## Text is easy
+
+To [tokenize](https://platform.openai.com/docs/concepts/tokens#tokens) text, everybody uses a technique called byte-pair encoding and rarely changes the tokenizer: OpenAI has been using [the same tokenizer](https://github.com/openai/tiktoken/blob/2ab6d3706d557b560b200be48e6a32324682c9a3/tiktoken/model.py#L8-L16C17) since GPT-4o, an ancient model if you count in LLM years.
+
+<FigureWithCaption src={"assets/codec-explainer/image.png"}>
+  A random text from Wikipedia tokenized via the GPT-4o tokenizer
+</FigureWithCaption>
+
+You can even get decent results without tokenizing text at all, just predicting individual
+characters. One of the first posts that got me excited about machine learning was
+Andrej Karpathy’s [RNN effectiveness](https://karpathy.github.io/2015/05/21/rnn-effectiveness/)
+blog post from 2015. Karpathy trains a three-layer LSTM on a single GPU and gets
+it to generate decent-looking code and LaTeX:
+
+<div className="flex flex-col md:flex-row gap-4 items-start my-2">
+  <img
+    src="assets/codec-explainer/rnns-code.png"
+    alt=""
+    className="w-full md:w-auto flex-1 min-w-0"
+  />
+  <img
+    src="assets/codec-explainer/rnns-latex.png"
+    alt=""
+    className="w-full md:w-auto flex-1 min-w-0"
+  />
+</div>
+
+Remember this was ten years ago, back when we didn’t even know that [attention is all we need](https://en.wikipedia.org/wiki/Attention_Is_All_You_Need).
+Now compare Karpathy’s results to a sample from [WaveNet](https://deepmind.google/discover/blog/wavenet-a-generative-model-for-raw-audio/), a model DeepMind published a year later:
+
+<AudioPlayer src="assets/codec-explainer/speaker-1.wav" />
+
+Purely acoustically, the audio sounds good, but it rarely even manages to produce a single correct English word. We can’t be too hard on WaveNet, though. The samples from Karpathy’s RNNs are only a few thousand characters long, but this 10-second audio consists of 160k audio samples, and WaveNet creates it by painstakingly predicting sample-by-sample.
+
+<FigureWithCaption src={"assets/codec-explainer/wavenet-audio.mp4"}>
+  A single second of audio consists of tens of thousands of samples, although it
+  corresponds to just a few words. Animation from the [WaveNet blog
+  post](https://deepmind.google/discover/blog/wavenet-a-generative-model-for-raw-audio/).
+</FigureWithCaption>
+
+It’s difficult to build models that are coherent over time scales this long, and the model also takes very long to run for so many steps.
+
+So instead of running the model to predict the samples one-by-one directly, we’d like to train a model to compress the audio into a more manageable size. We could compress the audio, use an LLM to predict a continuation in the compressed representation, and then decompress the result.
+
+## Sample by sample
+
+But first, let’s get a baseline model by generating audio sample by sample, like WaveNet does. **The code for all of these experiments is open-source! Check it out [here](https://github.com/kyutai-labs/nanoGPTaudio).** I forked Andrej Karpathy’s [nanoGPT](https://github.com/karpathy/nanoGPT) repo, a simple implementation of GPT-2.
+
+Text and audio are kind of the same from the perspective of the language model: it’s just tokens in, tokens out. The only thing we need to do is to quantize the continuous values of the samples into discrete buckets. Like WaveNet, we’ll use the ["μ-law algorithm"](https://en.wikipedia.org/wiki/%CE%9C-law_algorithm) to get 256 buckets. We’ll treat those as 256 possible tokens.
+
+Let’s train a language model on audio tokenized like this. For the dataset, we’ll use the [Libri-Light](https://ai.meta.com/tools/libri-light/) dataset, following [AudioLM](https://arxiv.org/abs/2209.03143) (with Neil Zeghidour, Eugene Kharitonov). Its train split contains 50k hours in total, but we’ll go with 1000 hours for this experiment. With this sample-by-sample tokenization, we end up with a dataset of 53 GB.
+
+We train a small-ish transformer of 151.28M parameters, about the size of the [smallest GPT-2 variant](https://openai.com/index/better-language-models/). When we sample from the model, it makes babbling sounds (warning, loud at times!):
+
+<AudioPlayer src="assets/codec-explainer/20250925_140600_3.wav" />
+
+Often, it goes into a “crackling mode” that it can’t seem to get out of:
+
+<AudioPlayer src="assets/codec-explainer/20250925_140600_4.wav" />
+
+I also trained a smaller model, which I teased at the beginning. It’s prone to generate nightmare fuel screeches (loud!):
+
+<AudioPlayer src="assets/codec-explainer/nightmare-fuel-2-20lufs.wav" />
+
+As you can tell, we’re not AGI yet. It sounds speech-like, but you can’t make out a single word and the voice keeps changing. No wonder: the context size of the model is 2048, which, for 16 kHz audio, translates to 128ms, not even the length of one word. Also, these 10-second examples took 30 minutes to generate on an H100, so we’re a few orders of magnitude away from being real-time.
+
+So let’s build a neural audio codec to compress the audio. The hope is that if we reduce the sampling rate 100x, the model will also become “100x more coherent”. An old idea in machine learning is to do this using an _autoencoder:_ a model that takes an input, compresses it into a smaller “latent space”, and then tries to reconstruct the original input.
+
+In our case, we’ll want an autoencoder whose latent space is quantized so that we can feed the latents into a language model and produce continuations. (You _can_ generate continuations with unquantized latents, but it’s trickier – see the [Further reading](#further-reading) section.)
+
+## Autoencoders with vector quantization (VQ-VAE)
+
+Bear with me, because we’ll take a detour from audio: let’s build a quantized autoencoder on images from [Fashion MNIST](https://arxiv.org/abs/1708.07747). We’ll take a subset with the first three classes: t-shirt/top, trouser, and pullover.
+
+<FigureWithCaption
+  src={"assets/codec-explainer/fashion-mnist-3.png"}
+>
+  [image
+  source](https://www.researchgate.net/figure/The-FashionMNIST-dataset-consists-of-10-classes-of-monochrome-clothing-items-and-is_fig1_373046669)
+</FigureWithCaption>
+
+First, let’s train a regular autoencoder to encode the images into two-dimensional space:
+
+<FigureWithCaption
+  src={"assets/codec-explainer/vq_images_unquantized_v2.mp4"}
+  widthClassName="w-full max-w-72"
+>
+  Training a regular autoencoder on Fashion MNIST
+</FigureWithCaption>
+
+Each frame shows one batch of training, with some batches skipped. The little images are the autoencoder’s reconstructions for the images in the batch. I’ve added colors for the three classes (t-shirt/top=blue trousers=green, pullover=yellow), but the autoencoder doesn’t get a class as input – the space just naturally clusters by class. Let's zoom in on a few reconstructions:
+
+<FigureWithCaption
+  src={"assets/codec-explainer/rvq-without-quantization-v4.png"}
+>
+  Original images (top) and their reconstructed versions (bottom)
+</FigureWithCaption>
+
+As you can tell, the reconstruction quality is not great. The images are blurry and the first two images are reconstructed to nearly the same thing. But we used a tiny network (4 fully connected layers for the encoder and decoder each) and projected into a mere two dimensions, so we can’t expect too much of our model.
+
+Now let’s quantize these embeddings using a clustering. We’ll do something like [k-means](https://en.wikipedia.org/wiki/K-means_clustering): we’ll maintain a list of the positions of the cluster centers. We initialize the positions randomly. For each training batch, we look at which embeddings would go to each cluster. (We don’t modify the embeddings, we just look at the assignment). Then we’ll nudge each cluster center towards the average position of these embeddings.
+
+Also, if a center is unused for a while, we teleport it to a random embedding from the batch, because otherwise it has no way to get unstuck from its current position.
+
+<FigureWithCaption
+  src={"assets/codec-explainer/vq_images_unquantized_with_clustering_v2.mp4"}
+  widthClassName="w-full max-w-72"
+>
+  Quantizing by fitting a clustering on top of the autoencoder
+</FigureWithCaption>
+
+You can see the reconstructions of the cluster centers getting refined over time.
+
+Next, we’ll make the encoder and decoder themselves better at handling quantized embeddings during training, because currently, we’re just fitting the clustering on top of an autoencoder that is not “aware” it’s being quantized. We’d like the autoencoder to adapt to the quantization as we train it. Currently, we’re doing this:
+
+```python
+x = get_batch()
+z = encoder(x)
+
+x_reconstructed = decoder(z)
+
+loss = reconstruction_loss(x, x_reconstructed)
+```
+
+Instead of feeding the unquantized embedding into the decoder, we’ll first move it to the closest cluster:
+
+```python
+x = get_batch()
+z = encoder(x)
+
+z_quantized = to_nearest_cluster(z)     # 👈
+x_reconstructed = decoder(z_quantized)  # 👈
+
+loss = reconstruction_loss(x, x_reconstructed)
+```
+
+There is a snag: if we do this, we won’t be able to train the autoencoder any more, because the quantization operation is not differentiable, meaning there is no gradient flowing from the loss to the weights of the encoder. Essentially, we’re no longer able to answer the question: “if I want the loss to decrease a bit, in which direction should I nudge the encoder’s weights?”
+
+We’ll fix this problem by pretending it doesn’t exist. Yes, really. We’ll think of `z_quantized` as `z` moved by an arbitrary vector that doesn’t affect the gradient. That will make the gradient of `z` equal to that of `z_quantized`, which is why this is also known as the _straight-through estimator_ of the gradient.
+
+```python
+x = get_batch()
+z = encoder(x)
+
+residual = z - to_nearest_cluster(z)
+# .detach() means "forget that this needs a gradient"
+z_quantized = z - residual.detach()
+x_reconstructed = decoder(z_quantized)
+
+loss = reconstruction_loss(x, x_reconstructed)
+```
+
+In the forward pass, `z_quantized` is set to the same value as before, but importantly, the gradient of `z` is now equal to that of `z_quantized` rather than just being 0 because of the non-differentiable `to_nearest_cluster(z)` operation.
+
+There is a price to pay for this lie. When training, the encoder’s weights will be updated to improve the reconstruction loss, but they’re updated as if the quantization didn’t happen, so they won’t move in the optimal direction. But as long as the embeddings stick close to their cluster centers, the gradient direction will still be mostly correct.
+
+We can actually encourage the encoder to make embeddings that are easily quantizable by adding a _commitment loss_: a penalty for each point based on how far it is from its cluster center. The gradient of this loss will push the points closer to their cluster centers.
+
+By quantizing at training time and adding a commitment loss, it’s no longer just a clustering being fit on top of the embeddings. The model itself is trained to be good for quantization.
+
+<FigureWithCaption
+  src={"assets/codec-explainer/vq_images_balanced_v2.mp4"}
+  widthClassName="w-full max-w-72"
+>
+  An autoencoder trained explicitly to be easy to quantize
+</FigureWithCaption>
+
+You’ll notice that the training dynamics look different: the commitment loss adds a certain “stiffness” that doesn’t allow the embeddings to move around as easily.
+
+Here’s what the reconstructions look like when we use the quantized representations:
+
+<FigureWithCaption src={"assets/codec-explainer/rvq-1-level-v4.png"} />
+
+Notice how the first two images are reconstructed to _exactly_ the same image. That’s simply because their embeddings got assigned to the same cluster and therefore quantized to the same value.
+
+The model described here is known as a “[VQ-VAE](https://arxiv.org/abs/1711.00937)”: a vector-quantized variational autoencoder. The word “variational” here is just a vestigial leftover that doesn’t mean anything anymore.
+
+## Residual vector quantization
+
+To improve the reconstruction fidelity, we can just increase the number of cluster centers. But keeping track of too many centers can get prohibitively expensive in terms of compute and memory required, so we’ll do a clever trick: if we want 2^20 (~1M) possible values, we won’t create 2^20 clusters directly. Instead, we’ll use two separate quantizers with 2^10=1024 clusters and combine their result. Each embedding will then be quantized to a tuple of two integers in [0..1023], yielding 2^20 possible combinations.
+
+Ok, but how? Well, recall the `residual` variable we used in the straight-through estimator, defined as `z - to_nearest_cluster(z)` the shift from the quantized embedding to the unquantized one. It represents the part of the original vector `z` that we didn’t manage to take into account when quantizing to `to_nearest_cluster(z)`.
+
+So for each embedding in the batch, we have a corresponding residual vector. The solution is obvious: we’ll quantize these residuals exactly the same way we did with the original embeddings, by training another vector quantizer.
+
+This time, the 2D positions for a single quantizer don’t define images because we need to combine the two quantizers, so we’ll just visualize everything as dots:
+
+<FigureWithCaption src={"assets/codec-explainer/rvq_fmnist.mp4"}>
+  Two-level quantization by fitting a quantizer on top of the
+  &ldquo;residuals&rdquo;, aka the errors of the first quantizer
+</FigureWithCaption>
+
+Each image is then represented as the index of the cluster of the embedding and that of the residual. Let’s try to reconstruct a few images with this two-level quantizer:
+
+<FigureWithCaption src={"assets/codec-explainer/rvq-2-level-v4.png"}>
+  Original images (top), one-level reconstruction (middle), two-level
+  reconstruction (bottom). These images are encoded as (4, 3), (4, 5), (16, 21),
+  and (30, 3).
+</FigureWithCaption>
+
+The reconstructions of the first two images are similar, but no longer the exact same: the first image is represented as (4, 3) and the second as (4, 5). In other words, they share the same token for the first level, but differ in how the residual is quantized. The differences are quite subtle, so here’s a comparison between the one-level and two-level reconstructions:
+
+<FigureWithCaption src={"assets/codec-explainer/rvq-2-level-diff-v3.png"}>
+  Difference between one-level and two-level reconstructions
+</FigureWithCaption>
+
+I’d like to emphasize that the second quantization level makes modifications to the embedding, not the output pixels directly. This can be seen by the fact that the leftmost and rightmost image are encoded as (4, 3) and (30, 3) respectively. So they have the same residual code, 3, but it modifies the two reconstructed images in different ways.
+
+Clearly, the reconstructions are still not very accurate. The upper bound on the quality is the reconstruction from unquantized embeddings, so if your autoencoder is bad (and ours is), improving the quantization won’t save you.
+
+We’ll stop here, but a natural extension to this idea is to go beyond two levels. Just take the residuals of the two-level reconstruction and quantize those, and so on. This generalized Residual Vector Quantization algorithm looks like this:
+
+```python
+def rvq_quantize(z):
+    residual = z
+    codes = []
+
+    for level in range(levels):
+        quantized, cluster_i = to_nearest_cluster(level, residual)
+        residual -= quantized
+        codes.append(cluster_i)
+
+    return codes
+```
+
+Residual vector quantization was first applied to neural audio codecs in [SoundStream](https://arxiv.org/abs/2107.03312), but the idea [has been around since the 80s](https://ieeexplore.ieee.org/document/1171604).
+
+## Now let’s tokenize audio
+
+Applying RVQ to audio is fairly straightforward. As our autoencoder, we’ll use a convolutional neural network (CNN) similar to [what Jukebox uses](https://github.com/openai/jukebox/blob/08efbbc1d4ed1a3cef96e08a931944c8b4d63bb3/jukebox/vqvae/encdec.py). The details of the architecture aren’t too important here. What’s important is that it’s a network that takes an audio with _t_ samples and converts it to a vector of shape _(t/128, 32)_. In other words, it downsamples by a factor of 128 and gives us 32-dimensional float representations. The decoder then takes the _(t/128, 32)_ embeddings and decodes them back into _t_ samples.
+
+```python
+audio = get_batch()               # shape: [B, T]
+z = encoder(audio)                # shape: [B, T/128, 32]
+audio_reconstructed = decoder(z)  # shape: [B, T]
+```
+
+As before, we’ll add an RVQ after the encoder. The only difference from the image case is that for each audio sample, we have _t/128_ embedding vectors, not just a single one as we did for images. We just quantize these independently (even though the encoder “sees” more audio than what corresponds to that one vector). During training, we also have a batch dimension, so our model now looks like this:
+
+```python
+audio = get_batch()                         # [B, T]
+z = encoder(audio)                          # [B, T/128, 32]
+
+# Combine the batch and time dimensions
+z = rearrange(                              # [B*T/128, 32]
+    z, "b t_emb d -> (b t_emb) d"
+)
+
+codes = rvq_quantize(z)           # integers, [B*T/128, levels]
+z_quantized = codes_to_embeddings(codes)    # [B*T/128, 32]
+z_quantized = rearrange(                    # [B, T/128, 32]
+    z_quantized, "(b t_emb) d -> b t_emb d"
+)
+
+audio_reconstructed = decoder(z_quantized)  # [B, T]
+```
+
+<FigureWithCaption src={"assets/codec-explainer/codecWithRvq.mp4"} />
+
+The last missing piece before we can train our first neural audio codec is a loss function. There’s a whole rabbit hole we could go into about which one to choose, but we’ll avoid it and just use a very simple one. We’ll compute the log amplitude spectrogram of the original and reconstructed audio, and take their difference. The loss is the mean square of this difference between spectrograms.
+
+To make it harder for the model to overfit to this loss, we take the spectrogram with three different parameters for the short-time Fourier transform, and let our loss be the mean between the three sub-losses. This is called the _multi-scale spectral loss_.
+
+<FigureWithCaption src={"assets/codec-explainer/image%202.png"}>
+  Image from Evan Radkoff’s excellent [blog
+  post](https://www.soundsandwords.io/audio-loss-functions/) about loss
+  functions in audio ML. Check it out if you want to go down the loss function
+  rabbit hole.
+</FigureWithCaption>
+
+Finally, let’s train some codecs! We’ll look at how varying the number of RVQ levels affects the reconstruction quality. As we expected, increasing the number of levels helps, decreasing the spectral loss:
+
+<FigureWithCaption
+  src={"assets/codec-explainer/image%203.png"}
+  widthClassName="max-w-104"
+/>
+
+Let’s hear what the codecs sound like. We’ll use the three codecs to reconstruct this audio from the [Expresso dataset](https://speechbot.github.io/expresso/):
+
+<AudioPlayer src="assets/codec-explainer/orig_audio.wav" />
+
+And the reconstructions:
+
+<div className="flex flex-row md:flex-row gap-4 my-4">
+  <div className="flex-1 min-w-0">
+    <div className="font-semibold mb-1">4 RVQ levels</div>
+    <AudioPlayer src="assets/codec-explainer/recon_4_rvq.wav" />
+  </div>
+  <div className="flex-1 min-w-0">
+    <div className="font-semibold mb-1">8 RVQ levels</div>
+    <AudioPlayer src="assets/codec-explainer/recon_8_rvq.wav" />
+  </div>
+  <div className="flex-1 min-w-0">
+    <div className="font-semibold mb-1">16 RVQ levels</div>
+    <AudioPlayer src="assets/codec-explainer/recon_16_rvq.wav" />
+  </div>
+</div>
+
+Clearly, the audio gets better as we add more RVQ levels.
+
+Even with 16 levels, there is some crackling, the audio sounds muffled, and there is a constant high-pitched noise. Later we’ll discuss how we could improve the codec further, but for demonstration purposes, this will do.
+
+## Why care about audio
+
+So now we have a neural audio codec: we can turn audio into LLM-friendly tokens and back. Codec just means a tokenizer for audio, but we say _codec_ because that’s the term used for classic compression like MP3. I’ll be using codec and tokenizer interchangeably.
+
+Let’s come back to what we wanted to do in the first place: modeling audio. Specifically, we’ll make a model that can take an audio prefix and generate a plausible continuation for it.
+
+Just as a reminder, we want to train good audio LLMs so that we have models that understand and produce speech natively, understanding emotion, emphasis, and so on. They could also be fine-tuned into [text-to-speech](/tts), [speech-to-text](/stt), or [translation models](https://arxiv.org/abs/2502.03382), among others.
+
+So now that you’re convinced that audio LLMs are the path to AGI, let’s train a few.
+
+For our dataset, we’ll use [Libri-Light](https://ai.meta.com/tools/libri-light/), like we did for our sample-by-sample model earlier. This time we’ll use 10000h of audio instead of 1000h. It’s a dataset of public-domain audiobooks, so if we have a good model for it, maybe we’ll be able to generate more stories. (Don’t get your hopes up too much.) All we need to do is to convert the audio dataset into a sequence of discrete tokens so that we can feed it into an LLM.
+
+## Dealing with multiple levels
+
+We’ll do that using our 8-level RVQ codec. From an audio with _t_ samples, we’ll get an array of tokens of shape _(t/128, 8)_. But now there’s an issue: how to deal with the fact that for each time step, there’s not one but eight tokens? This is not a problem we have to deal with in text LLMs, where we have a single sequence of tokens.
+
+We’ll do the simplest thing possible and just flatten the array into 1D of shape _(t/128 \* 8)_, and have our LLM predict the eight levels in separate time steps.
+
+<FigureWithCaption src={"assets/codec-explainer/flattenRvq.mp4"}>
+  Flattening a three-level RVQ to allow it to be fed into a language model
+</FigureWithCaption>
+
+The big disadvantage is that we lose some of our temporal compression. We downsampled the audio 128x, but now we’re inflating it 8x again by flattening the levels. That makes inference less efficient, and possibly worse quality because the effective context size decreases. We'll be using the 8 RVQ codec rather than the 16 RVQ one to avoid making the compression even worse.
+
+You could also predict all RVQ levels for a single step at once (”parallel pattern”), but it also makes things harder for the model because it has to decide on all levels at once. There are a bunch of other schemes people have tried to balance compression and quality. Here are a few tried out in MusicGen:
+
+<FigureWithCaption src={"assets/codec-explainer/image%204.png"}>
+  Figure taken from [MusicGen](https://arxiv.org/abs/2306.05284)
+</FigureWithCaption>
+
+Interestingly, as of 2025, there is no single solution that “won”: every paper does something different, and the schemes can get quite involved. Just look at this diagram from [MiMo-Audio](https://github.com/XiaomiMiMo/MiMo-Audio/blob/main/MiMo-Audio-Technical-Report.pdf), a model released in September 2025:
+
+<FigureWithCaption src={"assets/codec-explainer/image%205.png"}>
+  Ways to deal with multiple RVQ levels can get quite involved
+</FigureWithCaption>
+
+## Finally, let's train
+
+Time to finally train a codec-wrapped language model! As I’ve mentioned, [our code](https://github.com/kyutai-labs/nanoGPTaudio) is based on Andrej Karpathy’s [nanoGPT codebase](https://github.com/karpathy/nanoGPT) for training text LLMs. We just need to modify it to accept audio as input. But that’s easy, because LLMs don’t care about what kind of tokens you’re feeding in – it’s all just numbers. Once we’ve tokenized the dataset and flattened it into a 1D sequence, we’re good to go. Tokenized this way, our 10000 hours of audio take up 134 GB. For comparison, storing this much data as uncompressed audio would take over 1 TB.
+
+We’re going to use the exact same model architecture and hyperparameters as for the sample-by-sample model: the only difference is in the tokenization. We also have a 10x bigger dataset, but the sample-by-sample model can’t even fit the dataset with 1k hours, so more data wouldn’t save it.
+
+I trained the model on 8 H100s for about 5 days. To get some samples, I decided to prompt the model with a sample of Libri-Light reading of two lines from [Michael Field’s poem July](https://www.theotherpages.org/poems/field02.html). (As I learned when working on this, Michael Field is a pen name of Katherine Harris and Edith Emma Cooper.) Let’s see what kind of poetry we can get from our model:
+
+<AudioPlayer src="assets/codec-explainer/20251002_123351_4.wav" />
+
+There are some signs of life, but we don’t have a poet yet. It sounds like somebody speaking behind a curtain. You can’t really make out what it’s saying, but the intonation is there: it sounds like somebody reading from a book, which is indeed what the model was trained on.
+
+It also maintains a coherent voice, until it decides for the last few seconds to switch to a different one. That is also consistent with the data: we sample the training data from a concatenation of all the audiobooks chopped up into segments and mixed together, so the model does encounter boundaries between different speakers.
+
+## How far can a codec get us?
+
+Our codec was deliberately simplistic, which explains why the results aren't great—but there's been a good amount of research on neural audio codecs in the last four years that we could leverage.
+We won’t implement all the improvements here, but instead we’ll look at what happens when we use [Mimi](https://huggingface.co/kyutai/mimi) as the tokenizer.
+
+Mimi is a modern neural audio codec built here at Kyutai for [Moshi](https://arxiv.org/abs/2410.00037), our audio language model. It’s since been used as the tokenizer for other models as well, like [Sesame CSM](https://www.sesame.com/research/crossing_the_uncanny_valley_of_voice), [VoXtream](https://herimor.github.io/voxtream/), and [LFM2-Audio](https://www.liquid.ai/blog/lfm2-audio-an-end-to-end-audio-foundation-model).
+
+Unsurprisingly, Mimi sounds a lot better than the homemade codec we trained earlier.
+
+Instead of the multi-scale spectral loss, Mimi uses an adversarial loss, like a GAN. There’s a discriminator network that tries to classify audios as being original or reconstructed by the codec, and the goal of the codec is to fool this discriminator.
+
+Another improvement Mimi adds is using RVQ dropout: it uses 32 RVQ levels but during training, the reconstruction is sometimes randomly truncated to a lower number of levels. That allows us to run Mimi for a lower number of RVQ levels at inference time and still get decent results, because it doesn’t rely on all levels being present. For our codec, we had to train separately.
+
+Let’s hear our example audio reconstructed with Mimi:
+
+Original
+
+<AudioPlayer src="assets/codec-explainer/original_24kHz.wav" />
+
+<div className="grid grid-cols-2 md:grid-cols-4 gap-4 my-4">
+  <div className="flex-1 min-w-0">
+    <div className="font-semibold mb-1">4 RVQ levels</div>
+    <AudioPlayer src="assets/codec-explainer/mimi_4_rvq_recon.wav" />
+  </div>
+  <div className="flex-1 min-w-0">
+    <div className="font-semibold mb-1">8 RVQ levels</div>
+    <AudioPlayer src="assets/codec-explainer/mimi_8_rvq_24kHz.wav" />
+  </div>
+  <div className="flex-1 min-w-0">
+    <div className="font-semibold mb-1">16 RVQ levels</div>
+    <AudioPlayer src="assets/codec-explainer/mimi_16_rvq_recon.wav" />
+  </div>
+  <div className="flex-1 min-w-0">
+    <div className="font-semibold mb-1">32 RVQ levels</div>
+    <AudioPlayer src="assets/codec-explainer/mimi_24kHz.wav" />
+  </div>
+</div>
+
+For our purposes, a variant with fewer levels might have the advantage of being easier to model because it’s more compressed. Let’s train models with 8- and 32-level Mimi and compare the results.
+
+I trained the exact same model architecture as before, the only thing that changes is the tokenizer. It’s 10k hours from Libri-Light as the dataset, just like when we used our simple codec. Mimi has a sample rate of 24 kHz but Libri-Light uses 16 kHz, which puts a cap on how good it can sound, since we lose the higher frequencies of the audio.
+
+Mimi downsamples the audio a lot more aggressively, too: its sample rate is 12.5 frames per second, whereas we used 125 frames per second for our codec – 10x higher! This means the dataset is also smaller on disk. With our codec, it took 134 GB, but for Mimi it’s “just” 54 GB.
+
+Here’s a poem generated with the model trained on Mimi-tokenized data. I prompted it with two lines from the poem, as before:
+
+<AudioPlayer src="assets/codec-explainer/20251002_115006_2.wav" />
+
+Here is my best attempt at a transcription:
+
+> _When the grass is gone<br/>
+> And corn still grassy;_<br/>
+> Illness worried in the fur<br/>
+> this and pelan in stones<br/>
+> during the turan’s ciscerey<br/>
+> headforths nepet Paul Twain.<br/>
+> He _sees_ zin in them.<br/>
+
+A tad too surrealist for my taste, but maybe Lewis Carroll would like it.
+
+## Semantic tokens
+
+I have a confession to make: I lied to you just now. But just a bit, and for didactic purposes. In fact, the model above was trained on audio from a 31-level Mimi, where I omitted the very first level, which contains the “semantic token”.
+
+The role of this token is to represent semantic information of the audio, without necessarily aiding reconstruction. I won’t go into how these work, but in one sentence, Mimi’s semantic tokens are distilled from [WavLM](https://arxiv.org/abs/2110.13900), which you can think of as a [BERT](https://arxiv.org/abs/1810.04805) for speech.
+
+To get a feeling for what information semantic tokens encode, let’s take this example audio, passed through Mimi:
+
+<AudioPlayer src="assets/codec-explainer/original.wav" />
+
+Now let’s train a language model trained on the full Mimi, including semantic tokens. We’re going to run the model in a way where we keep the semantic tokens from the original audio but we discard the others, and let the model predict them. That means the information from the semantic tokens is fixed (”teacher-forced”), but the model is free to decide the others according to what continuations it finds plausible.
+
+<FigureWithCaption src={"assets/codec-explainer/regenerateWithSemantic.mp4"}>
+  We can get an idea of what information is contained in semantic tokens by
+  keeping them fixed and letting the model regenerate the rest.
+</FigureWithCaption>
+
+Listen to two different reconstructions we obtain this way:
+
+<AudioPlayer src="assets/codec-explainer/regenerate-1.wav" />
+
+<AudioPlayer src="assets/codec-explainer/regenerate-2.wav" />
+
+The voice is completely different, but it’s saying the same thing! This means the semantic tokens encode what the person is saying, but are invariant to the voice. That’s useful because it helps the model focus on _what_ to say, not _how_ to say it. In that regard, they’re closer to text tokens, which also don’t contain information about the voice, intonation, timing, or emotion.
+
+## Making poetry semantic
+
+Now let’s take the model trained on semantic Mimi and ask it to complete the poem:
+
+<AudioPlayer src="assets/codec-explainer/20251002_115255_0.wav" />
+
+> _When grass is gone<br/>
+> and corn still grassy;_<br/>
+> from the man was nothing moan.<br/>
+> The low death and heart<br/>
+> She came _fyde_ wood.<br/>
+> A finteriest, a fall,<br/>
+> all them.<br/>
+
+It still makes up words and the sentences are not too coherent, but clearly, the proportion of real words is much higher; the model is “more semantic”. The acoustic quality is the same, which is what we’d expect.
+
+Let’s listen to a second poem:
+
+<AudioPlayer src="assets/codec-explainer/20251002_115255_2.wav" />
+
+> _When grass is gone<br/>
+> and corn still grassy;_<br/>
+> hope won and she<br/>
+> who is just a night in Tatan<br/>
+> in doe ock-ohm?<br/>
+> the whom?<br/>
+
+Indeed, the whom?
+
+## Semantic–acoustic tradeoff
+
+We can sacrifice some acoustic quality to improve the semantics by reducing the number of RVQ levels. Let’s do 8. That way, we get higher audio compression, and a proportionally higher part of the loss comes from the semantic token, since now it’s 1/8 tokens and not just 1/32.
+
+One of the first things I noticed about this model is that it learned to memorize the Librivox notice, so it sometimes generates things like:
+
+<AudioPlayer src="assets/codec-explainer/20251002_121528_3_librivox_intro_trim.wav" />
+
+> Chapter 6 of The Founday, by R. Auclair.<br/>
+> This is a Librivox recording. All Librivox recordings are in the public domain. For information, or to volunteer, please visit librivox.org.<br/>
+> Reading by: Kelvert
+
+Repeating the training data is generally not what you want, but in our case it’s a great sign of life, because the previous models couldn’t even manage that. It also makes up the book, author, and reader, so there is still novelty here.
+
+Now let’s try to make some more poetry:
+
+<AudioPlayer src="assets/codec-explainer/20251002_120917_0_mimi8_temp08_trim.wav" />
+
+> _When grass is gone<br/>
+> and corn still grassy;_<br/>
+> When so we could say<br/>
+> that in fairy interesting wife<br/>
+> who lay there and gone<br/>
+> that save the rosy light of life<br/>
+> Jay Dien, the antique mollity<br/>
+> and a mollity the beast of gray failed summon<br/>
+>
+> end of poem.
+>
+> This recording is in the public domain.
+>
+> [different voice]<br/>
+> So we have formed a float that sent in would rattle down. The piece of opportunity reading and assimila—
+
+This is great. There are several signs of the model being better than the previous ones. I love that it makes up the word “mollity” and then repeats it in the next line. Also, it realizes that it’s reciting a poem and ends the section with “end of poem”. Then it decides it’s the end of the chapter/section and it ends with the “This recording is in the public domain.” disclaimer. After that, it changes the voice and continues talking. That makes sense, since the clips from various audiobooks are just shuffled and concatenated during training, so here the model simulated a clip boundary.
+
+We might get even better results by weighing the loss of the semantic tokens higher than the acoustic tokens, to make the model focus more on the meaning than the sound – in fact, Moshi uses a semantic loss factor of 100x! But we have to stop somewhere.
+
+## Conclusion
+
+We’ve managed to use neural audio codecs to make an audio language model that generates somewhat coherent speech. Obviously, that’s not where the state of the art is in 2025 (and we’re not trying to reach it here) but keep in mind that by using the _exact same model_ without neural audio codecs gives us this:
+
+<AudioPlayer src="assets/codec-explainer/20250925_140600_3.wav" />
+
+Of course, still a long way to go to match text models! Currently, there seems to be a trade-off between speech understanding and reasoning abilities. At the beginning, I mentioned that the speech-native models ([Gemini](https://blog.google/technology/google-deepmind/gemini-2-5-native-audio/), ChatGPT’s [Advanced Voice Mode](https://openai.com/index/hello-gpt-4o/), [Qwen](https://qwen.ai/blog?id=fdfbaf2907a36b7659a470c77fb135e381302028&from=research.research-list), [Moshi](https://moshi.chat/)) aren’t able to tell you whether you’re speaking in a high or low voice, despite the fact that they’re trained to natively understand audio. This is likely because they’re trained on a lot of data generated synthetically with text-to-speech and/or because understanding the tone of the voice (apparently) doesn’t help the models make more accurate predictions.
+
+Kyutai took a stab at creating a voice chat based on an audio language model with Moshi ([demo](https://moshi.chat/), [paper](https://arxiv.org/abs/2410.00037)), released in July 2024. Moshi might not be the AI you’d pick to do your homework for you, but cut it some slack: it was the first end-to-end voice AI, released even before OpenAI’s Advanced Voice Mode.
+
+Moshi models an “inner monologue” text stream in parallel with audio streams for itself and the user. The text stream is helps it plan what it’s going to say, and ablations showed that the text stream helps the model massively. At the same time, it’s a bit sad: most of the reasoning seems to be delegated to the text stream and the audio streams are just there to provide an integrated speech-to-text and text-to-speech.
+
+<FigureWithCaption
+  src={"assets/codec-explainer/moshi-figure-1.png"}
+  widthClassName="w-full max-w-104"
+>
+  [Moshi](https://arxiv.org/abs/2410.00037) models two audio streams and a text
+  stream in parallel
+</FigureWithCaption>
+
+It’s not just Moshi: as the “am I speaking in a high voice” experiment shows, this over-reliance on text in favor of audio is an issue for all audio LLMs. And that’s even though the dominant modeling approach is somewhat different than Moshi’s: interleaving text and audio tokens instead of modeling them in parallel streams.
+
+Over a year after Moshi, audio models still lag behind text LLMs. But why? To me, this mysterious unsolved “modality gap” makes audio ML an exciting field to work on.
+
+**Thank you for reading! The code for the experiments is [here](https://github.com/kyutai-labs/nanoGPTaudio), and for the animations [here](https://github.com/kyutai-labs/neural-audio-codecs-anims).**<br/>
+**Follow Kyutai on [X](https://x.com/kyutai_labs) and [LinkedIn](https://www.linkedin.com/company/kyutai-labs/).**<br/>
+**You can also find my personal site [here](https://vvolhejn.com/?utm_source=kyutai&utm_medium=kyutai&utm_campaign=codec-explainer).**
+
+## Further reading
+
+Here are some papers to check out if you'd like to learn more. This list is naturally Kyutai-centric because that's the school of thought I'm exposed to; my goal is not to do a complete review of the field.
+
+van den Oord et al., 2016. [WaveNet: A Generative Model for Raw Audio](https://arxiv.org/abs/1609.03499)
+
+- The OG, sample-by-sample audio continuation model.
+
+Mehri et al., 2016. [SampleRNN: An Unconditional End-to-End Neural Audio Generation Model](https://arxiv.org/abs/1612.07837)
+
+van den Oord et al., 2017. [Parallel WaveNet: Fast High-Fidelity Speech Synthesis](https://arxiv.org/abs/1711.10433)
+
+Kumar et al., 2019. [MelGAN: Generative Adversarial Networks for Conditional Waveform Synthesis](https://arxiv.org/abs/1910.06711)
+
+Kong et al., 2020. [HiFi-GAN: Generative Adversarial Networks for Efficient and High Fidelity Speech Synthesis](https://arxiv.org/abs/2010.05646)
+
+- Various pre-codec improvements over WaveNet, mainly focused on efficiency.
+
+van den Oord et al., 2017. [Neural Discrete Representation Learning](https://arxiv.org/abs/1711.00937)
+
+- Introduces VQ-VAE, originally for images.
+
+Esser et al., 2020. [Taming Transformers for High-Resolution Image Synthesis](https://arxiv.org/abs/2012.09841)
+
+- VQGAN, successfully applies a similar two-stage recipe to what we showed here with audio. A VQ-VAE generates quantized image representations, and a transformer predicts them autoregressively, building the image row-by-row.
+
+Lakhotia et al., 2021. [On Generative Spoken Language Modeling from Raw Audio](https://arxiv.org/abs/2102.01192)
+
+- The first paper to train a language model on discretized speech. As a tokenizer, it uses k-means to quantize latents from pre-trained speech representation models.
+
+Zeghidour et al., 2021. [SoundStream: An End-to-End Neural Audio Codec](https://arxiv.org/abs/2107.03312)
+
+- Introduces RVQ for neural audio codecs.
+
+Lee et al., 2022. [Autoregressive Image Generation using Residual Quantization](https://arxiv.org/abs/2203.01941)
+
+- Combines VQGAN with residual vector quantization.
+
+Défossez et al., 2022. [High Fidelity Neural Audio Compression](https://arxiv.org/abs/2210.13438)
+
+- EnCodec, an early [open-source](https://github.com/facebookresearch/encodec?tab=readme-ov-file) neural audio codec. One interesting point is that they try out the [Gumbel-Softmax](https://arxiv.org/abs/1611.01144), which is a different way of dealing with the fact that quantization is non-differentiable.
+
+Chen et al., 2021. [WavLM: Large-Scale Self-Supervised Pre-Training for Full Stack Speech Processing](https://arxiv.org/abs/2110.13900)
+
+- A masked speech prediction model used to create semantic tokens in Mimi.
+
+Défossez et al., 2024. [Moshi: a speech-text foundation model for real-time dialogue](https://arxiv.org/abs/2410.00037)
+
+- Moshi, Kyutai's audio-native model. Models the user and assistant audio as parallel audio streams, and includes an assistant text stream to help guide the generation.
+  The paper also introduces the neural audio codec Mimi.
+
+Dieleman, 2025. [Generative modelling in latent space](https://sander.ai/2025/04/15/latents.html)
+
+- A more high-level blog post about the general idea of using an encoder + generative model + decoder, where the (encoder, decoder) pair is trained separately from the generative model. A great read about where the field is and might be going.
+
+Peng et al., 2025. [VibeVoice Technical Report](https://arxiv.org/abs/2508.19205)
+
+Rouard et al., 2025. [Continuous Audio Language Models](https://arxiv.org/abs/2509.06926)
+
+- These works bypass the need for discrete tokens altogether by using diffusion or consistency models respectively, representing a promising alternative to RVQ.
+
+### Models
+
+Here are some modern LLMs (as of October 2025) that natively support audio. Again, I'm not trying to maintain a complete list here, and I'm not including models without any published technical details.
+
+[Moshi](https://moshi.chat/) (Kyutai, 2023): the online demo of Moshi, Kyutai's audio language model – see above.
+
+[CSM](https://www.sesame.com/research/crossing_the_uncanny_valley_of_voice) (Sesame, 2025): a natural-sounding voice chat, based on Llama + Mimi.
+
+[Qwen3-Omni](https://qwen.ai/blog?id=fdfbaf2907a36b7659a470c77fb135e381302028&from=research.research-list) (Alibaba, 2025): Alibaba's multimodal LLM. The audio output is created by a "talker" model whose outputs are not fed back into, which, as far as I can tell, basically makes it a text model with an integrated text-to-speech.
+
+[MiMo-Audio](https://github.com/XiaomiMiMo/MiMo-Audio) (Xiaomi, 2025): an audio-only language model that shows promising few-shot capabilities, similar to what GPT-2 did for text.
+
+[LFM2-Audio](https://www.liquid.ai/blog/lfm2-audio-an-end-to-end-audio-foundation-model) (Liquid AI, 2025): audio/text language model, uses Mimi as the codec.
