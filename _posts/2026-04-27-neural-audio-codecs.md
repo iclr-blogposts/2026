@@ -33,7 +33,7 @@ authors:
 #       name: IAS, Princeton
 
 # must be the exact same name as your blogpost
-bibliography: 2026-04-27-distill-example.bib
+bibliography: 2026-04-27-neural-audio-codecs.bib
 
 # Add a table of contents to your post.
 #   - make sure that TOC names match the actual section names
@@ -73,6 +73,9 @@ _styles: >
   .audio-sample {
     width: 100%;
   }
+  .bg-black {
+    background-color: black;
+  }
 ---
 
 {% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/codecIntro.mp4" class="img-fluid rounded z-depth-1" controls=true muted=true autoplay=true %}
@@ -102,8 +105,7 @@ To [tokenize](https://platform.openai.com/docs/concepts/tokens#tokens) text, eve
 <!-- <FigureWithCaption src={"assets/img/2026-04-27-neural-audio-codecs/image.png"}>
   A random text from Wikipedia tokenized via the GPT-4o tokenizer
 </FigureWithCaption> -->
-{% include figure.liquid path="assets/img/2026-04-27-neural-audio-codecs/image.png" class="img-fluid" caption="A random text from Wikipedia tokenized via the GPT-4o tokenizer" %}
-
+{% include figure.liquid path="assets/img/2026-04-27-neural-audio-codecs/image.png" class="img-fluid rounded z-depth-1" caption="A random text from Wikipedia tokenized via the GPT-4o tokenizer" %}
 
 You can even get decent results without tokenizing text at all, just predicting individual
 characters. One of the first posts that got me excited about machine learning was
@@ -127,11 +129,11 @@ Now compare Karpathy’s results to a sample from [WaveNet](https://deepmind.goo
 
 Purely acoustically, the audio sounds good, but it rarely even manages to produce a single correct English word. We can’t be too hard on WaveNet, though. The samples from Karpathy’s RNNs are only a few thousand characters long, but this 10-second audio consists of 160k audio samples, and WaveNet creates it by painstakingly predicting sample-by-sample.
 
-<FigureWithCaption src={"assets/img/2026-04-27-neural-audio-codecs/wavenet-audio.mp4"}>
+{% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/wavenet-audio.mp4" class="img-fluid rounded z-depth-1"  controls=true muted=true autoplay=true %}
+<div class="caption">
   A single second of audio consists of tens of thousands of samples, although it
-  corresponds to just a few words. Animation from the [WaveNet blog
-  post](https://deepmind.google/discover/blog/wavenet-a-generative-model-for-raw-audio/).
-</FigureWithCaption>
+  corresponds to just a few words. Animation from the <a href="https://deepmind.google/discover/blog/wavenet-a-generative-model-for-raw-audio/">WaveNet blog post.</a>
+</div>
 
 It’s difficult to build models that are coherent over time scales this long, and the model also takes very long to run for so many steps.
 
@@ -139,11 +141,11 @@ So instead of running the model to predict the samples one-by-one directly, we�
 
 ## Sample by sample
 
-But first, let’s get a baseline model by generating audio sample by sample, like WaveNet does. **The code for all of these experiments is open-source! Check it out [here](https://github.com/kyutai-labs/nanoGPTaudio).** I forked Andrej Karpathy’s [nanoGPT](https://github.com/karpathy/nanoGPT) repo, a simple implementation of GPT-2.
+But first, let’s get a baseline model by generating audio sample by sample, like WaveNet does. The code for all of these experiments is open-source! [Link to code omitted for anonymization, reading the code is not necessary for understanding the blog post.] I forked Andrej Karpathy’s [nanoGPT](https://github.com/karpathy/nanoGPT) repo, a simple implementation of GPT-2.
 
 Text and audio are kind of the same from the perspective of the language model: it’s just tokens in, tokens out. The only thing we need to do is to quantize the continuous values of the samples into discrete buckets. Like WaveNet, we’ll use the ["μ-law algorithm"](https://en.wikipedia.org/wiki/%CE%9C-law_algorithm) to get 256 buckets. We’ll treat those as 256 possible tokens.
 
-Let’s train a language model on audio tokenized like this. For the dataset, we’ll use the [Libri-Light](https://ai.meta.com/tools/libri-light/) dataset, following [AudioLM](https://arxiv.org/abs/2209.03143) (with Neil Zeghidour, Eugene Kharitonov). Its train split contains 50k hours in total, but we’ll go with 1000 hours for this experiment. With this sample-by-sample tokenization, we end up with a dataset of 53 GB.
+Let’s train a language model on audio tokenized like this. For the dataset, we’ll use the [Libri-Light](https://ai.meta.com/tools/libri-light/) dataset, following AudioLM <d-cite key="DBLP:journals/taslp/BorsosMVKPSRTGTZ23" />. Its train split contains 50k hours in total, but we’ll go with 1000 hours for this experiment. With this sample-by-sample tokenization, we end up with a dataset of 53 GB.
 
 We train a small-ish transformer of 151.28M parameters, about the size of the [smallest GPT-2 variant](https://openai.com/index/better-language-models/). When we sample from the model, it makes babbling sounds (warning, loud at times!):
 
@@ -165,44 +167,37 @@ In our case, we’ll want an autoencoder whose latent space is quantized so that
 
 ## Autoencoders with vector quantization (VQ-VAE)
 
-Bear with me, because we’ll take a detour from audio: let’s build a quantized autoencoder on images from [Fashion MNIST](https://arxiv.org/abs/1708.07747). We’ll take a subset with the first three classes: t-shirt/top, trouser, and pullover.
+Bear with me, because we’ll take a detour from audio: let’s build a quantized autoencoder on images from Fashion-MNIST <d-cite key="DBLP:journals/corr/abs-1708-07747" />. We’ll take a subset with the first three classes: t-shirt/top, trouser, and pullover.
 
-<FigureWithCaption
-  src={"assets/img/2026-04-27-neural-audio-codecs/fashion-mnist-3.png"}
->
-  [image
-  source](https://www.researchgate.net/figure/The-FashionMNIST-dataset-consists-of-10-classes-of-monochrome-clothing-items-and-is_fig1_373046669)
-</FigureWithCaption>
+{% include figure.liquid path="assets/img/2026-04-27-neural-audio-codecs/fashion-mnist-3.png" class="img-fluid rounded z-depth-1"%}
+<div class="caption">
+  image source: <d-cite key="DBLP:journals/information/NikfamCMM023" />
+</div>
 
 First, let’s train a regular autoencoder to encode the images into two-dimensional space:
 
-<FigureWithCaption
-  src={"assets/img/2026-04-27-neural-audio-codecs/vq_images_unquantized_v2.mp4"}
-  widthClassName="w-full max-w-72"
->
+{% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/vq_images_unquantized_v2.mp4" class="img-fluid rounded z-depth-1"  controls=true muted=true autoplay=true %}
+<div class="caption">
   Training a regular autoencoder on Fashion MNIST
-</FigureWithCaption>
+</div>
 
-Each frame shows one batch of training, with some batches skipped. The little images are the autoencoder’s reconstructions for the images in the batch. I’ve added colors for the three classes (t-shirt/top=blue trousers=green, pullover=yellow), but the autoencoder doesn’t get a class as input – the space just naturally clusters by class. Let's zoom in on a few reconstructions:
+Each frame shows one batch of training, with some batches skipped. The little images are the autoencoder’s reconstructions for the images in the batch. I’ve added colors for the three classes (t-shirt/top=blue trousers=yellow, pullover=purple), but the autoencoder doesn’t get a class as input – the space just naturally clusters by class. Let's zoom in on a few reconstructions:
 
-<FigureWithCaption
-  src={"assets/img/2026-04-27-neural-audio-codecs/rvq-without-quantization-v4.png"}
->
+{% include figure.liquid path="assets/img/2026-04-27-neural-audio-codecs/rvq-without-quantization-v4.png" class="img-fluid rounded z-depth-1 bg-black" %}
+<div class="caption">
   Original images (top) and their reconstructed versions (bottom)
-</FigureWithCaption>
+</div>
 
 As you can tell, the reconstruction quality is not great. The images are blurry and the first two images are reconstructed to nearly the same thing. But we used a tiny network (4 fully connected layers for the encoder and decoder each) and projected into a mere two dimensions, so we can’t expect too much of our model.
 
-Now let’s quantize these embeddings using a clustering. We’ll do something like [k-means](https://en.wikipedia.org/wiki/K-means_clustering): we’ll maintain a list of the positions of the cluster centers. We initialize the positions randomly. For each training batch, we look at which embeddings would go to each cluster. (We don’t modify the embeddings, we just look at the assignment). Then we’ll nudge each cluster center towards the average position of these embeddings.
+Now let’s quantize these embeddings using a clustering. We’ll do something like k-means: we’ll maintain a list of the positions of the cluster centers. We initialize the positions randomly. For each training batch, we look at which embeddings would go to each cluster. (We don’t modify the embeddings, we just look at the assignment). Then we’ll nudge each cluster center towards the average position of these embeddings.
 
 Also, if a center is unused for a while, we teleport it to a random embedding from the batch, because otherwise it has no way to get unstuck from its current position.
 
-<FigureWithCaption
-  src={"assets/img/2026-04-27-neural-audio-codecs/vq_images_unquantized_with_clustering_v2.mp4"}
-  widthClassName="w-full max-w-72"
->
+{% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/vq_images_unquantized_with_clustering_v2.mp4" class="img-fluid rounded z-depth-1"  controls=true muted=true autoplay=true %}
+<div class="caption">
   Quantizing by fitting a clustering on top of the autoencoder
-</FigureWithCaption>
+</div>
 
 You can see the reconstructions of the cluster centers getting refined over time.
 
