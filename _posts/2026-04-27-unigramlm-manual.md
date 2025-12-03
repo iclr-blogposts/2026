@@ -1,7 +1,7 @@
 ---
 layout: distill
 title: UnigramLM - An Attempt at Writing the Missing Manual
-description: An explanation of the math behind the UnigramLM tokenization algorithm
+description: This post is my attempt to write down the UnigramLM tokenization algorithm cleanly and explicitly because, well, I still haven't found such a derivation and I think understanding the theory behind the method could help us make it better. I'll formalize the generative model around which the algorithm is based, derive the EM updates, explain why pruning is needed (and how it's done), and point out the spots where the practical implementation defined by the SentencePiece library diverges from the pretty mathematical models.
 date: 2026-04-27
 future: true
 htmlwidgets: true
