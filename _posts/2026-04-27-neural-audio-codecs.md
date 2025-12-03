@@ -361,17 +361,17 @@ Let’s hear what the codecs sound like. We’ll use the three codecs to reconst
 
 And the reconstructions:
 
-<div className="flex flex-row md:flex-row gap-4 my-4">
-  <div className="flex-1 min-w-0">
-    <div className="font-semibold mb-1">4 RVQ levels</div>
+<div class="row">
+  <div class="col-sm mt-3 mt-md-0">
+    <div class="font-weight-semibold mb-1">4 RVQ levels</div>
     {% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/recon_4_rvq.wav" controls=true class="audio-sample" %}
   </div>
-  <div className="flex-1 min-w-0">
-    <div className="font-semibold mb-1">8 RVQ levels</div>
+  <div class="col-sm mt-3 mt-md-0">
+    <div class="font-weight-semibold mb-1">8 RVQ levels</div>
     {% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/recon_8_rvq.wav" controls=true class="audio-sample" %}
   </div>
-  <div className="flex-1 min-w-0">
-    <div className="font-semibold mb-1">16 RVQ levels</div>
+  <div class="col-sm mt-3 mt-md-0">
+    <div class="font-weight-semibold mb-1">16 RVQ levels</div>
     {% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/recon_16_rvq.wav" controls=true class="audio-sample" %}
   </div>
 </div>
@@ -386,7 +386,7 @@ So now we have a neural audio codec: we can turn audio into LLM-friendly tokens 
 
 Let’s come back to what we wanted to do in the first place: modeling audio. Specifically, we’ll make a model that can take an audio prefix and generate a plausible continuation for it.
 
-Just as a reminder, we want to train good audio LLMs so that we have models that understand and produce speech natively, understanding emotion, emphasis, and so on. They could also be fine-tuned into [text-to-speech](/tts), [speech-to-text](/stt), or [translation models](https://arxiv.org/abs/2502.03382), among others.
+Just as a reminder, we want to train good audio LLMs so that we have models that understand and produce speech natively, understanding emotion, emphasis, and so on. They could also be fine-tuned into text-to-speech, speech-to-text, or speech translation models <d-cite key="DBLP:journals/corr/abs-2502-03382" />, among others.
 
 So now that you’re convinced that audio LLMs are the path to AGI, let’s train a few.
 
@@ -446,21 +446,24 @@ Original
 
 {% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/original_24kHz.wav" controls=true class="audio-sample" %}
 
-<div className="grid grid-cols-2 md:grid-cols-4 gap-4 my-4">
-  <div className="flex-1 min-w-0">
-    <div className="font-semibold mb-1">4 RVQ levels</div>
+<div class="row mt-3">
+  <div class="col-sm w-100">
+    4 RVQ levels
     {% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/mimi_4_rvq_recon.wav" controls=true class="audio-sample" %}
   </div>
-  <div className="flex-1 min-w-0">
-    <div className="font-semibold mb-1">8 RVQ levels</div>
+  <div class="col-sm w-100">
+    8 RVQ levels
     {% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/mimi_8_rvq_24kHz.wav" controls=true class="audio-sample" %}
   </div>
-  <div className="flex-1 min-w-0">
-    <div className="font-semibold mb-1">16 RVQ levels</div>
+</div>
+
+<div class="row">
+  <div class="col-sm mt-3 mt-md-0">
+    <div>16 RVQ levels</div>
     {% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/mimi_16_rvq_recon.wav" controls=true class="audio-sample" %}
   </div>
-  <div className="flex-1 min-w-0">
-    <div className="font-semibold mb-1">32 RVQ levels</div>
+  <div class="col-sm mt-3 mt-md-0">
+    <div>32 RVQ levels</div>
     {% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/mimi_24kHz.wav" controls=true class="audio-sample" %}
   </div>
 </div>
