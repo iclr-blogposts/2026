@@ -123,7 +123,7 @@ it to generate decent-looking code and LaTeX:
 Remember this was ten years ago, back when we didn’t even know that [attention is all we need](https://en.wikipedia.org/wiki/Attention_Is_All_You_Need).
 Now compare Karpathy’s results to a sample from [WaveNet](https://deepmind.google/discover/blog/wavenet-a-generative-model-for-raw-audio/), a model DeepMind published a year later:
 
-<AudioPlayer src="assets/img/2026-04-27-neural-audio-codecs/speaker-1.wav" />
+{% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/speaker-1.wav" controls=true class="audio-sample" %}
 
 Purely acoustically, the audio sounds good, but it rarely even manages to produce a single correct English word. We can’t be too hard on WaveNet, though. The samples from Karpathy’s RNNs are only a few thousand characters long, but this 10-second audio consists of 160k audio samples, and WaveNet creates it by painstakingly predicting sample-by-sample.
 
@@ -147,15 +147,15 @@ Let’s train a language model on audio tokenized like this. For the dataset, we
 
 We train a small-ish transformer of 151.28M parameters, about the size of the [smallest GPT-2 variant](https://openai.com/index/better-language-models/). When we sample from the model, it makes babbling sounds (warning, loud at times!):
 
-<AudioPlayer src="assets/img/2026-04-27-neural-audio-codecs/20250925_140600_3.wav" />
+{% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/20250925_140600_3.wav" controls=true class="audio-sample" %}
 
 Often, it goes into a “crackling mode” that it can’t seem to get out of:
 
-<AudioPlayer src="assets/img/2026-04-27-neural-audio-codecs/20250925_140600_4.wav" />
+{% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/20250925_140600_4.wav" controls=true class="audio-sample" %}
 
 I also trained a smaller model, which I teased at the beginning. It’s prone to generate nightmare fuel screeches (loud!):
 
-<AudioPlayer src="assets/img/2026-04-27-neural-audio-codecs/nightmare-fuel-2-20lufs.wav" />
+{% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/nightmare-fuel-2-20lufs.wav" controls=true class="audio-sample" %}
 
 As you can tell, we’re not AGI yet. It sounds speech-like, but you can’t make out a single word and the voice keeps changing. No wonder: the context size of the model is 2048, which, for 16 kHz audio, translates to 128ms, not even the length of one word. Also, these 10-second examples took 30 minutes to generate on an H100, so we’re a few orders of magnitude away from being real-time.
 
@@ -372,22 +372,22 @@ Finally, let’s train some codecs! We’ll look at how varying the number of RV
 
 Let’s hear what the codecs sound like. We’ll use the three codecs to reconstruct this audio from the [Expresso dataset](https://speechbot.github.io/expresso/):
 
-<AudioPlayer src="assets/img/2026-04-27-neural-audio-codecs/orig_audio.wav" />
+{% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/orig_audio.wav" controls=true class="audio-sample" %}
 
 And the reconstructions:
 
 <div className="flex flex-row md:flex-row gap-4 my-4">
   <div className="flex-1 min-w-0">
     <div className="font-semibold mb-1">4 RVQ levels</div>
-    <AudioPlayer src="assets/img/2026-04-27-neural-audio-codecs/recon_4_rvq.wav" />
+    {% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/recon_4_rvq.wav" controls=true class="audio-sample" %}
   </div>
   <div className="flex-1 min-w-0">
     <div className="font-semibold mb-1">8 RVQ levels</div>
-    <AudioPlayer src="assets/img/2026-04-27-neural-audio-codecs/recon_8_rvq.wav" />
+    {% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/recon_8_rvq.wav" controls=true class="audio-sample" %}
   </div>
   <div className="flex-1 min-w-0">
     <div className="font-semibold mb-1">16 RVQ levels</div>
-    <AudioPlayer src="assets/img/2026-04-27-neural-audio-codecs/recon_16_rvq.wav" />
+    {% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/recon_16_rvq.wav" controls=true class="audio-sample" %}
   </div>
 </div>
 
@@ -439,7 +439,7 @@ We’re going to use the exact same model architecture and hyperparameters as fo
 
 I trained the model on 8 H100s for about 5 days. To get some samples, I decided to prompt the model with a sample of Libri-Light reading of two lines from [Michael Field’s poem July](https://www.theotherpages.org/poems/field02.html). (As I learned when working on this, Michael Field is a pen name of Katherine Harris and Edith Emma Cooper.) Let’s see what kind of poetry we can get from our model:
 
-<AudioPlayer src="assets/img/2026-04-27-neural-audio-codecs/20251002_123351_4.wav" />
+{% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/20251002_123351_4.wav" controls=true class="audio-sample" %}
 
 There are some signs of life, but we don’t have a poet yet. It sounds like somebody speaking behind a curtain. You can’t really make out what it’s saying, but the intonation is there: it sounds like somebody reading from a book, which is indeed what the model was trained on.
 
@@ -462,24 +462,24 @@ Let’s hear our example audio reconstructed with Mimi:
 
 Original
 
-<AudioPlayer src="assets/img/2026-04-27-neural-audio-codecs/original_24kHz.wav" />
+{% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/original_24kHz.wav" controls=true class="audio-sample" %}
 
 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 my-4">
   <div className="flex-1 min-w-0">
     <div className="font-semibold mb-1">4 RVQ levels</div>
-    <AudioPlayer src="assets/img/2026-04-27-neural-audio-codecs/mimi_4_rvq_recon.wav" />
+    {% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/mimi_4_rvq_recon.wav" controls=true class="audio-sample" %}
   </div>
   <div className="flex-1 min-w-0">
     <div className="font-semibold mb-1">8 RVQ levels</div>
-    <AudioPlayer src="assets/img/2026-04-27-neural-audio-codecs/mimi_8_rvq_24kHz.wav" />
+    {% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/mimi_8_rvq_24kHz.wav" controls=true class="audio-sample" %}
   </div>
   <div className="flex-1 min-w-0">
     <div className="font-semibold mb-1">16 RVQ levels</div>
-    <AudioPlayer src="assets/img/2026-04-27-neural-audio-codecs/mimi_16_rvq_recon.wav" />
+    {% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/mimi_16_rvq_recon.wav" controls=true class="audio-sample" %}
   </div>
   <div className="flex-1 min-w-0">
     <div className="font-semibold mb-1">32 RVQ levels</div>
-    <AudioPlayer src="assets/img/2026-04-27-neural-audio-codecs/mimi_24kHz.wav" />
+    {% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/mimi_24kHz.wav" controls=true class="audio-sample" %}
   </div>
 </div>
 
@@ -491,7 +491,7 @@ Mimi downsamples the audio a lot more aggressively, too: its sample rate is 12.5
 
 Here’s a poem generated with the model trained on Mimi-tokenized data. I prompted it with two lines from the poem, as before:
 
-<AudioPlayer src="assets/img/2026-04-27-neural-audio-codecs/20251002_115006_2.wav" />
+{% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/20251002_115006_2.wav" controls=true class="audio-sample" %}
 
 Here is my best attempt at a transcription:
 
@@ -513,7 +513,7 @@ The role of this token is to represent semantic information of the audio, withou
 
 To get a feeling for what information semantic tokens encode, let’s take this example audio, passed through Mimi:
 
-<AudioPlayer src="assets/img/2026-04-27-neural-audio-codecs/original.wav" />
+{% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/original.wav" controls=true class="audio-sample" %}
 
 Now let’s train a language model trained on the full Mimi, including semantic tokens. We’re going to run the model in a way where we keep the semantic tokens from the original audio but we discard the others, and let the model predict them. That means the information from the semantic tokens is fixed (”teacher-forced”), but the model is free to decide the others according to what continuations it finds plausible.
 
@@ -524,9 +524,9 @@ Now let’s train a language model trained on the full Mimi, including semantic 
 
 Listen to two different reconstructions we obtain this way:
 
-<AudioPlayer src="assets/img/2026-04-27-neural-audio-codecs/regenerate-1.wav" />
+{% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/regenerate-1.wav" controls=true class="audio-sample" %}
 
-<AudioPlayer src="assets/img/2026-04-27-neural-audio-codecs/regenerate-2.wav" />
+{% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/regenerate-2.wav" controls=true class="audio-sample" %}
 
 The voice is completely different, but it’s saying the same thing! This means the semantic tokens encode what the person is saying, but are invariant to the voice. That’s useful because it helps the model focus on _what_ to say, not _how_ to say it. In that regard, they’re closer to text tokens, which also don’t contain information about the voice, intonation, timing, or emotion.
 
@@ -534,7 +534,7 @@ The voice is completely different, but it’s saying the same thing! This means 
 
 Now let’s take the model trained on semantic Mimi and ask it to complete the poem:
 
-<AudioPlayer src="assets/img/2026-04-27-neural-audio-codecs/20251002_115255_0.wav" />
+{% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/20251002_115255_0.wav" controls=true class="audio-sample" %}
 
 > _When grass is gone<br/>
 > and corn still grassy;_<br/>
@@ -548,7 +548,7 @@ It still makes up words and the sentences are not too coherent, but clearly, the
 
 Let’s listen to a second poem:
 
-<AudioPlayer src="assets/img/2026-04-27-neural-audio-codecs/20251002_115255_2.wav" />
+{% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/20251002_115255_2.wav" controls=true class="audio-sample" %}
 
 > _When grass is gone<br/>
 > and corn still grassy;_<br/>
@@ -565,7 +565,7 @@ We can sacrifice some acoustic quality to improve the semantics by reducing the 
 
 One of the first things I noticed about this model is that it learned to memorize the Librivox notice, so it sometimes generates things like:
 
-<AudioPlayer src="assets/img/2026-04-27-neural-audio-codecs/20251002_121528_3_librivox_intro_trim.wav" />
+{% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/20251002_121528_3_librivox_intro_trim.wav" controls=true class="audio-sample" %}
 
 > Chapter 6 of The Founday, by R. Auclair.<br/>
 > This is a Librivox recording. All Librivox recordings are in the public domain. For information, or to volunteer, please visit librivox.org.<br/>
@@ -575,7 +575,7 @@ Repeating the training data is generally not what you want, but in our case it�
 
 Now let’s try to make some more poetry:
 
-<AudioPlayer src="assets/img/2026-04-27-neural-audio-codecs/20251002_120917_0_mimi8_temp08_trim.wav" />
+{% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/20251002_120917_0_mimi8_temp08_trim.wav" controls=true class="audio-sample" %}
 
 > _When grass is gone<br/>
 > and corn still grassy;_<br/>
@@ -601,7 +601,7 @@ We might get even better results by weighing the loss of the semantic tokens hig
 
 We’ve managed to use neural audio codecs to make an audio language model that generates somewhat coherent speech. Obviously, that’s not where the state of the art is in 2025 (and we’re not trying to reach it here) but keep in mind that by using the _exact same model_ without neural audio codecs gives us this:
 
-<AudioPlayer src="assets/img/2026-04-27-neural-audio-codecs/20250925_140600_3.wav" />
+{% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/20250925_140600_3.wav" controls=true class="audio-sample" %}
 
 Of course, still a long way to go to match text models! Currently, there seems to be a trade-off between speech understanding and reasoning abilities. At the beginning, I mentioned that the speech-native models ([Gemini](https://blog.google/technology/google-deepmind/gemini-2-5-native-audio/), ChatGPT’s [Advanced Voice Mode](https://openai.com/index/hello-gpt-4o/), [Qwen](https://qwen.ai/blog?id=fdfbaf2907a36b7659a470c77fb135e381302028&from=research.research-list), [Moshi](https://moshi.chat/)) aren’t able to tell you whether you’re speaking in a high or low voice, despite the fact that they’re trained to natively understand audio. This is likely because they’re trained on a lot of data generated synthetically with text-to-speech and/or because understanding the tone of the voice (apparently) doesn’t help the models make more accurate predictions.
 
