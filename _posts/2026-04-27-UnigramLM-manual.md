@@ -27,7 +27,7 @@ authors:
 #       name: IAS, Princeton
 
 # must be the exact same name as your blogpost
-bibliography: 2026-04-27-UnigramLM-manual.bib
+bibliography: 2026-04-27-unigramlm-manual.bib
 
 # Add a table of contents to your post.
 #   - make sure that TOC names match the actual section names
