@@ -248,18 +248,16 @@ We can actually encourage the encoder to make embeddings that are easily quantiz
 
 By quantizing at training time and adding a commitment loss, it’s no longer just a clustering being fit on top of the embeddings. The model itself is trained to be good for quantization.
 
-<FigureWithCaption
-  src={"assets/img/2026-04-27-neural-audio-codecs/vq_images_balanced_v2.mp4"}
-  widthClassName="w-full max-w-72"
->
+{% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/vq_images_balanced_v2.mp4" class="img-fluid rounded z-depth-1 w-full max-w-72" controls=true muted=true autoplay=true %}
+<div class="caption">
   An autoencoder trained explicitly to be easy to quantize
-</FigureWithCaption>
+</div>
 
 You’ll notice that the training dynamics look different: the commitment loss adds a certain “stiffness” that doesn’t allow the embeddings to move around as easily.
 
 Here’s what the reconstructions look like when we use the quantized representations:
 
-<FigureWithCaption src={"assets/img/2026-04-27-neural-audio-codecs/rvq-1-level-v4.png"} />
+{% include figure.liquid path="assets/img/2026-04-27-neural-audio-codecs/rvq-1-level-v4.png" class="img-fluid rounded z-depth-1 bg-black" %}
 
 Notice how the first two images are reconstructed to _exactly_ the same image. That’s simply because their embeddings got assigned to the same cluster and therefore quantized to the same value.
 
@@ -275,24 +273,19 @@ So for each embedding in the batch, we have a corresponding residual vector. The
 
 This time, the 2D positions for a single quantizer don’t define images because we need to combine the two quantizers, so we’ll just visualize everything as dots:
 
-<FigureWithCaption src={"assets/img/2026-04-27-neural-audio-codecs/rvq_fmnist.mp4"}>
+{% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/rvq_fmnist.mp4" class="img-fluid rounded z-depth-1" controls=true muted=true autoplay=true %}
+<div class="caption">
   Two-level quantization by fitting a quantizer on top of the
   &ldquo;residuals&rdquo;, aka the errors of the first quantizer
-</FigureWithCaption>
+</div>
 
 Each image is then represented as the index of the cluster of the embedding and that of the residual. Let’s try to reconstruct a few images with this two-level quantizer:
 
-<FigureWithCaption src={"assets/img/2026-04-27-neural-audio-codecs/rvq-2-level-v4.png"}>
-  Original images (top), one-level reconstruction (middle), two-level
-  reconstruction (bottom). These images are encoded as (4, 3), (4, 5), (16, 21),
-  and (30, 3).
-</FigureWithCaption>
+{% include figure.liquid path="assets/img/2026-04-27-neural-audio-codecs/rvq-2-level-v4.png" class="img-fluid rounded z-depth-1 bg-black" caption="Original images (top), one-level reconstruction (middle), two-level reconstruction (bottom). These images are encoded as (4, 3), (4, 5), (16, 21), and (30, 3)." %}
 
 The reconstructions of the first two images are similar, but no longer the exact same: the first image is represented as (4, 3) and the second as (4, 5). In other words, they share the same token for the first level, but differ in how the residual is quantized. The differences are quite subtle, so here’s a comparison between the one-level and two-level reconstructions:
 
-<FigureWithCaption src={"assets/img/2026-04-27-neural-audio-codecs/rvq-2-level-diff-v3.png"}>
-  Difference between one-level and two-level reconstructions
-</FigureWithCaption>
+{% include figure.liquid path="assets/img/2026-04-27-neural-audio-codecs/rvq-2-level-diff-v3.png" class="img-fluid rounded z-depth-1" caption="Difference between one-level and two-level reconstructions" %}
 
 I’d like to emphasize that the second quantization level makes modifications to the embedding, not the output pixels directly. This can be seen by the fact that the leftmost and rightmost image are encoded as (4, 3) and (30, 3) respectively. So they have the same residual code, 3, but it modifies the two reconstructed images in different ways.
 
@@ -345,25 +338,22 @@ z_quantized = rearrange(                    # [B, T/128, 32]
 audio_reconstructed = decoder(z_quantized)  # [B, T]
 ```
 
-<FigureWithCaption src={"assets/img/2026-04-27-neural-audio-codecs/codecWithRvq.mp4"} />
+{% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/codecWithRvq.mp4" class="img-fluid rounded z-depth-1" controls=true muted=true autoplay=true %}
 
 The last missing piece before we can train our first neural audio codec is a loss function. There’s a whole rabbit hole we could go into about which one to choose, but we’ll avoid it and just use a very simple one. We’ll compute the log amplitude spectrogram of the original and reconstructed audio, and take their difference. The loss is the mean square of this difference between spectrograms.
 
 To make it harder for the model to overfit to this loss, we take the spectrogram with three different parameters for the short-time Fourier transform, and let our loss be the mean between the three sub-losses. This is called the _multi-scale spectral loss_.
 
-<FigureWithCaption src={"assets/img/2026-04-27-neural-audio-codecs/image%202.png"}>
+{% include figure.liquid path="assets/img/2026-04-27-neural-audio-codecs/image%202.png" class="img-fluid rounded z-depth-1" %}
+<div class="caption">
   Image from Evan Radkoff’s excellent [blog
   post](https://www.soundsandwords.io/audio-loss-functions/) about loss
   functions in audio ML. Check it out if you want to go down the loss function
   rabbit hole.
-</FigureWithCaption>
+</div>
 
 Finally, let’s train some codecs! We’ll look at how varying the number of RVQ levels affects the reconstruction quality. As we expected, increasing the number of levels helps, decreasing the spectral loss:
-
-<FigureWithCaption
-  src={"assets/img/2026-04-27-neural-audio-codecs/image%203.png"}
-  widthClassName="max-w-104"
-/>
+{% include figure.liquid path="assets/img/2026-04-27-neural-audio-codecs/image%203.png" class="img-fluid rounded z-depth-1 max-w-104" %}
 
 Let’s hear what the codecs sound like. We’ll use the three codecs to reconstruct this audio from the [Expresso dataset](https://speechbot.github.io/expresso/):
 
@@ -408,23 +398,20 @@ We’ll do that using our 8-level RVQ codec. From an audio with _t_ samples, we�
 
 We’ll do the simplest thing possible and just flatten the array into 1D of shape _(t/128 \* 8)_, and have our LLM predict the eight levels in separate time steps.
 
-<FigureWithCaption src={"assets/img/2026-04-27-neural-audio-codecs/flattenRvq.mp4"}>
+{% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/flattenRvq.mp4" class="img-fluid rounded z-depth-1" controls=true muted=true autoplay=true %}
+<div class="caption">
   Flattening a three-level RVQ to allow it to be fed into a language model
-</FigureWithCaption>
+</div>
 
 The big disadvantage is that we lose some of our temporal compression. We downsampled the audio 128x, but now we’re inflating it 8x again by flattening the levels. That makes inference less efficient, and possibly worse quality because the effective context size decreases. We'll be using the 8 RVQ codec rather than the 16 RVQ one to avoid making the compression even worse.
 
 You could also predict all RVQ levels for a single step at once (”parallel pattern”), but it also makes things harder for the model because it has to decide on all levels at once. There are a bunch of other schemes people have tried to balance compression and quality. Here are a few tried out in MusicGen:
 
-<FigureWithCaption src={"assets/img/2026-04-27-neural-audio-codecs/image%204.png"}>
-  Figure taken from [MusicGen](https://arxiv.org/abs/2306.05284)
-</FigureWithCaption>
+{% include figure.liquid path="assets/img/2026-04-27-neural-audio-codecs/image%204.png" class="img-fluid rounded z-depth-1" caption="Figure taken from MusicGen (https://arxiv.org/abs/2306.05284)" %}
 
 Interestingly, as of 2025, there is no single solution that “won”: every paper does something different, and the schemes can get quite involved. Just look at this diagram from [MiMo-Audio](https://github.com/XiaomiMiMo/MiMo-Audio/blob/main/MiMo-Audio-Technical-Report.pdf), a model released in September 2025:
 
-<FigureWithCaption src={"assets/img/2026-04-27-neural-audio-codecs/image%205.png"}>
-  Ways to deal with multiple RVQ levels can get quite involved
-</FigureWithCaption>
+{% include figure.liquid path="assets/img/2026-04-27-neural-audio-codecs/image%205.png" class="img-fluid rounded z-depth-1" caption="Ways to deal with multiple RVQ levels can get quite involved" %}
 
 ## Finally, let's train
 
@@ -512,10 +499,11 @@ To get a feeling for what information semantic tokens encode, let’s take this 
 
 Now let’s train a language model trained on the full Mimi, including semantic tokens. We’re going to run the model in a way where we keep the semantic tokens from the original audio but we discard the others, and let the model predict them. That means the information from the semantic tokens is fixed (”teacher-forced”), but the model is free to decide the others according to what continuations it finds plausible.
 
-<FigureWithCaption src={"assets/img/2026-04-27-neural-audio-codecs/regenerateWithSemantic.mp4"}>
+{% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/regenerateWithSemantic.mp4" class="img-fluid rounded z-depth-1" controls=true muted=true autoplay=true %}
+<div class="caption">
   We can get an idea of what information is contained in semantic tokens by
   keeping them fixed and letting the model regenerate the rest.
-</FigureWithCaption>
+</div>
 
 Listen to two different reconstructions we obtain this way:
 
@@ -604,13 +592,10 @@ Kyutai took a stab at creating a voice chat based on an audio language model wit
 
 Moshi models an “inner monologue” text stream in parallel with audio streams for itself and the user. The text stream is helps it plan what it’s going to say, and ablations showed that the text stream helps the model massively. At the same time, it’s a bit sad: most of the reasoning seems to be delegated to the text stream and the audio streams are just there to provide an integrated speech-to-text and text-to-speech.
 
-<FigureWithCaption
-  src={"assets/img/2026-04-27-neural-audio-codecs/moshi-figure-1.png"}
-  widthClassName="w-full max-w-104"
->
-  [Moshi](https://arxiv.org/abs/2410.00037) models two audio streams and a text
-  stream in parallel
-</FigureWithCaption>
+{% include figure.liquid path="assets/img/2026-04-27-neural-audio-codecs/moshi-figure-1.png" class="img-fluid rounded z-depth-1 w-full max-w-104" %}
+<div class="caption">
+  [Moshi](https://arxiv.org/abs/2410.00037) models two audio streams and a text stream in parallel
+</div>
 
 It’s not just Moshi: as the “am I speaking in a high voice” experiment shows, this over-reliance on text in favor of audio is an issue for all audio LLMs. And that’s even though the dominant modeling approach is somewhat different than Moshi’s: interleaving text and audio tokens instead of modeling them in parallel streams.
 
