@@ -91,10 +91,10 @@ We’ll start from the basics and build up all the way to Mimi, a modern neural 
 
 To tokenize text, everybody uses a technique called byte-pair encoding and rarely changes the tokenizer: OpenAI has been using [the same tokenizer](https://github.com/openai/tiktoken/blob/2ab6d3706d557b560b200be48e6a32324682c9a3/tiktoken/model.py#L8-L16C17) since GPT-4o <d-cite key="DBLP:journals/corr/abs-2410-21276" />, an ancient model if you count in LLM years.
 
-<!-- <FigureWithCaption src={"assets/img/2026-04-27-neural-audio-codecs/image.png"}>
-  A random text from Wikipedia tokenized via the GPT-4o tokenizer
-</FigureWithCaption> -->
-{% include figure.liquid path="assets/img/2026-04-27-neural-audio-codecs/image.png" class="img-fluid rounded z-depth-1" caption="A random text from Wikipedia tokenized via the GPT-4o tokenizer" %}
+{% include figure.liquid path="assets/img/2026-04-27-neural-audio-codecs/image.png" class="img-fluid rounded z-depth-1" %}
+<div class="caption">
+A random text from Wikipedia tokenized via the GPT-4o tokenizer
+</div>
 
 You can even get decent results without tokenizing text at all, just predicting individual
 characters. One of the first posts that got me excited about machine learning was
@@ -270,11 +270,17 @@ This time, the 2D positions for a single quantizer don’t define images because
 
 Each image is then represented as the index of the cluster of the embedding and that of the residual. Let’s try to reconstruct a few images with this two-level quantizer:
 
-{% include figure.liquid path="assets/img/2026-04-27-neural-audio-codecs/rvq-2-level-v4.png" class="img-fluid rounded z-depth-1 bg-black" caption="Original images (top), one-level reconstruction (middle), two-level reconstruction (bottom). These images are encoded as (4, 3), (4, 5), (16, 21), and (30, 3)." %}
+{% include figure.liquid path="assets/img/2026-04-27-neural-audio-codecs/rvq-2-level-v4.png" class="img-fluid rounded z-depth-1 bg-black" %}
+<div class="caption">
+Original images (top), one-level reconstruction (middle), two-level reconstruction (bottom). These images are encoded as (4, 3), (4, 5), (16, 21), and (30, 3).
+</div>
 
 The reconstructions of the first two images are similar, but no longer the exact same: the first image is represented as (4, 3) and the second as (4, 5). In other words, they share the same token for the first level, but differ in how the residual is quantized. The differences are quite subtle, so here’s a comparison between the one-level and two-level reconstructions:
 
-{% include figure.liquid path="assets/img/2026-04-27-neural-audio-codecs/rvq-2-level-diff-v3.png" class="img-fluid rounded z-depth-1" caption="Difference between one-level and two-level reconstructions" %}
+{% include figure.liquid path="assets/img/2026-04-27-neural-audio-codecs/rvq-2-level-diff-v3.png" class="img-fluid rounded z-depth-1"  %}
+<div class="caption">
+Difference between one-level and two-level reconstructions
+</div>
 
 I’d like to emphasize that the second quantization level makes modifications to the embedding, not the output pixels directly. This can be seen by the fact that the leftmost and rightmost image are encoded as (4, 3) and (30, 3) respectively. So they have the same residual code, 3, but it modifies the two reconstructed images in different ways.
 
@@ -405,7 +411,10 @@ Figure taken from the MusicGen paper <d-cite key="DBLP:journals/corr/abs-2306-05
 
 Interestingly, as of 2025, there is no single solution that “won”: every paper does something different, and the schemes can get quite involved. Just look at this diagram from MiMo-Audio <d-cite key="mimoaudio" />, a model released in September 2025:
 
-{% include figure.liquid path="assets/img/2026-04-27-neural-audio-codecs/image-5.png" class="img-fluid rounded z-depth-1" caption="Ways to deal with multiple RVQ levels can get quite involved" %}
+{% include figure.liquid path="assets/img/2026-04-27-neural-audio-codecs/image-5.png" class="img-fluid rounded z-depth-1"  %}
+<div class="caption">
+Ways to deal with multiple RVQ levels can get quite involved
+</div>
 
 ## Finally, let's train
 
