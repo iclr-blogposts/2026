@@ -61,7 +61,7 @@ _styles: >
   }
 ---
 
-{% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/codecIntro.mp4" class="img-fluid rounded z-depth-1" controls=true muted=true autoplay=true loop=true %}
+{% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/codec-intro.mp4" class="img-fluid rounded z-depth-1" controls=true muted=true autoplay=true loop=true %}
 <div class="caption">
     The plan: sandwich a language model in an audio encoder/decoder pair (=neural
   audio codec), allowing it to predict audio continuations.
@@ -327,13 +327,13 @@ z_quantized = rearrange(                    # [B, T/128, 32]
 audio_reconstructed = decoder(z_quantized)  # [B, T]
 ```
 
-{% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/codecWithRvq.mp4" class="img-fluid rounded z-depth-1" controls=true muted=true autoplay=true loop=true %}
+{% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/codec-with-rvq.mp4" class="img-fluid rounded z-depth-1" controls=true muted=true autoplay=true loop=true %}
 
 The last missing piece before we can train our first neural audio codec is a loss function. There’s a whole rabbit hole we could go into about which one to choose, but we’ll avoid it and just use a very simple one. We’ll compute the log amplitude spectrogram of the original and reconstructed audio, and take their difference. The loss is the mean square of this difference between spectrograms.
 
 To make it harder for the model to overfit to this loss, we take the spectrogram with three different parameters for the short-time Fourier transform, and let our loss be the mean between the three sub-losses. This is called the _multi-scale spectral loss_.
 
-{% include figure.liquid path="assets/img/2026-04-27-neural-audio-codecs/image%202.png" class="img-fluid rounded z-depth-1" %}
+{% include figure.liquid path="assets/img/2026-04-27-neural-audio-codecs/image-2.png" class="img-fluid rounded z-depth-1" %}
 
 <div class="caption">
 Image from Evan Radkoff’s excellent blog
@@ -343,7 +343,7 @@ rabbit hole.
 </div>
 
 Finally, let’s train some codecs! We’ll look at how varying the number of RVQ levels affects the reconstruction quality. As we expected, increasing the number of levels helps, decreasing the spectral loss:
-{% include figure.liquid path="assets/img/2026-04-27-neural-audio-codecs/image%203.png" class="img-fluid rounded z-depth-1 max-w-104" %}
+{% include figure.liquid path="assets/img/2026-04-27-neural-audio-codecs/image-3.png" class="img-fluid rounded z-depth-1 max-w-104" %}
 
 Let’s hear what the codecs sound like. We’ll use the three codecs to reconstruct this audio from the Expresso dataset <d-cite key="DBLP:journals/corr/abs-2308-05725" />:
 
@@ -388,7 +388,7 @@ We’ll do that using our 8-level RVQ codec. From an audio with $t$ samples, we�
 
 We’ll do the simplest thing possible and just flatten the array into 1D of shape $(\frac{t}{128} \cdot 8)$, and have our LLM predict the eight levels in separate time steps.
 
-{% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/flattenRvq.mp4" class="img-fluid rounded z-depth-1" controls=true muted=true autoplay=true loop=true %}
+{% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/flatten-rvq.mp4" class="img-fluid rounded z-depth-1" controls=true muted=true autoplay=true loop=true %}
 <div class="caption">
   Flattening a three-level RVQ to allow it to be fed into a language model
 </div>
@@ -397,7 +397,7 @@ The big disadvantage is that we lose some of our temporal compression. We downsa
 
 You could also predict all RVQ levels for a single step at once (”parallel pattern”), but it also makes things harder for the model because it has to decide on all levels at once. There are a bunch of other schemes people have tried to balance compression and quality. Here are a few tried out in MusicGen:
 
-{% include figure.liquid path="assets/img/2026-04-27-neural-audio-codecs/image%204.png" class="img-fluid rounded z-depth-1" %}
+{% include figure.liquid path="assets/img/2026-04-27-neural-audio-codecs/image-4.png" class="img-fluid rounded z-depth-1" %}
 
 <div class="caption">
 Figure taken from the MusicGen paper <d-cite key="DBLP:journals/corr/abs-2306-05284" />.
@@ -405,7 +405,7 @@ Figure taken from the MusicGen paper <d-cite key="DBLP:journals/corr/abs-2306-05
 
 Interestingly, as of 2025, there is no single solution that “won”: every paper does something different, and the schemes can get quite involved. Just look at this diagram from MiMo-Audio <d-cite key="mimoaudio" />, a model released in September 2025:
 
-{% include figure.liquid path="assets/img/2026-04-27-neural-audio-codecs/image%205.png" class="img-fluid rounded z-depth-1" caption="Ways to deal with multiple RVQ levels can get quite involved" %}
+{% include figure.liquid path="assets/img/2026-04-27-neural-audio-codecs/image-5.png" class="img-fluid rounded z-depth-1" caption="Ways to deal with multiple RVQ levels can get quite involved" %}
 
 ## Finally, let's train
 
@@ -496,7 +496,7 @@ To get a feeling for what information semantic tokens encode, let’s take this 
 
 Now let’s train a language model trained on the full Mimi, including semantic tokens. We’re going to run the model in a way where we keep the semantic tokens from the original audio but we discard the others, and let the model predict them. That means the information from the semantic tokens is fixed (”teacher-forced”), but the model is free to decide the others according to what continuations it finds plausible.
 
-{% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/regenerateWithSemantic.mp4" class="img-fluid rounded z-depth-1" controls=true muted=true autoplay=true loop=true %}
+{% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/regenerate-with-semantic.mp4" class="img-fluid rounded z-depth-1" controls=true muted=true autoplay=true loop=true %}
 <div class="caption">
   We can get an idea of what information is contained in semantic tokens by
   keeping them fixed and letting the model regenerate the rest.
