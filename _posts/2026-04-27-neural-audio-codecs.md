@@ -1,9 +1,7 @@
 ---
 layout: distill
 title: "Neural audio codecs: how to get audio into LLMs"
-description: Your blog post's abstract.
-  Please add your abstract or summary here and not in the main body of your text.
-  Do not include math/latex or hyperlinks.
+description: A look at why audio is harder to model than text and how we can make it easier with neural audio codecs. With a codec, we can turn audio into larger discrete tokens, train models to predict continuations for these tokens, and then decode those back into audio.
 date: 2026-04-27
 future: true
 htmlwidgets: true
@@ -78,7 +76,7 @@ _styles: >
   }
 ---
 
-{% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/codecIntro.mp4" class="img-fluid rounded z-depth-1" controls=true muted=true autoplay=true %}
+{% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/codecIntro.mp4" class="img-fluid rounded z-depth-1" controls=true muted=true autoplay=true loop=true %}
 <div class="caption">
     The plan: sandwich a language model in an audio encoder/decoder pair (=neural
   audio codec), allowing it to predict audio continuations.
@@ -99,7 +97,8 @@ As a teaser, here’s what happens when you try to do that naively (warning, lou
 
 {% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/nightmare-fuel-20lufs.wav" controls=true class="audio-sample" %}
 
-We’ll have a look at why audio is harder to model than text and how we can make it easier with _neural audio codecs_, the de-facto standard way of getting audio into and out of LLMs. With a codec, we can turn audio into larger discrete _tokens_, train models to predict continuations for these tokens, and then decode those back into audio: see animation above.
+We'll see how to make much better audio models using neural audio codecs, the de-facto standard way of getting audio into and out of LLMs.
+With a codec, we can turn audio into larger discrete _tokens_, train models to predict continuations for these tokens, and then decode those back into audio: see animation above.
 
 We’ll start from the basics and build up all the way to Mimi, a modern neural audio codec originally developed for Moshi <d-cite key="DBLP:journals/corr/abs-2410-00037" /> and later adopted by others for their models, notably Sesame’s CSM <d-cite key="sesame_uncanny_valley_voice" />.
 
@@ -134,10 +133,10 @@ Now compare Karpathy’s results to a sample from WaveNet <d-cite key="DBLP:conf
 
 Purely acoustically, the audio sounds good, but it rarely even manages to produce a single correct English word. We can’t be too hard on WaveNet, though. The samples from Karpathy’s RNNs are only a few thousand characters long, but this 10-second audio consists of 160k audio samples, and WaveNet creates it by painstakingly predicting sample-by-sample.
 
-{% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/wavenet-audio.mp4" class="img-fluid rounded z-depth-1"  controls=true muted=true autoplay=true %}
+{% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/wavenet-audio.mp4" class="img-fluid rounded z-depth-1"  controls=true muted=true autoplay=true loop=true %}
 <div class="caption">
   A single second of audio consists of tens of thousands of samples, although it
-  corresponds to just a few words. Animation from the <a href="https://deepmind.google/discover/blog/wavenet-a-generative-model-for-raw-audio/">WaveNet blog post.</a>
+  corresponds to just a few words. Animation from the WaveNet blog post <d-cite key="wavenet_blog" />
 </div>
 
 It’s difficult to build models that are coherent over time scales this long, and the model also takes very long to run for so many steps.
@@ -168,7 +167,7 @@ As you can tell, we’re not AGI yet. It sounds speech-like, but you can’t mak
 
 So let’s build a neural audio codec to compress the audio. The hope is that if we reduce the sampling rate 100x, the model will also become “100x more coherent”. An old idea in machine learning is to do this using an _autoencoder:_ a model that takes an input, compresses it into a smaller “latent space”, and then tries to reconstruct the original input.
 
-In our case, we’ll want an autoencoder whose latent space is quantized so that we can feed the latents into a language model and produce continuations. (You _can_ generate continuations with unquantized latents, but it’s trickier – see the [Further reading](#further-reading) section.)
+In our case, we’ll want an autoencoder whose latent space is quantized so that we can feed the latents into a language model and produce continuations. (You _can_ generate continuations with unquantized latents, but it’s trickier <d-cite key="DBLP:journals/corr/abs-2508-19205" /> <d-cite key="DBLP:journals/corr/abs-2509-06926" />.)
 
 ## Autoencoders with vector quantization (VQ-VAE)
 
@@ -181,7 +180,7 @@ Bear with me, because we’ll take a detour from audio: let’s build a quantize
 
 First, let’s train a regular autoencoder to encode the images into two-dimensional space:
 
-{% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/vq_images_unquantized_v2.mp4" class="img-fluid rounded z-depth-1"  controls=true muted=true autoplay=true %}
+{% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/vq_images_unquantized_v2.mp4" class="img-fluid rounded z-depth-1"  controls=true muted=true autoplay=true loop=true %}
 <div class="caption">
   Training a regular autoencoder on Fashion-MNIST
 </div>
@@ -199,7 +198,7 @@ Now let’s quantize these embeddings using a clustering. We’ll do something l
 
 Also, if a center is unused for a while, we teleport it to a random embedding from the batch, because otherwise it has no way to get unstuck from its current position.
 
-{% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/vq_images_unquantized_with_clustering_v2.mp4" class="img-fluid rounded z-depth-1"  controls=true muted=true autoplay=true %}
+{% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/vq_images_unquantized_with_clustering_v2.mp4" class="img-fluid rounded z-depth-1"  controls=true muted=true autoplay=true loop=true %}
 <div class="caption">
   Quantizing by fitting a clustering on top of the autoencoder
 </div>
@@ -253,7 +252,7 @@ We can actually encourage the encoder to make embeddings that are easily quantiz
 
 By quantizing at training time and adding a commitment loss, it’s no longer just a clustering being fit on top of the embeddings. The model itself is trained to be good for quantization.
 
-{% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/vq_images_balanced_v2.mp4" class="img-fluid rounded z-depth-1 w-full max-w-72" controls=true muted=true autoplay=true %}
+{% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/vq_images_balanced_v2.mp4" class="img-fluid rounded z-depth-1 w-full max-w-72" controls=true muted=true autoplay=true loop=true %}
 <div class="caption">
   An autoencoder trained explicitly to be easy to quantize
 </div>
@@ -278,7 +277,7 @@ So for each embedding in the batch, we have a corresponding residual vector. The
 
 This time, the 2D positions for a single quantizer don’t define images because we need to combine the two quantizers, so we’ll just visualize everything as dots:
 
-{% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/rvq_fmnist.mp4" class="img-fluid rounded z-depth-1" controls=true muted=true autoplay=true %}
+{% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/rvq_fmnist.mp4" class="img-fluid rounded z-depth-1" controls=true muted=true autoplay=true loop=true %}
 <div class="caption">
   Two-level quantization by fitting a quantizer on top of the
   &ldquo;residuals&rdquo;, aka the errors of the first quantizer
@@ -343,7 +342,7 @@ z_quantized = rearrange(                    # [B, T/128, 32]
 audio_reconstructed = decoder(z_quantized)  # [B, T]
 ```
 
-{% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/codecWithRvq.mp4" class="img-fluid rounded z-depth-1" controls=true muted=true autoplay=true %}
+{% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/codecWithRvq.mp4" class="img-fluid rounded z-depth-1" controls=true muted=true autoplay=true loop=true %}
 
 The last missing piece before we can train our first neural audio codec is a loss function. There’s a whole rabbit hole we could go into about which one to choose, but we’ll avoid it and just use a very simple one. We’ll compute the log amplitude spectrogram of the original and reconstructed audio, and take their difference. The loss is the mean square of this difference between spectrograms.
 
@@ -361,7 +360,7 @@ rabbit hole.
 Finally, let’s train some codecs! We’ll look at how varying the number of RVQ levels affects the reconstruction quality. As we expected, increasing the number of levels helps, decreasing the spectral loss:
 {% include figure.liquid path="assets/img/2026-04-27-neural-audio-codecs/image%203.png" class="img-fluid rounded z-depth-1 max-w-104" %}
 
-Let’s hear what the codecs sound like. We’ll use the three codecs to reconstruct this audio from the [Expresso dataset](https://speechbot.github.io/expresso/):
+Let’s hear what the codecs sound like. We’ll use the three codecs to reconstruct this audio from the Expresso dataset <d-cite key="DBLP:journals/corr/abs-2308-05725" />:
 
 {% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/orig_audio.wav" controls=true class="audio-sample" %}
 
@@ -404,7 +403,7 @@ We’ll do that using our 8-level RVQ codec. From an audio with $t$ samples, we�
 
 We’ll do the simplest thing possible and just flatten the array into 1D of shape $(\frac{t}{128} \cdot 8)$, and have our LLM predict the eight levels in separate time steps.
 
-{% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/flattenRvq.mp4" class="img-fluid rounded z-depth-1" controls=true muted=true autoplay=true %}
+{% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/flattenRvq.mp4" class="img-fluid rounded z-depth-1" controls=true muted=true autoplay=true loop=true %}
 <div class="caption">
   Flattening a three-level RVQ to allow it to be fed into a language model
 </div>
@@ -429,7 +428,7 @@ Time to finally train a codec-wrapped language model! As I’ve mentioned, our c
 
 We’re going to use the exact same model architecture and hyperparameters as for the sample-by-sample model: the only difference is in the tokenization. We also have a 10x bigger dataset, but the sample-by-sample model can’t even fit the dataset with 1k hours, so more data wouldn’t save it.
 
-I trained the model on 8 H100s for about 5 days. To get some samples, I decided to prompt the model with a sample of Libri-Light reading of two lines from [Michael Field’s poem July](https://www.theotherpages.org/poems/field02.html). (As I learned when working on this, Michael Field is a pen name of Katherine Harris and Edith Emma Cooper.) Let’s see what kind of poetry we can get from our model:
+I trained the model on 8 H100s for about 5 days. To get some samples, I decided to prompt the model with a sample of Libri-Light reading of two lines from Michael Field’s poem July <d-cite key="michael_field" />. (As I learned when working on this, Michael Field is a pen name of Katherine Harris and Edith Emma Cooper.) Let’s see what kind of poetry we can get from our model:
 
 {% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/20251002_123351_4.wav" controls=true class="audio-sample" %}
 
@@ -512,7 +511,7 @@ To get a feeling for what information semantic tokens encode, let’s take this 
 
 Now let’s train a language model trained on the full Mimi, including semantic tokens. We’re going to run the model in a way where we keep the semantic tokens from the original audio but we discard the others, and let the model predict them. That means the information from the semantic tokens is fixed (”teacher-forced”), but the model is free to decide the others according to what continuations it finds plausible.
 
-{% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/regenerateWithSemantic.mp4" class="img-fluid rounded z-depth-1" controls=true muted=true autoplay=true %}
+{% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/regenerateWithSemantic.mp4" class="img-fluid rounded z-depth-1" controls=true muted=true autoplay=true loop=true %}
 <div class="caption">
   We can get an idea of what information is contained in semantic tokens by
   keeping them fixed and letting the model regenerate the rest.
@@ -557,7 +556,7 @@ Indeed, the whom?
 
 ## Semantic–acoustic tradeoff
 
-We can sacrifice some acoustic quality to improve the semantics by reducing the number of RVQ levels. Let’s do 8. That way, we get higher audio compression, and a proportionally higher part of the loss comes from the semantic token, since now it’s 1/8 tokens and not just 1/32.
+We can sacrifice some acoustic quality to improve the semantics by reducing the number of RVQ levels. Let’s do 8. That way, we get higher audio compression, and a proportionally higher part of the loss comes from the semantic token, since now it’s $\frac{1}{8}$ tokens and not just $\frac{1}{32}$.
 
 One of the first things I noticed about this model is that it learned to memorize the Librivox notice, so it sometimes generates things like:
 
