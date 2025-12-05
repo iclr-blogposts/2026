@@ -442,7 +442,7 @@ It also maintains a coherent voice, until it decides for the last few seconds to
 Our codec was deliberately simplistic, which explains why the results aren't great—but there's been a good amount of research on neural audio codecs in the last four years that we could leverage.
 We won’t implement all the improvements here, but instead we’ll look at what happens when we use [Mimi](https://huggingface.co/kyutai/mimi) as the tokenizer.
 
-Mimi is a modern neural audio codec built here at Kyutai for [Moshi](https://arxiv.org/abs/2410.00037), our audio language model. It’s since been used as the tokenizer for other models as well, like [Sesame CSM](https://www.sesame.com/research/crossing_the_uncanny_valley_of_voice), [VoXtream](https://herimor.github.io/voxtream/), and [LFM2-Audio](https://www.liquid.ai/blog/lfm2-audio-an-end-to-end-audio-foundation-model).
+Mimi is a modern neural audio codec built for the audio language model Moshi <d-cite key="DBLP:journals/corr/abs-2410-00037" />. It’s since been used as the tokenizer for other models as well, like Sesame CSM <d-cite key="sesame_uncanny_valley_voice" />, VoXtream <d-cite key="DBLP:journals/corr/abs-2509-15969" />, and LFM2-Audio <d-cite key="lfm2_audio" /> ([GitHub](https://github.com/Liquid4All/liquid-audio)).
 
 Unsurprisingly, Mimi sounds a lot better than the homemade codec we trained earlier.
 
@@ -504,7 +504,7 @@ A tad too surrealist for my taste, but maybe Lewis Carroll would like it.
 
 I have a confession to make: I lied to you just now. But just a bit, and for didactic purposes. In fact, the model above was trained on audio from a 31-level Mimi, where I omitted the very first level, which contains the “semantic token”.
 
-The role of this token is to represent semantic information of the audio, without necessarily aiding reconstruction. I won’t go into how these work, but in one sentence, Mimi’s semantic tokens are distilled from [WavLM](https://arxiv.org/abs/2110.13900), which you can think of as a [BERT](https://arxiv.org/abs/1810.04805) for speech.
+The role of this token is to represent semantic information of the audio, without necessarily aiding reconstruction. I won’t go into how these work, but in one sentence, Mimi’s semantic tokens are distilled from WavLM <d-cite key="DBLP:journals/corr/abs-2110-13900" />, which you can think of as a BERT <d-cite key="DBLP:journals/corr/abs-1810-04805" /> for speech.
 
 To get a feeling for what information semantic tokens encode, let’s take this example audio, passed through Mimi:
 
@@ -599,96 +599,11 @@ We’ve managed to use neural audio codecs to make an audio language model that 
 
 {% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/20250925_140600_3.wav" controls=true class="audio-sample" %}
 
-Of course, still a long way to go to match text models! Currently, there seems to be a trade-off between speech understanding and reasoning abilities. At the beginning, I mentioned that the speech-native models ([Gemini](https://blog.google/technology/google-deepmind/gemini-2-5-native-audio/), ChatGPT’s [Advanced Voice Mode](https://openai.com/index/hello-gpt-4o/), [Qwen](https://qwen.ai/blog?id=fdfbaf2907a36b7659a470c77fb135e381302028&from=research.research-list), [Moshi](https://moshi.chat/)) aren’t able to tell you whether you’re speaking in a high or low voice, despite the fact that they’re trained to natively understand audio. This is likely because they’re trained on a lot of data generated synthetically with text-to-speech and/or because understanding the tone of the voice (apparently) doesn’t help the models make more accurate predictions.
+Of course, still a long way to go to match text models! Currently, there seems to be a trade-off between speech understanding and reasoning abilities. At the beginning, I mentioned that the speech-native models
+(Gemini 2.5 <d-cite key="gemini_2_5_native_audio" />,
+ChatGPT’s Advanced Voice Mode <d-cite key="DBLP:journals/corr/abs-2410-21276" />,
+Qwen <d-cite key="DBLP:journals/corr/abs-2509-17765" />,
+Moshi <d-cite key="DBLP:journals/corr/abs-2410-00037" />)
+aren’t able to tell you whether you’re speaking in a high or low voice, despite the fact that they’re trained to natively understand audio. This is likely because they’re trained on a lot of data generated synthetically with text-to-speech and/or because understanding the tone of the voice (apparently) doesn’t help the models make more accurate predictions.
 
-Kyutai took a stab at creating a voice chat based on an audio language model with Moshi ([demo](https://moshi.chat/), [paper](https://arxiv.org/abs/2410.00037)), released in July 2024. Moshi might not be the AI you’d pick to do your homework for you, but cut it some slack: it was the first end-to-end voice AI, released even before OpenAI’s Advanced Voice Mode.
-
-Moshi models an “inner monologue” text stream in parallel with audio streams for itself and the user. The text stream is helps it plan what it’s going to say, and ablations showed that the text stream helps the model massively. At the same time, it’s a bit sad: most of the reasoning seems to be delegated to the text stream and the audio streams are just there to provide an integrated speech-to-text and text-to-speech.
-
-{% include figure.liquid path="assets/img/2026-04-27-neural-audio-codecs/moshi-figure-1.png" class="img-fluid rounded z-depth-1 w-full max-w-104" %}
-<div class="caption">
-  [Moshi](https://arxiv.org/abs/2410.00037) models two audio streams and a text stream in parallel
-</div>
-
-It’s not just Moshi: as the “am I speaking in a high voice” experiment shows, this over-reliance on text in favor of audio is an issue for all audio LLMs. And that’s even though the dominant modeling approach is somewhat different than Moshi’s: interleaving text and audio tokens instead of modeling them in parallel streams.
-
-Over a year after Moshi, audio models still lag behind text LLMs. But why? To me, this mysterious unsolved “modality gap” makes audio ML an exciting field to work on.
-
-**Thank you for reading! The code for the experiments is [here](https://github.com/kyutai-labs/nanoGPTaudio), and for the animations [here](https://github.com/kyutai-labs/neural-audio-codecs-anims).**<br/>
-**Follow Kyutai on [X](https://x.com/kyutai_labs) and [LinkedIn](https://www.linkedin.com/company/kyutai-labs/).**<br/>
-**You can also find my personal site [here](https://vvolhejn.com/?utm_source=kyutai&utm_medium=kyutai&utm_campaign=codec-explainer).**
-
-## Further reading
-
-Here are some papers to check out if you'd like to learn more. This list is naturally Kyutai-centric because that's the school of thought I'm exposed to; my goal is not to do a complete review of the field.
-
-van den Oord et al., 2016. [WaveNet: A Generative Model for Raw Audio](https://arxiv.org/abs/1609.03499)
-
-- The OG, sample-by-sample audio continuation model.
-
-Mehri et al., 2016. [SampleRNN: An Unconditional End-to-End Neural Audio Generation Model](https://arxiv.org/abs/1612.07837)
-
-van den Oord et al., 2017. [Parallel WaveNet: Fast High-Fidelity Speech Synthesis](https://arxiv.org/abs/1711.10433)
-
-Kumar et al., 2019. [MelGAN: Generative Adversarial Networks for Conditional Waveform Synthesis](https://arxiv.org/abs/1910.06711)
-
-Kong et al., 2020. [HiFi-GAN: Generative Adversarial Networks for Efficient and High Fidelity Speech Synthesis](https://arxiv.org/abs/2010.05646)
-
-- Various pre-codec improvements over WaveNet, mainly focused on efficiency.
-
-van den Oord et al., 2017. [Neural Discrete Representation Learning](https://arxiv.org/abs/1711.00937)
-
-- Introduces VQ-VAE, originally for images.
-
-Esser et al., 2020. [Taming Transformers for High-Resolution Image Synthesis](https://arxiv.org/abs/2012.09841)
-
-- VQGAN, successfully applies a similar two-stage recipe to what we showed here with audio. A VQ-VAE generates quantized image representations, and a transformer predicts them autoregressively, building the image row-by-row.
-
-Lakhotia et al., 2021. [On Generative Spoken Language Modeling from Raw Audio](https://arxiv.org/abs/2102.01192)
-
-- The first paper to train a language model on discretized speech. As a tokenizer, it uses k-means to quantize latents from pre-trained speech representation models.
-
-Zeghidour et al., 2021. [SoundStream: An End-to-End Neural Audio Codec](https://arxiv.org/abs/2107.03312)
-
-- Introduces RVQ for neural audio codecs.
-
-Lee et al., 2022. [Autoregressive Image Generation using Residual Quantization](https://arxiv.org/abs/2203.01941)
-
-- Combines VQGAN with residual vector quantization.
-
-Défossez et al., 2022. [High Fidelity Neural Audio Compression](https://arxiv.org/abs/2210.13438)
-
-- EnCodec, an early [open-source](https://github.com/facebookresearch/encodec?tab=readme-ov-file) neural audio codec. One interesting point is that they try out the [Gumbel-Softmax](https://arxiv.org/abs/1611.01144), which is a different way of dealing with the fact that quantization is non-differentiable.
-
-Chen et al., 2021. [WavLM: Large-Scale Self-Supervised Pre-Training for Full Stack Speech Processing](https://arxiv.org/abs/2110.13900)
-
-- A masked speech prediction model used to create semantic tokens in Mimi.
-
-Défossez et al., 2024. [Moshi: a speech-text foundation model for real-time dialogue](https://arxiv.org/abs/2410.00037)
-
-- Moshi, Kyutai's audio-native model. Models the user and assistant audio as parallel audio streams, and includes an assistant text stream to help guide the generation.
-  The paper also introduces the neural audio codec Mimi.
-
-Dieleman, 2025. [Generative modelling in latent space](https://sander.ai/2025/04/15/latents.html)
-
-- A more high-level blog post about the general idea of using an encoder + generative model + decoder, where the (encoder, decoder) pair is trained separately from the generative model. A great read about where the field is and might be going.
-
-Peng et al., 2025. [VibeVoice Technical Report](https://arxiv.org/abs/2508.19205)
-
-Rouard et al., 2025. [Continuous Audio Language Models](https://arxiv.org/abs/2509.06926)
-
-- These works bypass the need for discrete tokens altogether by using diffusion or consistency models respectively, representing a promising alternative to RVQ.
-
-### Models
-
-Here are some modern LLMs (as of October 2025) that natively support audio. Again, I'm not trying to maintain a complete list here, and I'm not including models without any published technical details.
-
-[Moshi](https://moshi.chat/) (Kyutai, 2023): the online demo of Moshi, Kyutai's audio language model – see above.
-
-[CSM](https://www.sesame.com/research/crossing_the_uncanny_valley_of_voice) (Sesame, 2025): a natural-sounding voice chat, based on Llama + Mimi.
-
-[Qwen3-Omni](https://qwen.ai/blog?id=fdfbaf2907a36b7659a470c77fb135e381302028&from=research.research-list) (Alibaba, 2025): Alibaba's multimodal LLM. The audio output is created by a "talker" model whose outputs are not fed back into, which, as far as I can tell, basically makes it a text model with an integrated text-to-speech.
-
-[MiMo-Audio](https://github.com/XiaomiMiMo/MiMo-Audio) (Xiaomi, 2025): an audio-only language model that shows promising few-shot capabilities, similar to what GPT-2 did for text.
-
-[LFM2-Audio](https://www.liquid.ai/blog/lfm2-audio-an-end-to-end-audio-foundation-model) (Liquid AI, 2025): audio/text language model, uses Mimi as the codec.
+Audio models still lag behind text LLMs. But why? To me, this mysterious unsolved “modality gap” makes audio ML an exciting field to work on.
