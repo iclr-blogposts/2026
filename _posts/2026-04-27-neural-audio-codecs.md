@@ -85,7 +85,7 @@ _styles: >
 As of October 2025, speech LLMs suck. Many LLMs have voice interfaces, but they usually work by transcribing your speech, generating the answer in text, and using text-to-speech to read the response out loud. That’s perfectly fine in many cases, but it’s a wrapper, not _real_ speech understanding. The model can’t hear the frustration in your voice and respond with empathy, it can’t emphasize important words in its answer, it cannot sense sarcasm, and so on.
 
 Yes, there _are_ LLMs
-(Gemini 2.5 <d-cite key="gemini_2_5_native_audio" />,
+(Gemini 2.5 <d-cite key="DBLP:journals/corr/abs-2507-06261" /> <d-cite key="gemini_2_5_native_audio" />,
 ChatGPT’s Advanced Voice Mode <d-cite key="DBLP:journals/corr/abs-2410-21276" />,
 Qwen <d-cite key="DBLP:journals/corr/abs-2509-17765" />,
 Moshi <d-cite key="DBLP:journals/corr/abs-2410-00037" />)
@@ -599,7 +599,7 @@ We’ve managed to use neural audio codecs to make an audio language model that 
 {% include audio.liquid path="assets/img/2026-04-27-neural-audio-codecs/20250925_140600_3.wav" controls=true class="audio-sample" %}
 
 Of course, still a long way to go to match text models! Currently, there seems to be a trade-off between speech understanding and reasoning abilities. At the beginning, I mentioned that the speech-native models
-(Gemini 2.5 <d-cite key="gemini_2_5_native_audio" />,
+(Gemini 2.5 <d-cite key="DBLP:journals/corr/abs-2507-06261" /> <d-cite key="gemini_2_5_native_audio" />,
 ChatGPT’s Advanced Voice Mode <d-cite key="DBLP:journals/corr/abs-2410-21276" />,
 Qwen <d-cite key="DBLP:journals/corr/abs-2509-17765" />,
 Moshi <d-cite key="DBLP:journals/corr/abs-2410-00037" />)
