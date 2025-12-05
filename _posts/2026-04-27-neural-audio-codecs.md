@@ -266,11 +266,11 @@ Here’s what the reconstructions look like when we use the quantized representa
 
 Notice how the first two images are reconstructed to _exactly_ the same image. That’s simply because their embeddings got assigned to the same cluster and therefore quantized to the same value.
 
-The model described here is known as a “[VQ-VAE](https://arxiv.org/abs/1711.00937)”: a vector-quantized variational autoencoder. The word “variational” here is just a vestigial leftover that doesn’t mean anything anymore.
+The model described here is known as a VQ-VAE <d-cite key="DBLP:journals/corr/abs-1711-00937" />: a vector-quantized variational autoencoder. The word “variational” here is just a vestigial leftover that doesn’t mean anything anymore <d-cite key="dieleman2025latents" />.
 
 ## Residual vector quantization
 
-To improve the reconstruction fidelity, we can just increase the number of cluster centers. But keeping track of too many centers can get prohibitively expensive in terms of compute and memory required, so we’ll do a clever trick: if we want 2^20 (~1M) possible values, we won’t create 2^20 clusters directly. Instead, we’ll use two separate quantizers with 2^10=1024 clusters and combine their result. Each embedding will then be quantized to a tuple of two integers in [0..1023], yielding 2^20 possible combinations.
+To improve the reconstruction fidelity, we can just increase the number of cluster centers. But keeping track of too many centers can get prohibitively expensive in terms of compute and memory required, so we’ll do a clever trick: if we want $2^{20}$ (~1M) possible values, we won’t create $2^{20}$ clusters directly. Instead, we’ll use two separate quantizers with $2^{10}=1024$ clusters and combine their result. Each embedding will then be quantized to a tuple of two integers in [0..1023], yielding $2^{20}$ possible combinations.
 
 Ok, but how? Well, recall the `residual` variable we used in the straight-through estimator, defined as `z - to_nearest_cluster(z)` the shift from the quantized embedding to the unquantized one. It represents the part of the original vector `z` that we didn’t manage to take into account when quantizing to `to_nearest_cluster(z)`.
 
@@ -311,11 +311,11 @@ def rvq_quantize(z):
     return codes
 ```
 
-Residual vector quantization was first applied to neural audio codecs in [SoundStream](https://arxiv.org/abs/2107.03312), but the idea [has been around since the 80s](https://ieeexplore.ieee.org/document/1171604).
+Residual vector quantization was first applied to neural audio codecs in SoundStream <d-cite key="DBLP:journals/taslp/ZeghidourLOST22">, but the idea has been around since the 80s <d-cite key="multiplestage82">.
 
 ## Now let’s tokenize audio
 
-Applying RVQ to audio is fairly straightforward. As our autoencoder, we’ll use a convolutional neural network (CNN) similar to [what Jukebox uses](https://github.com/openai/jukebox/blob/08efbbc1d4ed1a3cef96e08a931944c8b4d63bb3/jukebox/vqvae/encdec.py). The details of the architecture aren’t too important here. What’s important is that it’s a network that takes an audio with _t_ samples and converts it to a vector of shape _(t/128, 32)_. In other words, it downsamples by a factor of 128 and gives us 32-dimensional float representations. The decoder then takes the _(t/128, 32)_ embeddings and decodes them back into _t_ samples.
+Applying RVQ to audio is fairly straightforward. As our autoencoder, we’ll use a convolutional neural network (CNN) similar to [what Jukebox uses](https://github.com/openai/jukebox/blob/08efbbc1d4ed1a3cef96e08a931944c8b4d63bb3/jukebox/vqvae/encdec.py) <d-cite key="DBLP:journals/corr/abs-2005-00341" />. The details of the architecture aren’t too important here. What’s important is that it’s a network that takes an audio with $t$ samples and converts it to a vector of shape $(\frac{t}{128}, 32)$. In other words, it downsamples by a factor of 128 and gives us 32-dimensional float representations. The decoder then takes the $(\frac{t}{128}, 32)$ embeddings and decodes them back into $t$ samples.
 
 ```python
 audio = get_batch()               # shape: [B, T]
@@ -323,7 +323,7 @@ z = encoder(audio)                # shape: [B, T/128, 32]
 audio_reconstructed = decoder(z)  # shape: [B, T]
 ```
 
-As before, we’ll add an RVQ after the encoder. The only difference from the image case is that for each audio sample, we have _t/128_ embedding vectors, not just a single one as we did for images. We just quantize these independently (even though the encoder “sees” more audio than what corresponds to that one vector). During training, we also have a batch dimension, so our model now looks like this:
+As before, we’ll add an RVQ after the encoder. The only difference from the image case is that for each audio sample, we have $\frac{t}{128}$ embedding vectors, not just a single one as we did for images. We just quantize these independently (even though the encoder “sees” more audio than what corresponds to that one vector). During training, we also have a batch dimension, so our model now looks like this:
 
 ```python
 audio = get_batch()                         # [B, T]
@@ -350,11 +350,12 @@ The last missing piece before we can train our first neural audio codec is a los
 To make it harder for the model to overfit to this loss, we take the spectrogram with three different parameters for the short-time Fourier transform, and let our loss be the mean between the three sub-losses. This is called the _multi-scale spectral loss_.
 
 {% include figure.liquid path="assets/img/2026-04-27-neural-audio-codecs/image%202.png" class="img-fluid rounded z-depth-1" %}
+
 <div class="caption">
-  Image from Evan Radkoff’s excellent [blog
-  post](https://www.soundsandwords.io/audio-loss-functions/) about loss
-  functions in audio ML. Check it out if you want to go down the loss function
-  rabbit hole.
+Image from Evan Radkoff’s excellent blog
+post <d-cite key="loss_functions_audio_ml" /> about loss
+functions in audio ML. Check it out if you want to go down the loss function
+rabbit hole.
 </div>
 
 Finally, let’s train some codecs! We’ll look at how varying the number of RVQ levels affects the reconstruction quality. As we expected, increasing the number of levels helps, decreasing the spectral loss:
@@ -395,13 +396,13 @@ Just as a reminder, we want to train good audio LLMs so that we have models that
 
 So now that you’re convinced that audio LLMs are the path to AGI, let’s train a few.
 
-For our dataset, we’ll use [Libri-Light](https://ai.meta.com/tools/libri-light/), like we did for our sample-by-sample model earlier. This time we’ll use 10000h of audio instead of 1000h. It’s a dataset of public-domain audiobooks, so if we have a good model for it, maybe we’ll be able to generate more stories. (Don’t get your hopes up too much.) All we need to do is to convert the audio dataset into a sequence of discrete tokens so that we can feed it into an LLM.
+For our dataset, we’ll use Libri-Light <d-cite key="DBLP:conf/icassp/KahnRZKXMKLCFLS20" />, like we did for our sample-by-sample model earlier. This time we’ll use 10000h of audio instead of 1000h. It’s a dataset of public-domain audiobooks, so if we have a good model for it, maybe we’ll be able to generate more stories. (Don’t get your hopes up too much.) All we need to do is to convert the audio dataset into a sequence of discrete tokens so that we can feed it into an LLM.
 
 ## Dealing with multiple levels
 
-We’ll do that using our 8-level RVQ codec. From an audio with _t_ samples, we’ll get an array of tokens of shape _(t/128, 8)_. But now there’s an issue: how to deal with the fact that for each time step, there’s not one but eight tokens? This is not a problem we have to deal with in text LLMs, where we have a single sequence of tokens.
+We’ll do that using our 8-level RVQ codec. From an audio with $t$ samples, we’ll get an array of tokens of shape $(\frac{t}{128}, 8)$. But now there’s an issue: how to deal with the fact that for each time step, there’s not one but eight tokens? This is not a problem we have to deal with in text LLMs, where we have a single sequence of tokens.
 
-We’ll do the simplest thing possible and just flatten the array into 1D of shape _(t/128 \* 8)_, and have our LLM predict the eight levels in separate time steps.
+We’ll do the simplest thing possible and just flatten the array into 1D of shape $(\frac{t}{128} \cdot 8)$, and have our LLM predict the eight levels in separate time steps.
 
 {% include video.liquid path="assets/img/2026-04-27-neural-audio-codecs/flattenRvq.mp4" class="img-fluid rounded z-depth-1" controls=true muted=true autoplay=true %}
 <div class="caption">
@@ -412,15 +413,19 @@ The big disadvantage is that we lose some of our temporal compression. We downsa
 
 You could also predict all RVQ levels for a single step at once (”parallel pattern”), but it also makes things harder for the model because it has to decide on all levels at once. There are a bunch of other schemes people have tried to balance compression and quality. Here are a few tried out in MusicGen:
 
-{% include figure.liquid path="assets/img/2026-04-27-neural-audio-codecs/image%204.png" class="img-fluid rounded z-depth-1" caption="Figure taken from MusicGen (https://arxiv.org/abs/2306.05284)" %}
+{% include figure.liquid path="assets/img/2026-04-27-neural-audio-codecs/image%204.png" class="img-fluid rounded z-depth-1" %}
 
-Interestingly, as of 2025, there is no single solution that “won”: every paper does something different, and the schemes can get quite involved. Just look at this diagram from [MiMo-Audio](https://github.com/XiaomiMiMo/MiMo-Audio/blob/main/MiMo-Audio-Technical-Report.pdf), a model released in September 2025:
+<div class="caption">
+Figure taken from the MusicGen paper <d-cite key="DBLP:journals/corr/abs-2306-05284" />.
+</div>
+
+Interestingly, as of 2025, there is no single solution that “won”: every paper does something different, and the schemes can get quite involved. Just look at this diagram from MiMo-Audio <d-cite key="mimoaudio" />, a model released in September 2025:
 
 {% include figure.liquid path="assets/img/2026-04-27-neural-audio-codecs/image%205.png" class="img-fluid rounded z-depth-1" caption="Ways to deal with multiple RVQ levels can get quite involved" %}
 
 ## Finally, let's train
 
-Time to finally train a codec-wrapped language model! As I’ve mentioned, [our code](https://github.com/kyutai-labs/nanoGPTaudio) is based on Andrej Karpathy’s [nanoGPT codebase](https://github.com/karpathy/nanoGPT) for training text LLMs. We just need to modify it to accept audio as input. But that’s easy, because LLMs don’t care about what kind of tokens you’re feeding in – it’s all just numbers. Once we’ve tokenized the dataset and flattened it into a 1D sequence, we’re good to go. Tokenized this way, our 10000 hours of audio take up 134 GB. For comparison, storing this much data as uncompressed audio would take over 1 TB.
+Time to finally train a codec-wrapped language model! As I’ve mentioned, our code is based on Andrej Karpathy’s [nanoGPT codebase](https://github.com/karpathy/nanoGPT) for training text LLMs. We just need to modify it to accept audio as input. But that’s easy, because LLMs don’t care about what kind of tokens you’re feeding in – it’s all just numbers. Once we’ve tokenized the dataset and flattened it into a 1D sequence, we’re good to go. Tokenized this way, our 10000 hours of audio take up 134 GB. For comparison, storing this much data as uncompressed audio would take over 1 TB.
 
 We’re going to use the exact same model architecture and hyperparameters as for the sample-by-sample model: the only difference is in the tokenization. We also have a 10x bigger dataset, but the sample-by-sample model can’t even fit the dataset with 1k hours, so more data wouldn’t save it.
 
