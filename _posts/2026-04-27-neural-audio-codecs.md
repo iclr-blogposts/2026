@@ -38,36 +38,21 @@ bibliography: 2026-04-27-neural-audio-codecs.bib
 #     for hyperlinks within the post to work correctly.
 #   - please use this format rather than manually creating a markdown table of contents.
 toc:
-  - name: Equations
-  - name: Images and Figures
-    subsections:
-      - name: Interactive Figures
-  - name: Citations
-  - name: Footnotes
-  - name: Code Blocks
-  - name: Diagrams
-  - name: Tweets
-  - name: Layouts
-  - name: Other Typography?
+  - name: Text is easy
+  - name: Sample by sample
+  - name: Autoencoders with vector quantization (VQ-VAE)
+  - name: Residual vector quantization
+  - name: Now let’s tokenize audio
+  - name: Why care about audio
+  - name: Dealing with multiple levels
+  - name: Finally, let’s train
+  - name: How far can a codec get us?
+  - name: Semantic tokens
+  - name: Making poetry semantic
+  - name: Semantic–acoustic tradeoff
+  - name: Conclusion
 
-# Below is an example of injecting additional post-specific styles.
-# This is used in the 'Layouts' section of this post.
-# If you use this post as a template, delete this _styles block.
 _styles: >
-  .fake-img {
-    background: #bbb;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    box-shadow: 0 0px 4px rgba(0, 0, 0, 0.1);
-    margin-bottom: 12px;
-  }
-  .fake-img p {
-    font-family: monospace;
-    color: white;
-    text-align: left;
-    margin: 12px 0;
-    text-align: center;
-    font-size: 16px;
-  }
   .audio-sample {
     width: 100%;
   }
@@ -104,7 +89,7 @@ We’ll start from the basics and build up all the way to Mimi, a modern neural 
 
 ## Text is easy
 
-To tokenize text, everybody uses a technique called byte-pair encoding and rarely changes the tokenizer: OpenAI has been using [the same tokenizer](https://github.com/openai/tiktoken/blob/2ab6d3706d557b560b200be48e6a32324682c9a3/tiktoken/model.py#L8-L16C17) since GPT-4o <d-cite key="DBLP:journals/corr/abs-2410-21276">, an ancient model if you count in LLM years.
+To tokenize text, everybody uses a technique called byte-pair encoding and rarely changes the tokenizer: OpenAI has been using [the same tokenizer](https://github.com/openai/tiktoken/blob/2ab6d3706d557b560b200be48e6a32324682c9a3/tiktoken/model.py#L8-L16C17) since GPT-4o <d-cite key="DBLP:journals/corr/abs-2410-21276" />, an ancient model if you count in LLM years.
 
 <!-- <FigureWithCaption src={"assets/img/2026-04-27-neural-audio-codecs/image.png"}>
   A random text from Wikipedia tokenized via the GPT-4o tokenizer
@@ -310,7 +295,7 @@ def rvq_quantize(z):
     return codes
 ```
 
-Residual vector quantization was first applied to neural audio codecs in SoundStream <d-cite key="DBLP:journals/taslp/ZeghidourLOST22">, but the idea has been around since the 80s <d-cite key="multiplestage82">.
+Residual vector quantization was first applied to neural audio codecs in SoundStream <d-cite key="DBLP:journals/taslp/ZeghidourLOST22" />, but the idea has been around since the 80s <d-cite key="multiplestage82" />.
 
 ## Now let’s tokenize audio
 
