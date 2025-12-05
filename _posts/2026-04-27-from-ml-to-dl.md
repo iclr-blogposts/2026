@@ -13,7 +13,7 @@ hidden: false
 
 mermaid:
   enabled: true
-  zoomable: false
+  zoomable: true
 
 authors:
   - name: Anonymous
@@ -117,7 +117,7 @@ Finally, there is the issue of *scale* since trees are sample efficient and hand
 The literature also suggests remedies to these limitations, including discretization and binning, embeddings for numerical features, attention-based architectures to mitigate rotational invariance, and augmentation with large-scale training to exploit NNs as universal approximators.
 
 We took inspiration from these ideas, but also from industry case studies where NNs or heterogeneous ensembles beat boosting models in production.
-Migration narratives from **ShareChat** for short-video recommendations, **Swiggy** for restaurant ranking, **Stripe** for payment fraud detection, and internal anecdotes from **eBay** all point to a similar pattern of leveraging heterogeneous ensembling (stacking) as a temporary model instead of directly migrating from boosting to neural networks.
+Migration narratives from ShareChat<d-cite key="Jeunen_2023"></d-cite> for short-video recommendations, Swiggy<d-cite key="swiggy2021learningtorank"></d-cite> for restaurant ranking, Stripe <d-cite key="stripe2020howwebuiltitstriperadar"></d-cite> for payment fraud detection, and internal anecdotes from eBay all point to a similar pattern of leveraging heterogeneous ensembling (stacking) as a temporary model instead of directly migrating from boosting to neural networks.
 
 Our production boosting models were already a form of ensembling (albeit homogeneous), as they combine many similar weak trees into a strong model.
 This approach could be extended through heterogeneous ensembling, in which multiple classes of learners, such as boosting models and neural networks, are combined to solve the same task.
