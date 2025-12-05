@@ -68,6 +68,8 @@ This is in stark contrast to fully closed models<d-footnote>See news reports on 
 Their approach, illustrated in Figure 2(a), is based on how Byte-Pair Encoding token merge lists are created, and the implications for data used to train the tokenizer.
 This insight allowed them to accurately infer known properties about publicly disclosed models, and to predict the properties of private models.
 
+In personal correspondence with Alisa Liu, she told me that this finding was sparked by manually inspecting the BPE merge list for the Gemma tokenizer, and noticing that the token $$( \; )$$ appeared near the top of the list. Alisa thought this was odd, because one might expect to find high-frequency fragments and stopwords at the top of the merge list, not a parenthesiss. After further reflection, Alisa realized that the prominent position of this token could be because the model was trained on a large volume of programming code, and, by extension, that tokenizer merge lists *must* reveal information about word frequency in the training data.
+
 **Pretraining Data:** Carlini et al. show how to extract verbatim sequences from the GPT-2 language model<d-cite key="carlini2021extracting"></d-cite>. 
 Their work is <a href="https://nicholas.carlini.com/writing/2025/privacy-copyright-and-generative-models.html">primarily focused on understanding privacy attacks</a> on language models, in which a model may reveal personal identifying information.
 More directly related to detecting copyright violations, Karamolegkou et al. prompted open and closed LLMs with prefixes of copyrighted material from books<d-cite key="karamolegkou2023copyright"></d-cite>.
@@ -75,7 +77,7 @@ Finally, Nasr et al. demonstrated a simple attack on ChatGPT that involved forci
 This eventually causes the model to "diverge" from its post-training objective and revert to its base model behaviour, in which it generates memorized training data.
 It was possible to extract strings up-to 4,000 characters long using this method.
 
-**Status**: it has never been confirmed if Hayase et al. inferred the true data distribution of the tokenizers for GPT-4 and Claude. 
+**Status**: it has never been confirmed if Hayase et al. inferred the true data distribution of any of the studied tokenizers. 
 It has never been confirmed if Carlini et al, Nasr et al, or Karamolegkou et al. succeeded in extracting the training data from the GPT or Claude models.
 
 ## Discovering Model Training Procedures
