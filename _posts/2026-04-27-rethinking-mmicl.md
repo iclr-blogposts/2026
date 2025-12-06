@@ -33,11 +33,11 @@ toc:
   - name: MM-ICL with Reasoning for Vision-Language Models
   - name: Experimental Results
     subsections:
-      - name: Format Always Matters: a Case study on the Format Inconsistency Issue
+      - name: "Format Always Matters: a Case study on the Format Inconsistency Issue"
       - name: Does MM-ICL with Reasoning Help? Zero-Shot vs. Few-Shot
       - name: Assessing the Role of Retriever Methods
       - name: ID versus OOD with Modern VLMs
-  - name: Why MM-ICL Falls Short: An Attention-Level Perspective
+  - name: "Why MM-ICL Falls Short: An Attention-Level Perspective"
   - name: Conclusion, Limitations and Future Direction
 
 # Below is an example of injecting additional post-specific styles.
