@@ -233,7 +233,7 @@ print(egg.top(5, pattern="log(v0)", negate=True)
 ```
 | Expression | Fitness | Size |
 |---------------|--------|----| 
-| $\left(\left({{\left(\theta_{0} \cdot r_{k}\right)^{\theta_{1}}}^{log_{Re}}} \cdot \theta_{2}\right) + \theta_{3}\right)$ | -0.001131 |11  |
+| $\left(\left(\theta_0 \cdot r_k\right)^{\theta_1}^{log_{Re}} \cdot \theta_2\right)$ | -0.001131 |11  |
 | $\left({\left(log_{Re} \cdot \theta_{0}\right)^{\theta_{1}}} \cdot \left(r_{k} + \theta_{2}\right)\right)^{\theta_{3}}$ |-0.001187 |11  |
 | \left(\frac{\left(r_k + \theta_0 \right)^{\theta_1}}{\left(\frac{\theta_2}{log_{Re}} + \theta_3\right)} + \theta_4\right)$ |-0.001190| 13  |
 | $\left({\left(e^{\left(log_{Re} + \theta_{0}\right)} \cdot \theta_{1}\right)^{\theta_{2}}} \cdot r_{k}\right)^{\theta_{3}}$ | -0.001191 |12  |
