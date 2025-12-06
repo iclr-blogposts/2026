@@ -77,6 +77,13 @@ To explore this question, we propose to evaluate whether VLMs can move beyond su
 
 **(4)** We provide an attention-level perspective, showing that VLMs demonstrate weak prefix matching and no clear induction-head–like behavior, potentially explaining their limited MM-ICL performance.
 
+## Related Works
+**Multimodal In-Context Learning.** Large VLMs have the emerging ability to answer an unseen question or perform a new task without additional training, a capability known as zero-shot learning. Moreover, researchers have found that these models can often achieve better performance when multiple demonstrations of solutions to similar tasks are presented to the model before querying the question <d-cite key="brown2020language"/>. LLMs have shown strong ICL abilities—learning from demonstrations without parameter updates <d-cite key="brown2020language, wei2022emergent, dong2022survey"/>. VLMs, built on LLMs and pretrained on large-scale multimodal data, are believed to inherit similar capabilities. Recent benchmarks <d-cite key="zong2024vl"/> and follow-up studies <d-cite key="qin2024factors, xu2024introspection"/> have evaluated MM-ICL across tasks and analyzed factors such as retrieval, prompt design, and modality contributions. However, these efforts assume that VLMs are capable of MM-ICL, without first establishing whether models actually understand and learn from demonstrations. This motivates a deeper investigation into what VLMs learn in the MM-ICL setting.
+
+**Vision-Language Reasoning Models.** To enhance reasoning in VLMs, recent work has focused on post-training techniques and curated datasets. Reinforcement learning (RL)-based approaches, such as Group Relative Policy Optimization (GRPO), have been applied to improve performance across tasks like referring expression comprehension and open-vocabulary detection <d-cite key="shen2025vlm, wang2025vl"/>. In parallel, non-RL strategies—such as preference optimization <d-cite key="wang2024enhancing"/>—have shown success in reducing hallucination and improving multi-step reasoning. Additionally, structured reasoning datasets like LLaVA-CoT <d-cite key="xu2024llava"/> offer a complementary path by enabling fine-tuning with explicit reasoning supervision. Together, these advances reflect growing interest in building VLMs that can reason more reliably and systematically.
+
+## Rethinking the Success of Multimodal In-Context Learning
+
 ## Equations
 
 This theme supports rendering beautiful math in inline and display modes using [MathJax 3](https://www.mathjax.org/) engine.
