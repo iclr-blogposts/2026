@@ -1,0 +1,159 @@
+\begin{figure}[!t]
+\centering
+\begin{tcolorbox}
+[colback=black!5!white,colframe=gray!75!black,title=Gemini 2.0 Flash w/ Pseudo Reasoning Demos on M$^3$CoT (2-shot \& random selection)]
+\scriptsize
+{\color{blue}\textbf{User:} [Support Sample 1]}
+
+\textbf{Image}: \\
+\includegraphics[width=0.35\linewidth]{figs/physical-commonsense-38.jpg}
+
+\textbf{Question}: 
+In the provided image, how many items from the given choices will submerge underwater? 
+Options: A. 0 B. 1 C. 2 D. 3 
+Please select the correct answer from the options above. Give step by step reasoning before you answer, and when you are ready to answer, please use the format "Final answer: .." 
+\vspace{0.5em}
+
+{\color{blue}\textbf{Assistant:}}
+
+Here's how we can determine which objects will sink:
+
+1.  **Density Calculation:** An object will sink if its density is greater than the density of water (approximately 1000 kg/m³). Density is calculated as mass/volume.
+
+2.  **Calculate the density of each object:**
+    *   Object A: 5108.68 kg / 8.92 m³ = 572.72 kg/m³
+    *   Object B: 5521.41 kg / 14.11 m³ = 391.31 kg/m³
+    *   Object C: 4973.41 kg / 10.2 m³ = 487.59 kg/m³
+    *   Object D: 2472.27 kg / 16.97 m³ = 145.68 kg/m³
+    *   Object E: 7085.55 kg / 19.08 m³ = 371.36 kg/m³
+    *   Object F: 2128.44 kg / 16.45 m³ = 129.39 kg/m³
+    *   Object G: 3982.11 kg / 10.24 m³ = 388.88 kg/m³
+
+3.  **Compare to Water Density:** None of the objects have a density greater than 1000 kg/m³.
+
+4.  **Conclusion:** Since none of the objects have a density greater than water, none of them will sink.
+
+{\color{blue}Final answer: A}\\
+
+{\color{blue} \textbf{User:} [Support Sample 2]}
+
+\textbf{Image}: \\
+\includegraphics[width=0.45\linewidth]{figs/economics-215.jpg}
+
+\textbf{Question}: How many countries have achieved fiscal surpluses in 2020?  Options:  A. 2  B. 5  C. 6  D. 7  E. 4  Please select the correct answer from the options above.     Give step by step reasoning before you answer, and when you are ready to answer, please use the format "Final answer: .." 
+\vspace{0.5em}
+
+{\color{blue}\textbf{Assistant:}}
+
+Here's how we can determine the number of countries with fiscal surpluses in 2020:
+
+1.   **Understanding Fiscal Surplus:** A fiscal surplus occurs when export value exceeds import value. In the graphs, we need to compare the export value (top graph) with the import value (bottom graph) for each country in the year 2020.
+
+2.   **Analyzing Each Country:**
+    *   **Country 3:** Export value in 2020 is approximately 4.03, and import value is approximately 3.23. Export > Import, so Country 3 has a surplus.
+    *   **Country 4:** Export value in 2020 is approximately 2.41, and import value is approximately 2.85. Export < Import, so Country 4 does not have a surplus.
+    *   **Country 5:** Export value in 2020 is approximately 3.89, and import value is approximately 2.99. Export > Import, so Country 5 has a surplus.
+
+3.   **Counting Surpluses:** Countries 3 and 5 have fiscal surpluses in 2020.
+
+4.   **Total:** Therefore, 2 countries have fiscal surpluses in 2020.
+
+{\color{blue}Final answer: A}\\
+
+ {\color{red}\textbf{User:}[Query]}
+
+\textbf{Image}: \\
+\includegraphics[width=0.3\linewidth]{figs/mathematics-10.jpg}
+
+\textbf{Question}: Based on the information in the picture, can you determine the correct solution for the Algebra problem? Options: A. option D in the image is the answer. B. the correct choice is option A in the image. C. the answer is option C in the image D. the correct choice is option B in the image. Please select the correct answer from the options above. Give step-by-step reasoning before you answer, and when you are ready to answer, please use the format "Final answer: .." 
+
+\vspace{0.5em}
+ {\color{red}\textbf{Assistant:}}
+
+Here's how to solve the problem and determine the correct answer:
+
+1.  **Inverse Variation:** The statement "a² varies inversely with b³" means that a² * b³ = k, where k is a constant.
+
+2.  **Find the Constant (k):** We are given that a = 7 when b = 3. Therefore, a² = 7² = 49.  So, k = a² * b³ = 49 * 3³ = 49 * 27 = 1323.
+
+3.  **Find a² when b = 6:** We know that a² * b³ = k, so a² = k / b³.  When b = 6, a² = 1323 / 6³ = 1323 / 216 = 6.125.
+
+4.  **Match with the Choices:** The value of a² when b = 6 is 6.125, which corresponds to option D in the image.
+
+{\color{red} Final answer: A}
+
+\end{tcolorbox}
+\vspace{-1em}
+\caption{Gemini 2.0 Flash w/ Pseudo Reasoning Demos on M$^3$CoT (2-shot \& random selection)}
+\label{fig:gemini_example}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure}[!t]
+\centering
+\begin{tcolorbox}
+[colback=black!5!white,colframe=gray!75!black,title=LLaVA-CoT w/ Pseudo Reasoning Demos on ScienceQA (2-shot \& random selection)]
+\scriptsize
+{\color{blue}\textbf{User:} [Support Sample 1]}
+
+\textbf{Image}: \\
+\includegraphics[width=0.35\linewidth]{figs/3257.jpg}
+% 1604
+
+\textbf{Question}: 
+Which country is highlighted? Options: A. Cuba B. Saint Vincent and the Grenadines C. Grenada D. Trinidad and Tobago Please select the correct answer from the options above.
+\vspace{0.5em}
+
+{\color{blue}\textbf{Assistant:}}
+
+\texttt{<SUMMARY>} I will analyze the map to identify the highlighted country and compare it with the options provided to determine the correct answer. \texttt{</SUMMARY>}
+
+\texttt{<CAPTION>} The image depicts a map of the Caribbean region with several islands. One island, located at the southernmost part of the Caribbean, is highlighted in green. \texttt{</CAPTION>}
+
+\texttt{<REASONING>} To identify the highlighted country, I will examine its location in the Caribbean. The highlighted area is at the southernmost part of the Caribbean, near the northeastern coast of South America. This location corresponds to Trinidad and Tobago, which is situated at the southern end of the Caribbean island chain. \texttt{</REASONING>}
+
+\texttt{<CONCLUSION>} {\color{blue}D} \texttt{</CONCLUSION>}\\
+
+{\color{blue} \textbf{User:} [Support Sample 2]}
+
+\textbf{Image}: \\
+\includegraphics[width=0.4\linewidth]{figs/6585.jpg}
+% 3159
+
+\textbf{Question}: Two magnets are placed as shown. Will these magnets attract or repel each other? Options: A. repel B. attract. Please select the correct answer from the options above. 
+\vspace{0.5em}
+
+{\color{blue}\textbf{Assistant:}}
+
+\texttt{<SUMMARY>} To solve the problem, I will analyze the orientation of the magnets in the image and determine whether they will attract or repel each other based on the positions of their poles. \texttt{</SUMMARY>}
+
+\texttt{<CAPTION>} The image shows two identical circular magnets. Each magnet has a distinct north pole (N) and south pole (S). The north pole of the left magnet is facing the south pole of the right magnet. \texttt{</CAPTION>}
+
+\texttt{<REASONING>} Magnets have two poles: north (N) and south (S). Opposite poles attract each other, while like poles repel each other. In the image, the north pole of the left magnet is adjacent to the south pole of the right magnet. Since opposite poles (N and S) are facing each other, the magnets will attract. \texttt{</REASONING>}
+
+\texttt{<CONCLUSION>} {\color{blue}B. attract} \texttt{</CONCLUSION>}\\
+
+ {\color{red}\textbf{User:}[Query]}
+
+\textbf{Image}: \\
+\includegraphics[width=0.3\linewidth]{figs/16.jpg}
+
+\textbf{Question}: Which continent is highlighted? Options: A. Africa B. North America C. South America D. Asia. Please select the correct answer from the options above.  
+
+\vspace{0.5em}
+ {\color{red}\textbf{Assistant:}}
+
+\texttt{<SUMMARY>} I will examine the image to identify the highlighted continent. I will describe the relevant details in the CAPTION, use logical reasoning to determine the continent in the REASONING section, and provide the final answer in the CONCLUSION. \texttt{</SUMMARY>}
+
+\texttt{<CAPTION>} The image is a world map where one continent is highlighted in a darker shade. The highlighted continent is located in the eastern hemisphere and is known for its vast landmass. \texttt{</CAPTION>}
+
+\texttt{<REASONING>} To identify the highlighted continent, I will consider its geographical position and characteristics. The highlighted area is in the eastern hemisphere, extending from the Middle East to East Asia. It is the largest landmass in this hemisphere, covering a vast area that includes regions such as Russia, China, and India. This description matches the continent of Asia. \texttt{</REASONING>}
+
+\texttt{<CONCLUSION>} {\color{red}D. Asia} \texttt{</CONCLUSION>}
+
+\end{tcolorbox}
+\vspace{-1em}
+\caption{LLaVA-CoT w/ Pseudo Reasoning Demos on ScienceQA (2-shot \& random selection)}
+\label{fig:llavacot_example}
+\end{figure}

@@ -1,0 +1,222 @@
+% \begin{figure}[!h]
+% \centering
+% \begin{minipage}[t]{0.49\textwidth}
+% \centering
+% \begin{adjustbox}{width=1.0\textwidth}
+% \begin{tikzpicture}
+% \begin{axis}[
+%     ybar,
+%     % grid=both,
+%     bar width=4pt,
+%     width=\textwidth,
+%     height=0.8\textwidth,
+%     enlarge x limits=0.1,
+%     ylabel={Difference (JICES - RS)},
+%     xlabel={Dataset},
+%     xtick=data,
+%     xticklabel style={font=\footnotesize, rotate=45, anchor=east},
+%     symbolic x coords={A-OKVQA, ScienceQA, M3CoT, TextVQA, OK-VQA},
+%     ymin=-12, ymax=12,
+%     legend style={
+%         at={(0.02,0.95)},
+%         anchor=north west,
+%         fill=none,
+%         legend columns=4,
+%         font=\tiny
+%     },
+%     legend cell align={left},
+%     cycle list name=color list,
+% ]
+% % \definecolor{lightskyblue}{RGB}{135,206,250}
+% % \definecolor{moccasin}{RGB}{255,228,181}
+% % \definecolor{darkorange}{RGB}{255,140,0}
+% % \definecolor{orchid}{RGB}{218,112,214}
+% \addplot+[fill=steelblue] coordinates { (A-OKVQA, -5.68) (ScienceQA, 1.04) (M3CoT, 2.16) (TextVQA, -11.42) (OK-VQA, 5.18) };
+% \addplot+[fill=moccasin] coordinates { (A-OKVQA, -5.33) (ScienceQA, 0.59) (M3CoT, 2.37) (TextVQA, -7.97) (OK-VQA, 4.56) };
+% \addplot+[fill=darkorange] coordinates { (A-OKVQA, -4.02) (ScienceQA, 2.13) (M3CoT, 6.04) (TextVQA, -8.75) (OK-VQA, 2.93) };
+% \addplot+[fill=orchid] coordinates { (A-OKVQA, -2.18) (ScienceQA, 3.57) (M3CoT, 4.87) (TextVQA, -10.17) (OK-VQA, 2.05) };
+% \legend{1-shot, 2-shot, 4-shot, 8-shot}
+% \end{axis}
+% \end{tikzpicture}
+% \end{adjustbox}
+% \caption*{(a) JICES vs. Random Sampling (Llama-3.2-11B-Vision-Instruct)}
+% \end{minipage}
+% \hfill
+% \begin{minipage}[t]{0.49\textwidth}
+% \centering
+% \begin{adjustbox}{width=1.0\textwidth}
+% \begin{tikzpicture}
+% \begin{axis}[
+%     ybar,
+%     bar width=4pt,
+%     width=\textwidth,
+%     height=0.8\textwidth,
+%     enlarge x limits=0.1,
+%     ylabel={Difference (JICES - RS)},
+%     xlabel={Dataset},
+%     xtick=data,
+%     xticklabel style={font=\footnotesize, rotate=45, anchor=east},
+%     symbolic x coords={A-OKVQA, ScienceQA, M3CoT, TextVQA, OK-VQA, VizWiz},
+%     ymin=-12, ymax=12,
+%     legend style={
+%         at={(0.02,0.95)},
+%         anchor=north west,
+%         fill=none,
+%         legend columns=4,
+%         font=\tiny
+%     },
+%     legend cell align={left},
+%     cycle list name=color list,
+% ]
+% \addplot+[fill=steelblue] coordinates { (A-OKVQA, -2.79) (ScienceQA, -3.72) (M3CoT, -1.42) (TextVQA, -5.24) (OK-VQA, -5.34) };
+% \addplot+[fill=moccasin] coordinates { (A-OKVQA, -2.18) (ScienceQA, -1.49) (M3CoT, -0.91) (TextVQA, -5.11) (OK-VQA, -3.36) };
+% \addplot+[fill=darkorange] coordinates { (A-OKVQA, -2.27) (ScienceQA, -2.68) (M3CoT, 0.22) (TextVQA, -6.08) (OK-VQA, -2.61) };
+% \addplot+[fill=orchid] coordinates { (A-OKVQA, -0.35) (ScienceQA, -2.88) (M3CoT, -0.09) (TextVQA, -5.43) (OK-VQA, 0.00) };
+% \legend{1-shot, 2-shot, 4-shot, 8-shot}
+% \end{axis}
+% \end{tikzpicture}
+% \end{adjustbox}
+% \caption*{(b) JICES vs. Random Sampling (LLaVA-CoT)}
+% \end{minipage}
+% \caption{Comparison of JICES vs. Random Sampling on 6 vision-language datasets.\ch{Haven't finished the 3 general VQA yet; may draw the mean of all base/reason models instead of just one pair later}}
+% \label{fig:jices-two-plots-trimmed}
+% \end{figure}
+
+
+\begin{figure}[t]
+% \vspace{-4em}
+    \centering
+    \begin{subfigure}{0.45\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figs/mmretriever_random_diff_llamabase.pdf}
+    \end{subfigure}
+    % \hspace{3em}
+    \begin{subfigure}{0.45\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figs/mmretriever_random_diff_llavacot.pdf}
+    \end{subfigure}
+    \vspace{-1em}
+    \caption{Comparison of Multimodal Retriever vs. Random Selection on 6 vision-language datasets. \textbf{Left:} Llama-3.2-11B-Vision-Instruct, \textbf{Right:} LLaVA-CoT}
+    \label{fig:jices-two-plots-trimmed}    
+\end{figure}
+
+\begin{figure}[!t]
+\vspace{-1em}
+    \centering
+    \includegraphics[width=\linewidth]{figs/ood_id_updated.pdf}
+    \vspace{-2em}
+    \caption{Performance difference between OOD and ID on ScienceQA and A-OKVQA}
+    \label{fig:compare_id_ood}
+\vspace{-2em}
+\end{figure}
+
+
+
+% \begin{figure}[htbp]
+% \centering
+% \begin{adjustbox}{width=1.0\textwidth}
+% \begin{tikzpicture}
+% \begin{axis}[
+%     ybar,
+%     bar width=6pt,
+%     width=\textwidth,
+%     height=0.45\textwidth,
+%     enlarge x limits=0.05,
+%     ylabel={Difference (JICES - Random Selection) (RICES - Random Sampling)},
+%     xlabel={Dataset},
+%     xtick=data,
+%     xticklabel style={rotate=45, anchor=east},
+%     symbolic x coords={
+%         MS-COCO, Flickr30k, OK-VQA, TextVQA, VQAv2, VizWiz,
+%         MMMU, ScienceQA, Hateful Memes, rendered SST-2, CIFAR-100, ImageNet 1k
+%     },
+%     ymin=-15, ymax=60,
+%     legend style={
+%         at={(0.02,0.95)},
+%         anchor=north west,
+%         % draw=none,
+%         fill=none,
+%         legend columns=4,
+%         /tikz/every even column/.append style={column sep=4pt}
+%     },
+% %     legend style={
+% %     at={(0.02,0.98)},
+% %     anchor=north west,
+% %     draw=none,
+% %     fill=none,
+% %     font=\small,
+% %     nodes={inner sep=2pt}
+% % },
+% % legend columns=1,
+% % legend cell align={left},
+% % ]
+%     legend cell align={left},
+%     cycle list name=color list,
+% ]
+
+% \addplot+[fill=green!60!black] coordinates {
+%     (MS-COCO, -7)
+%     (Flickr30k, -13)
+%     (OK-VQA, 0)
+%     (TextVQA, 1)
+%     (VQAv2, 0)
+%     (VizWiz, 8)
+%     (MMMU, 0)
+%     (ScienceQA, -2)
+%     (Hateful Memes, 10)
+%     (rendered SST-2, 20)
+%     (CIFAR-100, 25)
+%     (ImageNet 1k, 55)
+% };
+% \addplot+[fill=orange!70!black] coordinates {
+%     (MS-COCO, -1)
+%     (Flickr30k, -6)
+%     (OK-VQA, 1)
+%     (TextVQA, 1)
+%     (VQAv2, 1)
+%     (VizWiz, 6)
+%     (MMMU, 0)
+%     (ScienceQA, -3)
+%     (Hateful Memes, 12)
+%     (rendered SST-2, 27)
+%     (CIFAR-100, 27)
+%     (ImageNet 1k, 53)
+% };
+% \addplot+[fill=blue!60] coordinates {
+%     (MS-COCO, 2)
+%     (Flickr30k, -2)
+%     (OK-VQA, 2)
+%     (TextVQA, 1)
+%     (VQAv2, 1)
+%     (VizWiz, 5)
+%     (MMMU, 5)
+%     (ScienceQA, -5)
+%     (Hateful Memes, 13)
+%     (rendered SST-2, 25)
+%     (CIFAR-100, 28)
+%     (ImageNet 1k, 51)
+% };
+% \addplot+[fill=purple!60] coordinates {
+%     (MS-COCO, 3)
+%     (Flickr30k, 1)
+%     (OK-VQA, 4)
+%     (TextVQA, 1)
+%     (VQAv2, 1)
+%     (VizWiz, 5)
+%     (MMMU, 0)
+%     (ScienceQA, -1)
+%     (Hateful Memes, 9)
+%     (rendered SST-2, 23)
+%     (CIFAR-100, 28)
+%     (ImageNet 1k, 50)
+% };
+
+% % \addlegendimage{empty legend}
+% % \addlegendentry{\textbf{Shots}}
+% \legend{4-shot, 8-shot, 16-shot, 32-shot}
+% \end{axis}
+% \end{tikzpicture}
+% \end{adjustbox}
+% \caption{Difference (JICES - Random Selection) between RICES and Random Sampling across datasets and shot counts.}
+% \label{fig:rices-barplot}
+% \end{figure}
