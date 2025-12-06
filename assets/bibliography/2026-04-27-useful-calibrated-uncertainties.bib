@@ -408,3 +408,37 @@ url={https://openreview.net/forum?id=X0epAjg0hd}
   pages={2668-2678},
   keywords={Deep learning;Adaptation models;Computer vision;Uncertainty;Computational modeling;Neural networks;Decision making;Algorithms;Machine learning architectures;formulations;and algorithms},
   doi={10.1109/WACV57701.2024.00266}}
+
+@InProceedings{pmlr-v97-geifman19a,
+  title = 	 {{S}elective{N}et: A Deep Neural Network with an Integrated Reject Option},
+  author =       {Geifman, Yonatan and El-Yaniv, Ran},
+  booktitle = 	 {Proceedings of the 36th International Conference on Machine Learning},
+  pages = 	 {2151--2159},
+  year = 	 {2019},
+  editor = 	 {Chaudhuri, Kamalika and Salakhutdinov, Ruslan},
+  volume = 	 {97},
+  series = 	 {Proceedings of Machine Learning Research},
+  month = 	 {09--15 Jun},
+  publisher =    {PMLR},
+  pdf = 	 {http://proceedings.mlr.press/v97/geifman19a/geifman19a.pdf},
+  url = 	 {https://proceedings.mlr.press/v97/geifman19a.html},
+  abstract = 	 {We consider the problem of selective prediction (also known as reject option) in deep neural networks, and introduce SelectiveNet, a deep neural architecture with an integrated reject option. Existing rejection mechanisms are based mostly on a threshold over the prediction confidence of a pre-trained network. In contrast, SelectiveNet is trained to optimize both classification (or regression) and rejection simultaneously, end-to-end. The result is a deep neural network that is optimized over the covered domain. In our experiments, we show a consistently improved risk-coverage trade-off over several well-known classification and regression datasets, thus reaching new state-of-the-art results for deep selective classification.}
+}
+
+
+@inproceedings{zhu2022rethinking,
+author = {Zhu, Fei and Cheng, Zhen and Zhang, Xu-Yao and Liu, Cheng-Lin},
+title = {Rethinking Confidence Calibration for Failure Prediction},
+year = {2022},
+isbn = {978-3-031-19805-2},
+publisher = {Springer-Verlag},
+address = {Berlin, Heidelberg},
+url = {https://doi.org/10.1007/978-3-031-19806-9_30},
+doi = {10.1007/978-3-031-19806-9_30},
+abstract = {Reliable confidence estimation for the predictions is important in many safety-critical applications. However, modern deep neural networks are often overconfident for their incorrect predictions. Recently, many calibration methods have been proposed to alleviate the overconfidence problem. With calibrated confidence, a primary and practical purpose is to detect misclassification errors by filtering out low-confidence predictions (known as failure prediction). In this paper, we find a general, widely-existed but actually-neglected phenomenon that most confidence calibration methods are useless or harmful for failure prediction. We investigate this problem and reveal that popular confidence calibration methods often lead to worse confidence separation between correct and incorrect samples, making it more difficult to decide whether to trust a prediction or not. Finally, inspired by the natural connection between flat minima and confidence separation, we propose a simple hypothesis: flat minima is beneficial for failure prediction. We verify this hypothesis via extensive experiments and further boost the performance by combining two different flat minima techniques. Our code is available at .},
+booktitle = {Computer Vision – ECCV 2022: 17th European Conference, Tel Aviv, Israel, October 23–27, 2022, Proceedings, Part XXV},
+pages = {518–536},
+numpages = {19},
+keywords = {Selective classification, Misclassification detection, Uncertainty, Flat minima, Confidence calibration, Failure prediction},
+location = {Tel Aviv, Israel}
+}
