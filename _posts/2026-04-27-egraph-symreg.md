@@ -223,7 +223,7 @@ This will retrieve the top 5 expressions that follow the pattern $\alpha^\alpha$
 | $\left({\operatorname{log}({log_{Re}^{log_{Re}}})^{\theta_{0}}} \cdot r_{k}\right)^{\theta_{1}}$ | -0.001514 | 10 |  
 | $\left(\left({log_{Re}^{log_{Re}}} \cdot \theta_{0}\right) + \frac{\theta_{1}}{\operatorname{log}(r_{k})}\right)$ | -0.001567 | 10  |
 | $\left(\frac{\operatorname{log}({log_{Re}^{log_{Re}}})}{\left(\theta_{0} \cdot r_{k}\right)} + \theta_{1}\right)$ | -0.004623 | 10  |
-| $\left(\frac{{\left(r_{k} + \theta_{0}\right)^{\theta_{1}}}}{{\operatorname{log}(r_{k})^{\operatorname{log}(r_{k})}}} + \theta_{2}\right)$ | -0.005701 | 13  |
+| $\left(\frac{\left(r_k + \theta_0\right)^{\theta_1}}{\log(r_k)^{\log(r_k)}} + \theta_2\right)$ | -0.005701 | 13  |
 | $\left(\operatorname{log}({log_{Re}^{log_{Re}}}) \cdot r_{k}\right)^{\theta_{0}}$ | -0.010011 | 8 |
 
 Or retrieving the top-5 expressions **not** having the pattern $\log(v)$:
@@ -235,7 +235,7 @@ print(egg.top(5, pattern="log(v0)", negate=True)
 |---------------|--------|----| 
 | $\left(\left({{\left(\theta_{0} \cdot r_{k}\right)^{\theta_{1}}}^{log_{Re}}} \cdot \theta_{2}\right) + \theta_{3}\right)$ | -0.001131 |11  |
 | $\left({\left(log_{Re} \cdot \theta_{0}\right)^{\theta_{1}}} \cdot \left(r_{k} + \theta_{2}\right)\right)^{\theta_{3}}$ |-0.001187 |11  |
-| $\left(\frac{{\left(r_{k} + \theta_{0}\right)^{\theta_{1}}}}{\left(\frac{\theta_{2}}{log_{Re}} + \theta_{3}\right)} + \theta_{4}\right)$ |-0.001190| 13  |
+| \left(\frac{\left(r_k + \theta_0 \right)^{\theta_1}}{\left(\frac{\theta_2}{log_{Re}} + \theta_3\right)} + \theta_4\right)$ |-0.001190| 13  |
 | $\left({\left(e^{\left(log_{Re} + \theta_{0}\right)} \cdot \theta_{1}\right)^{\theta_{2}}} \cdot r_{k}\right)^{\theta_{3}}$ | -0.001191 |12  |
 | $\left(\theta_0 \cdot \left(\left(\left(log_{Re} \cdot log_{Re}\right) \cdot \theta_{1}\right) + r_{k}\right)\right)^{\theta_{2}}$ | -0.001192 |11|
 
