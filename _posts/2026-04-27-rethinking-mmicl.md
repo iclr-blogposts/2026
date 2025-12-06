@@ -60,7 +60,22 @@ _styles: >
   }
 ---
 
-# Note: please use the table of contents as defined in the front matter rather than the traditional markdown styling.
+Note: please use the table of contents as defined in the front matter rather than the traditional markdown styling.
+
+## Introduction
+Vision-language models (VLMs), inspired by the success of large language models (LLMs), are widely believed to exhibit the ability of in-context learning (ICL), i.e., learning from a few examples provided in the prompt without any parameter updates. This capability has been well-documented in LLMs <d-cite key="brown2020language, wei2022emergent, dong2022survey, khattab_demonstrate-search-predict_2023, zhou_least--most_2023, ge_innate_2025"/>, and recent work suggests that VLMs may inherit similar behavior through large-scale multimodal pretraining <d-cite key="zong2024vl"/> and are capable of performing multimodal in-context learning (MM-ICL) <d-cite key="qin2024factors, baldassini2024makes, awadalla2023openflamingo, bai_qwen-vl_2023"/>. However, several studies <d-cite key="baldassini2024makes, qin2024factors, chen_can_2024"/> question whether current VLMs are truly learning from demonstrations. Instead, they find that VLMs often rely on shallow heuristics such as copying recent similar responses or defaulting to majority-vote patterns over the demonstrations—rather than acquiring a deeper understanding of the task.
+
+To further probe this issue, we begin by testing under distribution shift, where support and query examples originate from different datasets. Counterintuitively, we observe that model performance often plateaus or even degrades as the number of shots increases, despite being given more demonstrations. This contrasts with the in-distribution case, where performance reliably improves with more demonstrations. We also find failure cases where the model simply copies answers from the demonstrations, rather than learning from them. These observations raise a central question: *do VLMs truly learn from in-context demonstrations, or are they just matching superficial patterns?*
+
+To explore this question, we propose to evaluate whether VLMs can move beyond surface-level pattern matching and truly learn from in-context demonstrations in a new setting. Rather than providing only final answers, we enrich each demonstration with a detailed **reasoning process** <d-cite key="jiang_mme-cot_2025, wang_multimodal_2025, lu_mathvista_2024, hao_can_2025, gao_interleaved-modal_2024, yang_formal_2024, stefanik_can_2023"/>, i.e., explicit step-by-step rationales that make the task-solving strategy clear. By increasing the informational content of each example, we aim to give models a stronger learning signal and a better chance to internalize the methodology behind the task, rather than relying on shallow cues. To achieve this, we leverage the capabilities of **VLM Reasoners** <d-cite key="shen2025vlm, xu2024llava, wang2025vl"/>, which inherently generate rationales and answers simultaneously, to assess whether access to intermediate reasoning steps helps models generalize more effectively from demonstrations. Our contributions are as follows:
+
+**(1)** To the best of our knowledge, this paper is the first to study the MM-ICL of VLMs from the lens of reasoning. Using information-enhanced demonstrations with reasoning components, we benchmark the MM-ICL capability of modern VLMs and reach conclusions with more solid evidence.
+
+**(2)** To fairly evaluate MM-ICL for VLM reasoners, we introduce a new **MM-ICL with Reasoning** pipeline that resolves a key format mismatch in prior work: instead of supplying only answers in demonstrations while expecting rationale-plus-answer outputs, we provide demonstrations with both a Pseudo Reasoning (a generated rationale) and an answer. This consistent support-query format improves performance across models and datasets over inconsistent ones.
+
+**(3)** We conduct extensive controlled studies by varying shot count, retrieval method, rationale quality, and distribution. Our analysis reveals that MM-ICL are largely insensitive to these factors, showing limited performance variation across different configurations. We reveal a counterintuitive failure mode showing that current VLMs do not effectively leverage demonstration-level information, challenging the belief that they inherit few-shot learning abilities from LLMs.
+
+**(4)** We provide an attention-level perspective, showing that VLMs demonstrate weak prefix matching and no clear induction-head–like behavior, potentially explaining their limited MM-ICL performance.
 
 ## Equations
 
