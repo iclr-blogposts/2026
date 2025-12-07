@@ -63,9 +63,7 @@ _styles: >
 ## The opening riddle
 
 Ask an LLM for a limerick, and it will gladly provide one. Ask it for the exact path of every raindrop from a storm ten years ago, and it will not be able to help. This isn’t because it is “stupid,” but because the question goes beyond its knowledge limits.
-
 However, there are weirder blind spots than these obvious ones. Some limitations won’t disappear with more data, computing power, or smarter algorithms <d-cite key="raghu2017expressive"></d-cite>. They are structural; they exist in the space between what can be described, what can be inferred, and what can be found through the training process.
-
 We can call that boundary the information shadow.
 
 This post makes a bold claim: 
