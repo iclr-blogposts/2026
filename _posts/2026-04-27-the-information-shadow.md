@@ -60,8 +60,6 @@ _styles: >
   }
 ---
 
-Note: please use the table of contents as defined in the front matter rather than the traditional markdown styling.
-
 ## The opening riddle
 
 Ask an LLM for a limerick, and it will gladly provide one. Ask it for the exact path of every raindrop from a storm ten years ago, and it will not be able to help. This isn’t because it is “stupid,” but because the question goes beyond its knowledge limits.
