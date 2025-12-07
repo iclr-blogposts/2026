@@ -133,11 +133,16 @@ Finlayson et al. reported that several fully closed models changed their APIs to
 {% include figure.liquid path="assets/img/2026-04-27-genai-archaeology/prompt_exfiltration.png" class="img-fluid" %}
 Figure 4: Zhang et al. showed that simply asking LLMs to translate inputs into a different language (a) can reveal the model system prompt (b).
 
-This final finding is credited to Zhang et al. who show how to extract the system prompt of LLMs using a jailbreak attack<d-cite key="zhang2024effective"></d-cite>.
-The attack involves prompting the model to translate everything into a different language, e.g. German, Korean, Portuguese, etc., as shown in Figure 4(a), which can cause the model to reply with its system prompts, as shown in Figure 4(b).
-This technique can also be used to "unmask" the LLM used by a third-party service.
+System prompts are used to define the tone, operational parameters, and tools that LLMs can use when responding to a request.
+The basic template suggested for the <a href="https://www.llama.com/docs/model-cards-and-prompt-formats/llama4/">LLaMA-4 system prompt</a> instructs the model that it is "companionable and confident", whereas the <a href="https://platform.claude.com/docs/en/release-notes/system-prompts#claude-opus-4">Claude Sonnet 4 prompt</a> has specific information about the outcome of the November 2024 United States Election, and alleged snippets of the <a href="https://simonwillison.net/2025/Aug/15/gpt-5-has-a-hidden-system-prompt/">GPT-5 system prompt</a>, show that the model has variable verbosity levels when generating a response.
 
-**Status**: The success of this technique can be directly confirmed for the <a href="https://docs.claude.com/en/release-notes/system-prompts">Claude models</a>.
+Zhang et al. show how to extract the system prompt of LLMs using a jailbreak attack<d-cite key="zhang2024effective"></d-cite>.
+Jailbreaks are instructions that exploit the safeguards of LLMs to retrieve responses that are supposed to be inaccessible<d-cite key="rando2025donotwrite"></d-cite>.
+This attack involves prompting the model to translate everything into a different language, e.g. German, Korean, Portuguese, etc., as shown in Figure 4(a), which can cause the model to reply with its system prompts, as shown in Figure 4(b).
+The authors note the importance of the target language for the attack: "choosing languages that barely share a target vocabulary, e.g. (Finnish or Japanese), the extracted prompts are less likely to be filtered out by an English-only output filter"
+It is also noted that this technique can also be used to unmask the LLM used by third-party services.
+
+**Status**: The success of this technique has been directly confirmed for the <a href="https://docs.claude.com/en/release-notes/system-prompts">Claude models</a> because Anthrophic publish the system prompts.
 
 ## Outlook
 
