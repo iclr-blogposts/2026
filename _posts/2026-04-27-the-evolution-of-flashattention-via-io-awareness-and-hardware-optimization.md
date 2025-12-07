@@ -8,7 +8,7 @@ htmlwidgets: true
 authors:
   - name: Anonymous
 
-bibliography: 2026-04-27-The Evolution of FlashAttention via IO-Awareness and Hardware Optimization.bib
+bibliography: 2026-04-27-the-evolution-of-flashattention-via-io-awareness-and-hardware-optimization.bib
 
 toc:
   - name: Introduction
@@ -34,14 +34,14 @@ However, in 2017, Vaswani et al. <d-cite key="vaswani2023attentionneed"></d-cite
 
 The importance of this mechanism can be explained with the help of the following example
 
-{% include figure.liquid path="assets/img/2026-04-27-The Evolution of FlashAttention via IO-Awareness and Hardware Optimization/Figure_1.jpg" class="img-fluid rounded z-depth-1" caption="Attention weights showing how the model resolves ambiguity in word meaning through context. The arrows indicate strong attention connections between 'bank' and contextually relevant words." %}
+{% include figure.liquid path="assets/img/2026-04-27-the-evolution-of-flashattention-via-io-awareness-and-hardware-optimization/Figure_1.jpg" class="img-fluid rounded z-depth-1" caption="Attention weights showing how the model resolves ambiguity in word meaning through context. The arrows indicate strong attention connections between 'bank' and contextually relevant words." %}
 
 Consider the sentence **"I swam across the river to get to the other bank."** The word "**bank**" has multiple meanings—it could refer to a financial institution or a riverbank. The attention mechanism helps the model understand context by weighing relationships between words. In this case, the model attends strongly to words like "swam," "across," and "river," which provide contextual clues that "bank" refers to a riverbank rather than a financial institution.
 
 
 Therefore, the Attention mechanism has become a critical mechanism driving the growth of Large Language Models. Over the years, several variants of the attention mechanism have been proposed such as Multi Query Attention (MQA) (cite), Grouped-Query Attention (GQA), Multi-Head Latent Attention (MLA), etc. For instance, here's a non-exhaustive taxonomy of efficient attention mechanisms
 
-{% include figure.liquid path="assets/img/2026-04-27-The Evolution of FlashAttention via IO-Awareness and Hardware Optimization/Figure_0.png" class="img-fluid rounded z-depth-1" caption="Figure adapted from <d-cite key='sun2025efficient'></d-cite>" %}
+{% include figure.liquid path="assets/img/2026-04-27-the-evolution-of-flashattention-via-io-awareness-and-hardware-optimization/Figure_0.png" class="img-fluid rounded z-depth-1" caption="Figure adapted from <d-cite key='sun2025efficient'></d-cite>" %}
 
 
 
@@ -56,7 +56,7 @@ The FlashAttention series by Tri Dao <d-cite key="dao2022flashattention"></d-cit
 
 ### GPU Memory Hierarchy
 
-{% include figure.liquid path="assets/img/2026-04-27-The Evolution of FlashAttention via IO-Awareness and Hardware Optimization/Figure_2.png" class="img-fluid rounded z-depth-1" caption="Memory Hierarchy with Bandwidth & Memory Size" %}
+{% include figure.liquid path="assets/img/2026-04-27-the-evolution-of-flashattention-via-io-awareness-and-hardware-optimization/Figure_2.png" class="img-fluid rounded z-depth-1" caption="Memory Hierarchy with Bandwidth & Memory Size" %}
 
 Every modern processor faces the same fundamental challenge: fast storage is expensive and small, while large storage is slow and cheap. 
 Modern GPUs organize memory into a hierarchical form which has five distinct levels, each with different characteristics, different access patterns, and different implications for your code. Starting from the fastest and smallest and working towards the slowest and largest, these levels are: registers, shared memory, L1 cache, L2 cache, and global memory (as shown in the above Figure). At the top of the memory hierarchy sit registers, the fastest storage available on a GPU. Each thread running on the GPU has access to a private set of registers - typically up to 255 registers per thread on modern NVIDIA architectures. These registers feed directly into the computational units. When a thread performs an arithmetic operation, the operands come from registers and the result goes back to registers. There is no separate "register access" operation visible to the programmer; registers are simply where the active data lives. The register file on a single Streaming Multiprocessor contains 65,536 registers with each register holding 32 bits. This gives 256 kilobytes of register storage per SM, and these registers are dynamically shared among all threads running on that SM
@@ -99,7 +99,7 @@ One of the hardware-efficient mechanisms now widely adopted across different pro
 
 FlashAttention addresses the dual challenges of speed and memory consumption in transformers, especially on long sequences, by rethinking attention algorithms through the lens of GPU memory hierarchy awareness. The key insight is minimizing data movement between high-bandwidth memory (HBM) and on-chip SRAM.
 
-{% include figure.liquid path="assets/img/2026-04-27-The Evolution of FlashAttention via IO-Awareness and Hardware Optimization/Figure_3.png" class="img-fluid rounded z-depth-1" caption="Standard execution loads data from HBM for every step. Kernel fusion and tiling keep data in fast memory longer, reducing memory traffic and improving throughput." %}
+{% include figure.liquid path="assets/img/2026-04-27-the-evolution-of-flashattention-via-io-awareness-and-hardware-optimization/Figure_3.png" class="img-fluid rounded z-depth-1" caption="Standard execution loads data from HBM for every step. Kernel fusion and tiling keep data in fast memory longer, reducing memory traffic and improving throughput." %}
 
 FlashAttention v1, published at Neural Information Processing Systems 2022 by Tri Dao and collaborators, introduced two key innovations: **tiled** attention that processes blocks of queries, keys, and values entirely in SRAM, and an **online softmax algorithm** that computes exact softmax incrementally without materializing the full attention matrix.
 
@@ -188,13 +188,13 @@ We can define the correction factor $\alpha = e^{m_{old} - m_{new}}$. This is th
 
 ### Forward Pass
 
-{% include figure.liquid path="assets/img/2026-04-27-The Evolution of FlashAttention via IO-Awareness and Hardware Optimization/Figure_4.png" class="img-fluid rounded z-depth-1" caption="Algorithm for FlashAttention Forward Pass. The algorithm partitions inputs into blocks that fit in SRAM, computes attention incrementally using online softmax, and updates running statistics to avoid materializing the full attention matrix in HBM." %}
+{% include figure.liquid path="assets/img/2026-04-27-the-evolution-of-flashattention-via-io-awareness-and-hardware-optimization/Figure_4.png" class="img-fluid rounded z-depth-1" caption="Algorithm for FlashAttention Forward Pass. The algorithm partitions inputs into blocks that fit in SRAM, computes attention incrementally using online softmax, and updates running statistics to avoid materializing the full attention matrix in HBM." %}
 
 For each attention head, FlashAttention reduces memory reads and writes by tiling. It loads small blocks of queries, keys, and values from GPU HBM into fast on-chip SRAM, computes attention for that block, and updates the output before moving on to the next block. This limits how often data moves between slow and fast memory, which is the main bottleneck on modern GPUs. Cutting this movement often gives a 2–4× speedup in practice.
 
 #### Mathematical Derivation
 
-{% include figure.liquid path="assets/img/2026-04-27-The Evolution of FlashAttention via IO-Awareness and Hardware Optimization/Figure_5.png" class="img-fluid rounded z-depth-1"%}
+{% include figure.liquid path="assets/img/2026-04-27-the-evolution-of-flashattention-via-io-awareness-and-hardware-optimization/Figure_5.png" class="img-fluid rounded z-depth-1"%}
 
 We define the block sizes based on the available SRAM size $M$. Let $B_c$ be the block size for columns (dimension along $N$ for $K, V$), and let $B_r$ be the block size for rows (dimension along $N$ for $Q, O$). The key constraint is $4 B_c d \le M$ to ensure that $K, V$ blocks and various buffers fit in SRAM. Usually, we set $B_c \approx \lceil \frac{M}{4d} \rceil$ and $B_r \approx \min(\lceil \frac{M}{4d} \rceil, d)$.
 
@@ -208,7 +208,7 @@ Ideally, to minimize HBM writes of the output $O$, we want to load a block of $Q
 
 **Initialization:**
 
-{% include figure.liquid path="assets/img/2026-04-27-The Evolution of FlashAttention via IO-Awareness and Hardware Optimization/Figure_6.png" class="img-fluid rounded z-depth-1" caption="Q, K, and V blocks are stored in HBM (blue). Each K and V block is streamed into SRAM, where partial score matrices S(t) and exponentials A(t) are computed (orange). Softmax normalization is accumulated across blocks, and partial outputs O(t) are merged to form the final output." %}
+{% include figure.liquid path="assets/img/2026-04-27-the-evolution-of-flashattention-via-io-awareness-and-hardware-optimization/Figure_6.png" class="img-fluid rounded z-depth-1" caption="Q, K, and V blocks are stored in HBM (blue). Each K and V block is streamed into SRAM, where partial score matrices S(t) and exponentials A(t) are computed (orange). Softmax normalization is accumulated across blocks, and partial outputs O(t) are merged to form the final output." %}
 
 We initialize the output matrix $O = 0 \in \mathbb{R}^{N \times d}$, the running sum vector $\ell = 0 \in \mathbb{R}^N$, and the running maximum vector $m = -\infty \in \mathbb{R}^N$. These statistics will be updated incrementally as we process each block.
 
@@ -263,7 +263,7 @@ We initialize the output matrix $O = 0 \in \mathbb{R}^{N \times d}$, the running
 
 In practice, to avoid numerical instability from dividing by $\ell_i$ at every step, the algorithm often stores the unnormalized output (let's call it $U_i = O_i \cdot \ell_i$) and only divides by $\ell_i$ at the very end of the computation or maintains the invariant correctly. The formulation above effectively rescales the previous running average to match the new magnitude determined by the new maximum.
 
-{% include figure.liquid path="assets/img/2026-04-27-The Evolution of FlashAttention via IO-Awareness and Hardware Optimization/Figure_7.png" class="img-fluid rounded z-depth-1" caption="Blockwise computation of attention using online softmax. Q remains in HBM while K and V are streamed in blocks. For each block, partial scores S(t) and exponentials A(t) are computed in SRAM. The running softmax denominator is updated across blocks, and partial outputs O(t) are rescaled and accumulated to form the final output." %}
+{% include figure.liquid path="assets/img/2026-04-27-the-evolution-of-flashattention-via-io-awareness-and-hardware-optimization/Figure_7.png" class="img-fluid rounded z-depth-1" caption="Blockwise computation of attention using online softmax. Q remains in HBM while K and V are streamed in blocks. For each block, partial scores S(t) and exponentials A(t) are computed in SRAM. The running softmax denominator is updated across blocks, and partial outputs O(t) are rescaled and accumulated to form the final output." %}
 
 
 ### Complexity Analysis
@@ -272,7 +272,7 @@ The efficiency of FlashAttention is theoretically grounded in its IO complexity.
 
 #### Standard Attention IO Complexity
 
-{% include figure.liquid path="assets/img/2026-04-27-The Evolution of FlashAttention via IO-Awareness and Hardware Optimization/Figure_8.png" class="img-fluid rounded z-depth-1"%}
+{% include figure.liquid path="assets/img/2026-04-27-the-evolution-of-flashattention-via-io-awareness-and-hardware-optimization/Figure_8.png" class="img-fluid rounded z-depth-1"%}
 
 
 For standard attention, the HBM accesses are:
@@ -528,7 +528,7 @@ FlashAttention-2, released in July 2023, achieves a ~2x speedup over v1 by addre
 
 FlashAttention-2 introduces **algebraic simplifications** to minimize non-matrix-multiply operations. While matrix multiplications (GEMMs) run on specialized Tensor Cores, operations like `exp`, `sum`, and `division` run on the Special Function Units (SFUs) or CUDA cores, which are much slower.
 
-{% include figure.liquid path="assets/img/2026-04-27-The Evolution of FlashAttention via IO-Awareness and Hardware Optimization/Figure_12.png" class="img-fluid rounded z-depth-1" caption="NVIDIA A100 Streaming Multiprocessor (SM) Architecture. Note the specialized Tensor Cores for matrix math vs. SFUs for activation functions." %}
+{% include figure.liquid path="assets/img/2026-04-27-the-evolution-of-flashattention-via-io-awareness-and-hardware-optimization/Figure_12.png" class="img-fluid rounded z-depth-1" caption="NVIDIA A100 Streaming Multiprocessor (SM) Architecture. Note the specialized Tensor Cores for matrix math vs. SFUs for activation functions." %}
 
 **1. Deferring Normalization:**
 In FlashAttention v1, the output matrix $O$ is rescaled at every iteration to maintain numerical stability:
@@ -550,7 +550,7 @@ During the backward pass, the required statistics can be derived as $\ell = \exp
 
 #### Optimization 2: Loop Reordering (Split-K to Split-Q)
 
-{% include figure.liquid path="assets/img/2026-04-27-The Evolution of FlashAttention via IO-Awareness and Hardware Optimization/Figure_10.png" class="img-fluid rounded z-depth-1" %}
+{% include figure.liquid path="assets/img/2026-04-27-the-evolution-of-flashattention-via-io-awareness-and-hardware-optimization/Figure_10.png" class="img-fluid rounded z-depth-1" %}
 
 The original FlashAttention used a loop order where the outer loop iterated over $K, V$ blocks and the inner loop over $Q$ blocks. This minimized repeated loads of $K$ and $V$ from HBM, but required writing partial results to the output accumulator $O$ back to HBM after each step. This "Split-K" style (accumulating results across $K$) creates dependencies that are difficult to parallelize without atomic updates, particularly when multiple warps share the same output.
 
@@ -575,7 +575,7 @@ This approach easily saturates the 108 SMs of an A100, even with a batch size of
 **Improved Warp Partitioning:**
 A major innovation in v2 is parallelizing across the sequence dimension. Instead of one thread block handling one $(i,j)$ pair at a time, FlashAttention-2 splits the work of a single attention head into multiple thread blocks and warps.
 
-{% include figure.liquid path="assets/img/2026-04-27-The Evolution of FlashAttention via IO-Awareness and Hardware Optimization/Figure_15.png" class="img-fluid rounded z-depth-1" caption="Comparison of Warp Partitioning: Split-K (FA1) vs Split-Q (FA2)" %}
+{% include figure.liquid path="assets/img/2026-04-27-the-evolution-of-flashattention-via-io-awareness-and-hardware-optimization/Figure_15.png" class="img-fluid rounded z-depth-1" caption="Comparison of Warp Partitioning: Split-K (FA1) vs Split-Q (FA2)" %}
 
 FlashAttention v1 used a "Split-K" scheme where 4 warps each computed a slice of $K^{T}$ and then synchronized to aggregate results. This required writing intermediate results to shared memory, barrier synchronization across warps, and reading/summing partial results.
 
@@ -662,8 +662,8 @@ FA3 is the first to effectively utilize FP8 (8-bit floating point) for attention
 
 **Challenge 2: Quantization Error.** FP8 (E4M3) has only 3 mantissa bits, making it sensitive to outliers.
 
-{% include figure.liquid path="assets/img/2026-04-27-The Evolution of FlashAttention via IO-Awareness and Hardware Optimization/Figure_13.png" class="img-fluid rounded z-depth-1" caption="FP8 E5M2 Format Structure" %}
-{% include figure.liquid path="assets/img/2026-04-27-The Evolution of FlashAttention via IO-Awareness and Hardware Optimization/Figure_14.png" class="img-fluid rounded z-depth-1" caption="FP8 E5M2 Calculation Example" %}
+{% include figure.liquid path="assets/img/2026-04-27-the-evolution-of-flashattention-via-io-awareness-and-hardware-optimization/Figure_13.png" class="img-fluid rounded z-depth-1" caption="FP8 E5M2 Format Structure" %}
+{% include figure.liquid path="assets/img/2026-04-27-the-evolution-of-flashattention-via-io-awareness-and-hardware-optimization/Figure_14.png" class="img-fluid rounded z-depth-1" caption="FP8 E5M2 Calculation Example" %}
 
 *   **Solution:** FA3 uses **Block Quantization** (per-block scaling factors) and **Incoherent Processing** (Hadamard transform) to spread outliers.
 
