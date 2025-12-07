@@ -29,7 +29,7 @@ bibliography: 2026-04-27-hallucination-cs.bib
 #   - make sure that TOC names match the actual section names
 #     for hyperlinks within the post to work correctly.
 toc:
-  - name: "Understanding Open-Loop Systems: Why Hallucination Happens"
+  - name: Understanding Open-Loop Systems: Why Hallucination Happens
     subsections:
       - name: Missing Feedback and Error Correction
       - name: LLMs as Open-Loop Dynamical Systems
@@ -39,7 +39,7 @@ toc:
     subsections:
       - name: 1. Data Quality and Contamination
       - name: 2. Knowledge Distribution and Statistical Limits
-      - name: "3. Compression and Entanglement: Structural Limits of Parametric Storage"
+      - name: 3. Compression and Entanglement: Structural Limits of Parametric Storage
       - name: 4. Training Objectives and Intrinsic Optimization Limits
       - name: 5. Alignment-Time Distortions (Post-Training Bias)
   - name: Activation - The Moment Hallucination Is Seeded
@@ -48,7 +48,7 @@ toc:
       - name: Decoding Dynamics and Token Selection Errors
   - name: Drift - Compounding Errors
     subsections:
-      - name: "Exposure Bias: The Engine of Drift"
+      - name: Exposure Bias: The Engine of Drift
       - name: Compounding Errors and Trajectory Propagation
       - name: Architectural and Decoding Weaknesses
       - name: Lack of Real-Time Self-Correction
@@ -56,11 +56,11 @@ toc:
     subsections:
       - name: Mathematical Divergence and the Jensen Gap
       - name: Theoretical Impossibility and Creativity–Hallucination Duality
-  - name: "Towards Closed-Loop LLMs: Introducing Feedback and Error Correction"
+  - name: Towards Closed-Loop LLMs: Introducing Feedback and Error Correction
     subsections:
-      - name: "The Observer: Internal Sensing for Hallucination Detection"
-      - name: "The Actuator: Dynamic Inference-Time Control"
-      - name: "The Feedback Loop: Iterative Correction and Refinement"
+      - name: The Observer: Internal Sensing for Hallucination Detection
+      - name: The Actuator: Dynamic Inference-Time Control
+      - name: The Feedback Loop: Iterative Correction and Refinement
       - name: Ethical Considerations and Real-World Applications
   - name: Conclusion
 ---
@@ -142,20 +142,20 @@ From a control-theoretic perspective, LLMs behave as <abbr title="A system that 
 
 In the autoregressive decoding implementation, the internal hidden state evolves based on the current state and the previous generated output:
 
-$$x(t+1)= F(x(t), \hat{y}(t))$$
+$$x(t+1)= F(x(t), \hat{y}(t), u_0)$$
 
 where
 
 - **x(t)** = internal hidden state at generation step *t*
-- **u(t)** = user prompt (initial condition)
+- **u₀** = user prompt (initial condition, fixed)
 - **ŷ(t)** = generated token distribution
 - **y*(t)** = desired "ground truth" output (unknown to the model)
 
-Crucially, the mechanism lacks a feedback controller term,
+Crucially, the mechanism lacks a feedback controller term of the form:
 
-$$u(t) = K \cdot (y^*(t) - \hat{y}(t))$$
+$$c(t) = K \cdot (y^*(t) - \hat{y}(t))$$
 
-—meaning no feedback controller exists to correct deviation. This open-loop structure is inherently fragile, drift-prone, and fundamentally unable to guarantee stability.
+where **c(t)** would be a corrective control signal—meaning no feedback controller exists to correct deviation. This open-loop structure is inherently fragile, drift-prone, and fundamentally unable to guarantee stability.
 
 ### Consequences of Open-Loop Generation
 
@@ -169,7 +169,7 @@ In control terms, LLMs function as nonlinear, self-exciting systems without stab
 {% include figure.liquid loading="eager" path="assets/img/2026-04-27-hallucination-cs/image 13.png" class="img-fluid rounded z-depth-1" zoomable=true %}
 
 <div class="caption">
-    Figure 12: Open-Loop System
+    Figure 1: Open-Loop System
 </div>
 
 <div class="l-body" style="background-color: #d1fae5; border-left: 4px solid #10b981; border-radius: 4px; padding: 20px; margin: 25px 0;">
@@ -194,12 +194,12 @@ This pipeline reframes hallucination as a predictable, stage-wise failure that c
 {% include figure.liquid loading="eager" path="assets/img/2026-04-27-hallucination-cs/image 0.png" class="img-fluid rounded z-depth-1" zoomable=true %}
 
 <div class="caption">
-    Figure 1: Four stages at which hallucination can occur.
+    Figure 2: Four stages at which hallucination can occur.
 </div>
 
 ## Memorization - The Source of Hallucination Risk
 
-The Memorization stage is where an LLM acquires its internal, parametric knowledge during pre-training and alignment. Hallucination risk originates here, not as an isolated defect, but as a structural consequence of four forces: imperfections in training data, the mathematical limits of compression, the objectives used to train them, and distortions introduced during post-training refinement. These vulnerabilities remain latent until inference, where they later manifest as activation-time failures.
+The Memorization stage is where an LLM acquires its internal, parametric knowledge during pre-training and alignment. Hallucination risk originates here, not as an isolated defect, but as a structural consequence of five forces: imperfections in training data, the mathematical limits of compression, the objectives used to train them, and distortions introduced during post-training refinement. These vulnerabilities remain latent until inference, where they later manifest as activation-time failures.
 
 We break down the memorization-phase contributors into five categories.
 
@@ -231,7 +231,7 @@ We break down the memorization-phase contributors into five categories.
 {% include figure.liquid loading="eager" path="assets/img/2026-04-27-hallucination-cs/image 7.png" class="img-fluid rounded z-depth-1" zoomable=true %}
 
 <div class="caption">
-    Figure 2: QA models memorize and regurgitate answers regardless of contextual information.
+    Figure 3: QA models memorize and regurgitate answers regardless of contextual information.
 </div>
 
 - **Data Deduplication and Contamination**
@@ -257,7 +257,7 @@ A perfect corpus cannot eliminate hallucination, as LLMs are constrained by fund
 {% include figure.liquid loading="eager" path="assets/img/2026-04-27-hallucination-cs/image 8.png" class="img-fluid rounded z-depth-1" zoomable=true %}
 
 <div class="caption">
-    Figure 3: LLM struggles with long tail information.
+    Figure 4: LLM struggles with long tail information.
 </div>
 
 - **Arbitrary Facts and Singletons**
@@ -268,7 +268,7 @@ A perfect corpus cannot eliminate hallucination, as LLMs are constrained by fund
 {% include figure.liquid loading="eager" path="assets/img/2026-04-27-hallucination-cs/image 1.png" class="img-fluid rounded z-depth-1" zoomable=true %}
 
 <div class="caption">
-    Figure 4: LLM tends to hallucinate for singleton or absent information.
+    Figure 5: LLM tends to hallucinate for singleton or absent information.
 </div>
 
 - **Temporal Misalignment**
@@ -278,7 +278,7 @@ A perfect corpus cannot eliminate hallucination, as LLMs are constrained by fund
 {% include figure.liquid loading="eager" path="assets/img/2026-04-27-hallucination-cs/image 12.png" class="img-fluid rounded z-depth-1" zoomable=true %}
 
 <div class="caption">
-    Figure 5: LLM struggles with long tail information.
+    Figure 6: Temporal misalignment in LLMs.
 </div>
 
 
@@ -345,7 +345,7 @@ During this phase, the training objective itself—along with intrinsic optimiza
 
 {% include figure.liquid loading="eager" path="assets/img/2026-04-27-hallucination-cs/image 2.png" class="img-fluid rounded z-depth-1" zoomable=true %}
 <div class="caption">
-    Figure 6: How LLM generate words.
+    Figure 7: How LLM generate words.
 </div>
 
 - **Exposure Bias**
@@ -374,7 +374,7 @@ During this phase, the training objective itself—along with intrinsic optimiza
 {% include figure.liquid loading="eager" path="assets/img/2026-04-27-hallucination-cs/image 10.png" class="img-fluid rounded z-depth-1" zoomable=true %}
 
 <div class="caption">
-    Figure 7: Teacher forcing creates a discrepancy with the inference phase.
+    Figure 8: Teacher forcing creates a discrepancy with the inference phase.
 </div>
 
 - **Positional Encoding, Long-Context Reasoning, and the Inevitability of Context Compression**
@@ -391,7 +391,7 @@ During this phase, the training objective itself—along with intrinsic optimiza
 {% include figure.liquid loading="eager" path="assets/img/2026-04-27-hallucination-cs/image 3.png" class="img-fluid rounded z-depth-1" zoomable=true %}
 
 <div class="caption">
-    Figure 8: Three mechanisms that make long context degradation theoretically inevitable.
+    Figure 9: Three mechanisms that make long context degradation theoretically inevitable.
 </div>
 
 - **Computational Limits and Undecidable Problems**
@@ -452,7 +452,7 @@ A core driver of inference-time hallucination is the model's inability to accura
 {% include figure.liquid loading="eager" path="assets/img/2026-04-27-hallucination-cs/image 5.png" class="img-fluid rounded z-depth-1" zoomable=true %}
 
 <div class="caption">
-    Figure 9: A vanilla SFT/RL model confidently asserts an incorrect visa requirement rather than admitting insufficient information. 
+    Figure 10: A vanilla SFT/RL model confidently asserts an incorrect visa requirement rather than admitting insufficient information. 
 </div>
 
 ### Decoding Dynamics and Token Selection Errors
@@ -466,7 +466,7 @@ Autoregressive token generation introduces several vulnerabilities tied directly
 {% include figure.liquid loading="eager" path="assets/img/2026-04-27-hallucination-cs/image 6.png" class="img-fluid rounded z-depth-1" zoomable=true %}
 
 <div class="caption">
-    Figure 10: Selection of sampling approaches and their parameters directly reflects on hallucination chances.
+    Figure 11: Selection of sampling approaches and their parameters directly reflects on hallucination chances.
 </div>
 
 
@@ -481,7 +481,7 @@ Autoregressive token generation introduces several vulnerabilities tied directly
 {% include figure.liquid loading="eager" path="assets/img/2026-04-27-hallucination-cs/image 11.png" class="img-fluid rounded z-depth-1" zoomable=true %}
 
 <div class="caption">
-    Figure 11: Softmax bottleneck impacts the model's response and its capability to utilize all contexts.
+    Figure 12: Softmax bottleneck impacts the model's response and its capability to utilize all contexts.
 </div>
 
 
@@ -634,7 +634,7 @@ Once uncertainty or drift risk is detected, the system must apply real-time corr
 
 COMPASS uses a **Context Reliance Score (CRS)** to estimate factual grounding and feeds this signal into a **PID controller**.
 
-The controller computes a gain $\rho_t$ that applies a subtle pre-softmax correction to attention heads, steering the model toward evidence-supported tokens. <d-cite key="mohsin2025fundamentallimitsllmsscale"></d-cite>
+The controller computes a gain $\rho_t$ that applies a subtle pre-softmax correction to attention heads, steering the model toward evidence-supported tokens. <d-cite key="pandya2025compasscontextmodulatedpidattention"></d-cite>
 
 #### Contrastive Logit Modulation
 
