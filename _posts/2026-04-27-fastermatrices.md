@@ -129,12 +129,12 @@ Optimizing matrix multiplication is a problem as old as time. The product of two
 
 <img class="img-fluid rounded" src="{{ 'assets/img/2026-04-27-fastermatrices/innerproduct.png' | relative_url }}" alt="Inner Product">
 
-With traditional algorithms having a time complexity of $O(N^3)$, and researchers like Strassen coming up with better recursive approaches, the time complexity is still only down to about $O(N^{2.81})$, which is still a pretty heavy task.
+With traditional algorithms having a time complexity of $O(N^3)$, and researchers like Strassen <d-cite key="strassen1969gaussian"></d-cite> coming up with better recursive approaches, the time complexity is still only down to about $O(N^{2.81})$, which is still a pretty heavy task.
 
 Ever since they were introduced, Transformers have gained tremendous popularity. However, a major bottleneck in the attention mechanism is matrix multiplication, which powers the core of the transformers. Optimizing matrix multiplication would mean an improvement in the speed of these models. This blog aims at utilizing several techniques from RandNLA to improve DistilBERT.
 
 ## Introduction
-RandNLA is a field of linear algebra that uses randomization to improve very large-scale algorithms in linear algebra (see [RandNLA](https://arxiv.org/abs/2302.11474)). The "Sketch and Solve" paradigm refers to using a sketching matrix to bring down the size of the problem and then solving the problem for a compressed size.
+RandNLA is a field of linear algebra that uses randomization to improve very large-scale algorithms in linear algebra (see [RandNLA](https://arxiv.org/abs/2302.11474)). <d-cite key="murray2023randomized"></d-cite> The "Sketch and Solve" paradigm refers to using a sketching matrix to bring down the size of the problem and then solving the problem for a compressed size.
 
 ### Sketching for Matrix Multiplication
 
@@ -165,20 +165,20 @@ For the approximation $\tilde{\mathbf{C}}$ to be accurate, the sketching matrix 
 
 The sketches can be of various types, e.g., Gaussian, Count Sketch, Hadamard, and Learned sketches.
 * **Gaussian sketches** involve projecting data using a matrix where entries are sampled independently from a normal distribution $\mathcal{N}(0, \frac{1}{k})$ to preserve distances [Sobczyk and Luisier, 2022].<d-cite key="sobczyk2022approximate"></d-cite>
-* **Count Sketch** offers a sparser alternative by using hash functions to map rows to buckets and randomly flipping their signs [Clarkson and Woodruff, 2017].
-* **Hadamard-based sketches** (like the PHD matrix) combine randomized Hadamard transforms with uniform subsampling for structured efficiency [Clarkson and Woodruff, 2017].
+* **Count Sketch** offers a sparser alternative by using hash functions to map rows to buckets and randomly flipping their signs [Clarkson and Woodruff, 2017].<d-cite key="clarkson2017low"></d-cite>
+* **Hadamard-based sketches** (like the PHD matrix) combine randomized Hadamard transforms with uniform subsampling for structured efficiency [Clarkson and Woodruff, 2017].<d-cite key="clarkson2017low"></d-cite>
 
 For the broader problem of matrix multiplication, not just sketching techniques but sampling algorithms have also been studied which have shown good promise.
 
 The core idea behind the sampling algorithms is to select a subset of the original data. Several algorithms like uniform sampling, random sampling, priority sampling, threshold sampling, and leverage score sampling are popular. They basically "look" and find the "most important" parts of the entire matrix and then perform the multiplication on the smaller subset of the matrices.
 
-* **Uniform Sampling** samples each row with the probability $p=k/n$ of selection, effectively treating every single row as equally important [Cohen et al., 2015].
-* **Leverage Score Sampling** selects rows based on their statistical influence called leverage scores which are either calculated using SVD or QR-decomposition [Drineas et al., 2012].
-* **Priority and Threshold Sampling** is an innovative method which selects the rows based on their "importance," i.e., rows beyond a certain threshold are selected [Daliri et al., 2025].
+* **Uniform Sampling** samples each row with the probability $p=k/n$ of selection, effectively treating every single row as equally important [Cohen et al., 2015].<d-cite key="cohen2015uniform"></d-cite>
+* **Leverage Score Sampling** selects rows based on their statistical influence called leverage scores which are either calculated using SVD or QR-decomposition [Drineas et al., 2012].<d-cite key="drineas2012fast"></d-cite>
+* **Priority and Threshold Sampling** is an innovative method which selects the rows based on their "importance," i.e., rows beyond a certain threshold are selected [Daliri et al., 2025].<d-cite key="daliri2025matrix"></d-cite>
 
 ### Sketch and Solve for Transformers
 
-Transformers, as an architecture, is the industry standard because it has improved context as compared to previous architectures such as LSTM and RNNs, and provides the ability to parallelize the block which means faster training and inference.
+Transformers, as an architecture,<d-cite key="vaswani2017attention"></d-cite> is the industry standard because it has improved context as compared to previous architectures such as LSTM and RNNs, and provides the ability to parallelize the block which means faster training and inference.
 
 Its architecture is split into two distinct blocks, both composed of a stack of $N$ identical layers:
 
@@ -226,24 +226,36 @@ It is quite evident that improvement with $\mathbf{Q}\mathbf{K}^\top$ can lead t
 ### Better Transformers
 
 In regards to optimizing the attention matrix, a lot of work has already been done.
-Instead of computing the full matrix, architectures like the **Sparse Transformer** enforce a fixed sparsity pattern, such as a sliding window where tokens only attend to their immediate neighbors [Child et al., 2019]. This reduces the complexity to approximately $O(N\sqrt{N})$.
-A more dynamic approach was introduced by the **Reformer**, which replaces exact dot-product attention with Locality-Sensitive Hashing (LSH) [Kitaev et al., 2020]. By grouping similar query and key vectors into the same hash buckets, the model computes attention only within these buckets, effectively dropping the complexity to $O(N \log N)$.
+Instead of computing the full matrix, architectures like the **Sparse Transformer** enforce a fixed sparsity pattern, such as a sliding window where tokens only attend to their immediate neighbors [Child et al., 2019].<d-cite key="child2019generating"></d-cite> This reduces the complexity to approximately $O(N\sqrt{N})$.
+A more dynamic approach was introduced by the **Reformer**<d-cite key="kitaev2020reformer"></d-cite>, which replaces exact dot-product attention with Locality-Sensitive Hashing (LSH) [Kitaev et al., 2020]. By grouping similar query and key vectors into the same hash buckets, the model computes attention only within these buckets, effectively dropping the complexity to $O(N \log N)$.
 
-The **Linformer** relies on the low-rank property of the attention matrix [Wang et al., 2020]. Linformer projects the Key ($\mathbf{K}$) and Value ($\mathbf{V}$) matrices into a lower-dimensional space using learned linear projections ($\mathbf{E}$ and $\mathbf{F}$). By compressing the original $(N \times d)$ matrices into much smaller $(k \times d)$ matrices, the attention operation becomes linear $O(N)$ in time and space.
+The **Linformer**<d-cite key="wang2020linformer"></d-cite> relies on the low-rank property of the attention matrix [Wang et al., 2020]. Linformer projects the Key ($\mathbf{K}$) and Value ($\mathbf{V}$) matrices into a lower-dimensional space using learned linear projections ($\mathbf{E}$ and $\mathbf{F}$). By compressing the original $(N \times d)$ matrices into much smaller $(k \times d)$ matrices, the attention operation becomes linear $O(N)$ in time and space.
 
-**LevAttention** utilizes the concept of leverage scores (generalized $f$-sensitivities) to identify a small "universal set" of keys that dominate the attention scores for *any* query [Kannan et al., 2024]. This method proves that a subset of high-leverage keys, independent of the sequence length, captures the vast majority of the attention mass, allowing for efficient $O(N \cdot \text{poly}(d/\epsilon))$ computation.
+**LevAttention**<d-cite key="kannan2025levattention"></d-cite> utilizes the concept of leverage scores (generalized $f$-sensitivities) to identify a small "universal set" of keys that dominate the attention scores for *any* query [Kannan et al., 2024]. This method proves that a subset of high-leverage keys, independent of the sequence length, captures the vast majority of the attention mass, allowing for efficient $O(N \cdot \text{poly}(d/\epsilon))$ computation.
 
-**Matrix Product Sketching via Coordinated Sampling** proposes estimating the product $\mathbf{Q}\mathbf{K}^\top$ directly using coordinated random sampling [Daliri et al., 2025]. Unlike traditional linear sketching (such as Johnson-Lindenstrauss projections) which can be inefficient for sparse data, coordinated sampling (specifically Priority Sampling) selects rows from $\mathbf{Q}$ and $\mathbf{K}$ based on their norms using a shared random seed.
+**Matrix Product Sketching via Coordinated Sampling** <d-cite key="daliri2025matrix"></d-cite> proposes estimating the product $\mathbf{Q}\mathbf{K}^\top$ directly using coordinated random sampling [Daliri et al., 2025]. Unlike traditional linear sketching (such as Johnson-Lindenstrauss projections) which can be inefficient for sparse data, coordinated sampling (specifically Priority Sampling) selects rows from $\mathbf{Q}$ and $\mathbf{K}$ based on their norms using a shared random seed.
 
-In one way or another, all of these methods are trying to make the models faster by leveraging properties of the matrix itself or the matrix multiplication. With that in mind, we wanted to experiment with several different types of attention mechanisms for low resource Indic languages and see how they perform across various tasks in terms of accuracy and what does the distribution of the attention matrices really look like for different modifications and hence we have conducted an exhaustice set of experiments;
+In one way or another, all of these methods are trying to make the models faster by leveraging properties of the matrix itself or the matrix multiplication.
+
+Our framework addresses three fundamental questions:
+
+1. **Performance Comparison**: How do different efficient attention mechanisms perform across diverse Hindi NLP tasks?
+2. **Cross-Attention Compatibility**: Are attention mechanisms interchangeable? Can a model trained with one attention mechanism perform well with another during inference?
+3. **Task-Specific Patterns**: Do certain attention mechanisms work better for specific task types (classification, sequence labeling, multiple choice)?
+
+To answer these questions, we developed a comprehensive pipeline that:
+- Trains models with different attention mechanisms on multiple tasks
+- Evaluates performance with both matching and mismatched attention mechanisms
+- Provides detailed visualization and interpretability tools
+- Tracks computational efficiency and environmental impact
 
 ### Experiment Setup
 
-For the course of our experiments, we have picked the **DistilBERT** (6 encoder blocks, 12 heads each) architecture which is a distilled version of **BERT** that retains 97% of its performance while being 40% lighter.
+For the course of our experiments, we have picked the **DistilBERT**<d-cite key="sanh2019distilbert"></d-cite> (6 encoder blocks, 12 heads each) architecture which is a distilled version of **BERT** that retains 97% of its performance while being 40% lighter.
 
 <img class="img-fluid rounded" src="{{ 'assets/img/2026-04-27-fastermatrices/distbert.drawio (1).png' | relative_url }}" alt="DistilBert">
 
-We have used DistilBert-Multilingual-Cased model available on hugging face (https://huggingface.co/distilbert/distilbert-base-multilingual-cased) trained on wikipedia dataset as our base model for all the tasks
+We chose DistilBERT-multilingual-cased as our foundation model due to its balance between performance and efficiency. With 6 transformer layers, 768 hidden dimensions, and 12 attention heads, it provides sufficient capacity while remaining computationally manageable for our large-scale experiments. Its multilingual training includes Hindi, making it suitable for our target language.
 
 We then fine-tuned this model for various different tasks using our datasets and different attention mechanisms such as:
 
@@ -252,10 +264,23 @@ We then fine-tuned this model for various different tasks using our datasets and
 * Lewis score based sampling
 * Learned sketches
 * vanilla fine tuning
+  
+Each attention mechanism was implemented as a custom MultiHeadSelfAttention module, maintaining the same interface as the original while implementing the specific approximation strategy.
 
+#### Training The Base Models
+For each attention mechanism, we followed an identical five-step procedure:
 
+**Step 1: Model Initialization**
+We loaded the base DistilBERT model and configured it for each specific task type (sequence classification, token classification, or multiple choice).
 
-The datasets were taken from the  **IndicGLUE Benchmark** (Hindi Language subsets), courtesy of [AI4Bharat](https://indicnlp.ai4bharat.org/pages/indic-glue/).
+**Step 2: Pre-Training Attention Injection**
+Crucially, we injected the custom attention mechanism before fine-tuning. This ensured the model learned task-specific representations through the lens of that particular attention mechanism from the beginning of training.
+
+The process involved iterating through all transformer layers, creating a custom attention instance, copying weights from the original attention module to preserve pre-trained knowledge, and then replacing the attention module. This surgical replacement maintained the model's architecture while changing the attention computation mechanism.
+
+**Step 3: Task-Specific Fine-Tuning**
+The datasets were taken from the  **IndicGLUE Benchmark** (Hindi Language subsets), courtesy of [AI4Bharat](https://indicnlp.ai4bharat.org/pages/indic-glue/).<d-cite key="kakwani2020indicnlpsuite"></d-cite>
+We fine-tuned each model on five carefully selected Hindi NLP tasks:
 
 | Task & Dataset | Description | Unique Labels | Hindi Example |
 | :--- | :--- | :--- | :--- |
@@ -267,6 +292,10 @@ The datasets were taken from the  **IndicGLUE Benchmark** (Hindi Language subset
 | **Section Title Prediction**<br>`wstp.hi` | Predicts the correct section title for a Wikipedia paragraph. | `0` (Title A)<br>`1` (Title B)<br>`2` (Title C)<br>`3` (Title D) | **Text:** (Paragraph about Cricket rules)<br>**Correct:** *“नियम” (Rules)* |
 
 
+**Step 4: Model Deployment to HuggingFace Hub**
+We uploaded all models with a consistent naming convention for easy programmatic access: shreshthamodi02/bert-{attention_type}-hindi-{task_name}
+
+This created 25 publicly available models (5 attention types × 5 tasks).
 
 
 All of the datasets were split into training and testing set and had a sequence lenght of 512
@@ -285,7 +314,7 @@ All the models have been fine-tuned on Kaggle using the GPU P100 and are availab
 
 ####  Learned Sketch
 
-Adapting the idea from linformer, the assumption here is that the attention matrix is low rank. Hence, instead of computing the entire $N \times N$ matrix, we take smaller versions of the projected Key ($\mathbf{K}$) and Value ($\mathbf{V}$) matrices. [Wang et al., 2020].
+Adapting the idea from linformer, the assumption here is that the attention matrix is low rank. Hence, instead of computing the entire $N \times N$ matrix, we take smaller versions of the projected Key ($\mathbf{K}$) and Value ($\mathbf{V}$) matrices. [Wang et al., 2020].<d-cite key="wang2020linformer"></d-cite>
 
 Those smaller projection matrices are defined as $\mathbf{E} \in \mathbb{R}^{k \times N}$ and $\mathbf{F} \in \mathbb{R}^{k \times N}$, where $k \ll N$ such that
 
@@ -315,13 +344,13 @@ Final product
 This architecture is adopted from LevAttention, where Leverage scores are used to identify the most influential keys (rows of K), and we restrict attention computation to only these selected keys.
 Instead of applying this to vision-based tasks as in the original paper, we adapt this approach for natural language tasks.
 
-**Statistical Leverage Scores** are used here to identify the most "influential" keys in the sequence. High leverage indicates a key that is unique or critical to the subspace [Kannan et al., 2024].
+**Statistical Leverage Scores** are used here to identify the most "influential" keys in the sequence. High leverage indicates a key that is unique or critical to the subspace [Kannan et al., 2024].<d-cite key="kannan2025levattention"></d-cite>
 
 For a matrix $\mathbf{K} \in \mathbb{R}^{n \times d}$ with $n > d$ and full column rank, the statistical leverage score of the $i$-th row $\mathbf{k}_i$ is formally defined as:
 
 $$\tau_i(\mathbf{K}) = \mathbf{k}_i^\top (\mathbf{K}^\top \mathbf{K})^{-1} \mathbf{k}_i$$
 
-This corresponds to the $i$-th diagonal element of the projection matrix $\mathbf{P} = \mathbf{K}(\mathbf{K}^\top \mathbf{K})^{-1}\mathbf{K}^\top$, which projects onto the column space of $\mathbf{K}$ [Drineas et al., 2012; Mahoney et al., 2011]. The leverage scores satisfy $0 \leq \tau_i \leq 1$ and $\sum_{i=1}^n \tau_i = d$, providing a natural probability distribution over the rows of $\mathbf{K}$.
+This corresponds to the $i$-th diagonal element of the projection matrix $\mathbf{P} = \mathbf{K}(\mathbf{K}^\top \mathbf{K})^{-1}\mathbf{K}^\top$, which projects onto the column space of $\mathbf{K}$ [Drineas et al., 2012; Mahoney et al., 2011]. <d-cite key="drineas2012fast, mahoney2011randomized"></d-cite> The leverage scores satisfy $0 \leq \tau_i \leq 1$ and $\sum_{i=1}^n \tau_i = d$, providing a natural probability distribution over the rows of $\mathbf{K}$.
 
 For a matrix $\mathbf{K} \in \mathbb{R}^{N \times d}$, the leverage score $\tau_i$ of the $i$-th row $\mathbf{k}_i$ is defined as:
 $$\tau_i(\mathbf{K}) = \mathbf{k}_i (\mathbf{K}^\top \mathbf{K})^{-1} \mathbf{k}_i^\top$$
@@ -356,7 +385,7 @@ Attention:
 
 We have also tried to use Lewis weights for the key selection instead of Leverage scores for the attention mechanism.
 
-Lewis Weights are a generalization of leverage scores for $\ell_1$ norms. They provide a sensitivity measure for the $\ell_1$ norm, ensuring that the selected keys capture the geometry of the data distribution more robustly [Cohen & Peng, 2015].
+Lewis Weights are a generalization of leverage scores for $\ell_1$ norms. They provide a sensitivity measure for the $\ell_1$ norm, ensuring that the selected keys capture the geometry of the data distribution more robustly [Cohen & Peng, 2015].<d-cite key="cohen2015lp"></d-cite>
 
 For a matrix $\mathbf{K} \in \mathbb{R}^{n \times d}$, the $\ell_1$ Lewis weights $w_i$ are defined as the unique values satisfying:
 $$w_i = \tau_i(\mathbf{W}^{-1/2}\mathbf{K})$$
@@ -389,27 +418,26 @@ Compute Attention with Mask:
 
 Here we are using adapting the priority sampling algorithm for distilbert.
 
-We select the key vectors probabilistically, where the probability of selecting a key is proportional to its squared norm, using a threshold derived from the squared Frobenius norm of the key matrix [Daliri et al., 2025].
+We select the key vectors probabilistically, where the probability of selecting a key is proportional to its squared norm, using a threshold derived from the squared Frobenius norm of the key matrix [Daliri et al., 2025].<d-cite key="daliri2025matrix"></d-cite>
 
 More formally,
 
-Let \(\mathbf{ K} \in \mathbb{R}^{k\_len \times d} \) be the key matrix for a given head.
+Let $\mathbf{K} \in \mathbb{R}^{k\_len \times d}$ be the key matrix for a given head.
+lendi  
+The squared Frobenius norm of the key matrix is given by:
+$$
+\mathbf{A}_{\text{norm}}^2 = \|\mathbf{K}\|_F^2 = \sum_{i=1}^{k\_len} \|\mathbf{k}_i\|_2^2
+$$
 
- The squared Frobenius norm of the key matrix is given by:
-    \[
-    \mathbf{A_{\text{norm}}^2 }= \|\mathbf{K}\|_F^2 = \sum_{i=1}^{k\_len} \|\mathbf{k}_i\|_2^2
-    \]
+For a target sample size $k$, the threshold $\tau$ is:
+$$
+\tau = \frac{k}{\mathbf{A}_{\text{norm}}^2}
+$$
 
-For a target sample size \( k \), the threshold \( \tau \) is:
-    \[
-    \tau = \frac{k}{\mathbf{A_{\text{norm}}^2}}
-    \]
-
- For each key vector \( \mathbf{k}_i \), generate a random hash \( h_i \sim \text{Uniform}(0, 1) \). The key is selected if:
-    \[
-    h_i \leq \tau \cdot \|\mathbf{k}_i\|_2^2
-    \]
-
+For each key vector $\mathbf{k}_i$, generate a random hash $h_i \sim \text{Uniform}(0, 1)$. The key is selected if:
+$$
+h_i \leq \tau \cdot \|\mathbf{k}_i\|_2^2
+$$
 ```latex
 Input: K (N x d), k, random seed s
 
@@ -439,6 +467,39 @@ Attention:
 | **Learned Sketch** | ✅ | ✅ | ✅ | ✅ |
 | **L1 Attention** | ✅ | ✅ | ✅ | ✅ |
 | **LevAttention** | ✅ | ✅ | ✅ | ✅ |
+
+### Inference Methodology
+**Grid Dimensions**:
+- **5 Tasks**: sentiment analysis, NLI, NER, discourse classification, WSTP
+- **5 Trained attention types**: What the model was originally trained with
+- **5 Inference attention types**: What we use during evaluation
+
+**Total Experimental Conditions**: 5 × 5 × 5 = 125
+
+**Core Component 1: Argument Parser (`setup.py`)**
+
+The `setup.py` file functions as the central configuration hub for the experimental framework. It orchestrates the following critical operations:
+* **Argument Parsing:** Manages command-line arguments to distinguish between `trained_attn_type` and `inference_attn_type`.
+* **Directory Management:** Automates the creation of directory structures to ensure results are stored systematically.
+* **Dynamic Module Loading:** Handles the runtime initialization of specific attention modules based on the active experiment configuration.
+* **Convention Mapping:** Resolves naming inconsistencies by mapping between training and inference identifiers.
+
+**Core Component 2: Task-Specific Inference Scripts**
+
+Each NLP task utilizes a dedicated inference script. While these scripts adhere to a unified architectural template, they are specialized to handle task-specific nuances:
+1.  **`sentiment_analysis.py`:** Handles binary and multi-class classification, including the extraction of confidence scores.
+2.  **`nli.py`:** Manages Natural Language Inference tasks, focusing on multiple-choice inference via pair-wise comparison.
+3.  **`ner.py`:** Executes token-level classification and integrates `seqeval` metrics for rigorous entity-level evaluation.
+4.  **`discourse.py`:** Performs multi-class classification tailored for discourse analysis, incorporating mode analysis.
+5.  **`wstp.py`:** Processes multiple-choice questions with extended context windows (four options).
+
+**Core Component 3: Metrics Collection Framework**
+
+To ensure a holistic evaluation of the attention mechanisms, every inference run captures a comprehensive suite of metrics:
+* **Performance Metrics:** Standard, task-appropriate evaluators (Accuracy, F1-Score, Precision, Recall), alongside confidence distribution analysis and calibration error checking.
+* **Efficiency Metrics:** Computational profiling, including total inference time, per-batch latency, system throughput (samples/second), and GPU memory footprint (peak vs. average).
+* **Environmental Metrics:** Ecological impact estimation, tracking carbon emissions and energy consumption via **CodeCarbon**.
+* **Attention-Specific Metrics:** Intrinsic analysis of the mechanism, quantifying attention pattern entropy, sparsity ratios (for sparse attention variants), and head diversity.
 
 ### Results
 
