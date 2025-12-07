@@ -4,7 +4,7 @@
   journal={arXiv preprint arXiv:2404.00776},
   year={2024}
 }
-@misc{chen2024excelformerneuralnetworksurpassing,
+@misc{excelformer,
       title={ExcelFormer: A neural network surpassing GBDTs on tabular data}, 
       author={Jintai Chen and Jiahuan Yan and Qiyuan Chen and Danny Ziyi Chen and Jian Wu and Jimeng Sun},
       year={2024},
@@ -40,7 +40,7 @@
       primaryClass={cs.LG},
       url={https://arxiv.org/abs/2305.18446}, 
 }
-@misc{rubachev2024tabredanalyzingpitfallsfilling,
+@misc{tabred,
       title={TabReD: Analyzing Pitfalls and Filling the Gaps in Tabular Deep Learning Benchmarks}, 
       author={Ivan Rubachev and Nikolay Kartashev and Yury Gorishniy and Artem Babenko},
       year={2024},
@@ -49,7 +49,7 @@
       primaryClass={cs.LG},
       url={https://arxiv.org/abs/2406.19380}, 
 }
-@misc{gorishniy2023embeddingsnumericalfeaturestabular,
+@misc{embeddings,
       title={On Embeddings for Numerical Features in Tabular Deep Learning}, 
       author={Yury Gorishniy and Ivan Rubachev and Artem Babenko},
       year={2023},
@@ -58,7 +58,7 @@
       primaryClass={cs.LG},
       url={https://arxiv.org/abs/2203.05556}, 
 }
-@misc{holzmüller2025betterdefaultstrongpretuned,
+@misc{realmlp,
       title={Better by Default: Strong Pre-Tuned MLPs and Boosted Trees on Tabular Data}, 
       author={David Holzmüller and Léo Grinsztajn and Ingo Steinwart},
       year={2025},
@@ -67,14 +67,14 @@
       primaryClass={cs.LG},
       url={https://arxiv.org/abs/2407.04491}, 
 }
-@inproceedings{He2014PracticalLF,
+@inproceedings{facebook,
   title={Practical Lessons from Predicting Clicks on Ads at Facebook},
   author={Xinran He and Junfeng Pan and Ou Jin and Tianbing Xu and Bo Liu and Tao Xu and Yanxin Shi and Antoine Atallah and Ralf Herbrich and Stuart Bowers and Joaquin Qui{\~n}onero Candela},
   booktitle={International Workshop on Data Mining for Online Advertising},
   year={2014},
   url={https://api.semanticscholar.org/CorpusID:2999385}
 }
-@misc{erickson2025tabarenalivingbenchmarkmachine,
+@misc{tabarena,
       title={TabArena: A Living Benchmark for Machine Learning on Tabular Data}, 
       author={Nick Erickson and Lennart Purucker and Andrej Tschalzev and David Holzmüller and Prateek Mutalik Desai and David Salinas and Frank Hutter},
       year={2025},
@@ -83,19 +83,19 @@
       primaryClass={cs.LG},
       url={https://arxiv.org/abs/2506.16791}, 
 }
-@misc{stripe2020howwebuiltitstriperadar,
+@misc{stripe,
       title={How We Built It: Stripe Radar}, 
       author={Ryan Drapeau},
       year={2023},
       url={https://stripe.com/blog/how-we-built-it-stripe-radar}, 
 }
-@misc{swiggy2021learningtorank,
+@misc{swiggy,
       title={Learning to Rank Restaurants}, 
       author={Ashay Tamhane},
       year={2021},
       url={https://bytes.swiggy.com/learning-to-rank-restaurants-c6a69ba4b330}, 
 }
-@inproceedings{Jeunen_2023, series={FIRE 2023},
+@inproceedings{sharechat, series={FIRE 2023},
    title={On Gradient Boosted Decision Trees and Neural Rankers: A Case-Study on Short-Video Recommendations at ShareChat},
    url={http://dx.doi.org/10.1145/3632754.3632940},
    DOI={10.1145/3632754.3632940},
@@ -105,3 +105,42 @@
    year={2023},
    month=dec, pages={136–141},
    collection={FIRE 2023} }
+
+
+@inproceedings{grinsz,
+author = {Grinsztajn, L\'{e}o and Oyallon, Edouard and Varoquaux, Ga\"{e}l},
+title = {Why do tree-based models still outperform deep learning on typical tabular data?},
+year = {2022},
+isbn = {9781713871088},
+publisher = {Curran Associates Inc.},
+address = {Red Hook, NY, USA},
+abstract = {While deep learning has enabled tremendous progress on text and image datasets, its superiority on tabular data is not clear. We contribute extensive benchmarks of standard and novel deep learning methods as well as tree-based models such as XGBoost and Random Forests, across a large number of datasets and hyperparam-eter combinations. We define a standard set of 45 datasets from varied domains with clear characteristics of tabular data and a benchmarking methodology accounting for both fitting models and finding good hyperparameters. Results show that tree-based models remain state-of-the-art on medium-sized data (∼10K samples) even without accounting for their superior speed. To understand this gap, we conduct an empirical investigation into the differing inductive biases of tree-based models and neural networks. This leads to a series of challenges which should guide researchers aiming to build tabular-specific neural network: <b>1</b>. be robust to uninformative features, <b>2</b>. preserve the orientation of the data, and <b>3</b>. be able to easily learn irregular functions. To stimulate research on tabular architectures, we contribute a standard benchmark and raw data for baselines: every point of a 20 000 compute hours hyperparameter search for each learner.},
+booktitle = {Proceedings of the 36th International Conference on Neural Information Processing Systems},
+articleno = {37},
+numpages = {14},
+location = {New Orleans, LA, USA},
+series = {NIPS '22}
+}
+
+@inproceedings{reg-is-all-you-need,
+author = {Kadra, Arlind and Lindauer, Marius and Hutter, Frank and Grabocka, Josif},
+title = {Well-tuned simple nets excel on tabular datasets},
+year = {2021},
+isbn = {9781713845393},
+publisher = {Curran Associates Inc.},
+address = {Red Hook, NY, USA},
+abstract = {Tabular datasets are the last "unconquered castle" for deep learning, with traditional ML methods like Gradient-Boosted Decision Trees still performing strongly even against recent specialized neural architectures. In this paper, we hypothesize that the key to boosting the performance of neural networks lies in rethinking the joint and simultaneous application of a large set of modern regularization techniques. As a result, we propose regularizing plain Multilayer Perceptron (MLP) networks by searching for the optimal combination/cocktail of 13 regularization techniques for each dataset using a joint optimization over the decision on which regularizers to apply and their subsidiary hyperparameters.We empirically assess the impact of these regularization cocktails for MLPs in a large-scale empirical study comprising 40 tabular datasets and demonstrate that (i) well-regularized plain MLPs significantly outperform recent state-of-the-art specialized neural network architectures, and (ii) they even outperform strong traditional ML methods, such as XGBoost.},
+booktitle = {Proceedings of the 35th International Conference on Neural Information Processing Systems},
+articleno = {1832},
+numpages = {14},
+series = {NIPS '21}
+}
+
+@inproceedings{tabm,
+title={TabM: Advancing tabular deep learning with parameter-efficient ensembling},
+author={Yury Gorishniy and Akim Kotelnikov and Artem Babenko},
+booktitle={The Thirteenth International Conference on Learning Representations},
+year={2025},
+url={https://openreview.net/forum?id=Sd4wYYOhmY}
+}
+
