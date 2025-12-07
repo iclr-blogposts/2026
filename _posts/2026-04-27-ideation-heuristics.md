@@ -44,7 +44,7 @@ We formalize the cognitive heuristics underlying creative idea generation. By dr
 
 <div class="row mt-3">
     <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="assets/img/2026-04-27-ideation-heuristics/heuristics.jpg" class="img-fluid rounded z-depth-1" %}
+        {% include figure.liquid path="assets/img/2026-04-27-ideation-heuristics/heuristics.jpg" class="img-fluid rounded z-depth-1" %}
     </div>
 </div>
 
@@ -119,7 +119,7 @@ Each participant rates the usefulness of all 20 heuristics within their discipli
 
 <div class="row mt-3">
     <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="assets/img/2026-04-27-ideation-heuristics/survey_results.png" class="img-fluid rounded z-depth-1" %}
+        {% include figure.liquid path="assets/img/2026-04-27-ideation-heuristics/survey_results.png" class="img-fluid rounded z-depth-1" %}
     </div>
 </div>
 
@@ -139,6 +139,6 @@ You can use the skill by simply zipping the repository and uploading it to Claud
 
 <div class="row mt-3">
     <div class="col-sm mt-3 mt-md-0">
-        {% include figure.html path="assets/img/2026-04-27-ideation-heuristics/usage_example.png" class="img-fluid rounded z-depth-1" %}
+        {% include figure.liquid path="assets/img/2026-04-27-ideation-heuristics/usage_example.png" class="img-fluid rounded z-depth-1" %}
     </div>
 </div>
