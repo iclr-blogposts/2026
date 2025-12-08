@@ -404,7 +404,7 @@ If teams tie on Final Score:
        style="width:100%; max-width:1100px;">
 
   <figcaption>
-    <b>Figure.</b> Add figure caption.
+    <b>Figure.</b> Distribution of Team Performance Across Planning, Execution, and Final Composite Scores
   </figcaption>
 </figure>
 
@@ -424,7 +424,7 @@ We analyzed how team performance evolved across submissions using first-vs-best 
        style="width:100%; max-width:1100px;">
 
   <figcaption>
-    <b>Figure.</b> Add figure caption.
+    <b>Figure.</b> Effect of Iterative Feedback on Agent Performance Across the Competition
   </figcaption>
 </figure>
 
