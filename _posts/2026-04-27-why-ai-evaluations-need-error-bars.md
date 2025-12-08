@@ -152,7 +152,7 @@ $$
 This yields confidence intervals and lets us test whether differences between models are statistically significant. The core conceptual move is to treat evaluation questions as samples from a larger “super-population” of possible items—essentially, acknowledging that the benchmark is only a finite window into a much larger task space.
 
 <p align="center">
-  <img src="{{ '/assets/img/2026-04-27-why-ai-evaluations-need-error-bars/point-vs-ci.png' | relative_url }}" width="80%">
+  <img src="{{ '/assets/img/2026-04-27-why-ai-evaluations-need-error-bars/point-vs-ci.png' | relative_url }}" width="100%">
 </p>
 <p align="center"><em>Figure 2: Overlapping confidence intervals show ambiguous rankings. 
 Two models that differ by 1 percentage point in accuracy but have overlapping 95% confidence intervals. Without error bars, this looks like a clear ranking; with uncertainty, the “winner” is ambiguous.</em></p>
