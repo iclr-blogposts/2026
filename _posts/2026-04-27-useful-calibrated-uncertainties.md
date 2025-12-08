@@ -149,7 +149,7 @@ $$
 \hat y = \arg\max_k \text{logits}_\phi(x)_k~.
 $$
 
-Thus, in this case, $P_\theta(y=\hat y\mid x)$ can be viewed as the confidence of the classifier $f_\phi$ in its own prediction, hence the name *confidence calibration*.
+Thus, for this scenario, $P_\theta(y=\hat y\mid x)$ can be viewed as the confidence of the classifier $f_\phi$ in its own prediction, hence the name *confidence calibration*.
 
 For further discussion of other realisations of calibration (e.g. with different definitions of the binary $\text{event}$), as well as more specifics on how calibration is measured in practice (e.g *Expected Calibration Error* <d-cite key="Naeini2015BBQ"></d-cite>) I recommend this [excellent blogpost](https://iclr-blogposts.github.io/2025/blog/calibration/) by Maja Pavlovic <d-cite key="pavlovic2025understanding"></d-cite>.
 ## What Do Calibrated Probabilities Allow You to Do?
