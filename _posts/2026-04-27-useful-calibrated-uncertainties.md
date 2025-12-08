@@ -1,6 +1,6 @@
 ---
 layout: distill
-title: What (and What Not) are Calibrated Uncertainties Actually Useful for?
+title: What (and What Not) are Calibrated Probabilities Actually Useful for?
 description: This blogpost clarifies the practical usefulness of having a model with calibrated probabilities, something that is not often clearly stated in the calibration literature. We show that a calibrated model can be relied on to estimate average loss/reward, however, good calibration does not mean that a model is useful for per-sample decision making. 
 date: 2026-04-27
 future: true
@@ -59,24 +59,24 @@ In this blogpost we will:
 
 Calibration, as it is defined in deep learning, is not an intuitive concept to understand. As such, paper authors tend to first motivate it using imprecise, but more intuitive natural language, like in the example above. We will instead start with a clear and general explanation of calibration to the reader as a basis for the rest of the blogpost.
 
-For a model to be calibrated, when it predicts a certain probability distribution over different outcomes, the real-world frequency of said outcomes should match that probability distribution.<d-footnote>We will focus on distributions over discrete outcomes in this blogpost as it is the most common setting for calibration.</d-footnote> A widely used example is weather forecasting: over a long run of days, it should rain on 70% of the days which have 70% chance of rain forecasted. Explicitly in natural language a calibrated model is one where 
+For a model to be calibrated, when it predicts a certain probability distribution over different outcomes, the real-world frequency of said outcomes should match that probability distribution.<d-footnote>We will focus on distributions over discrete outcomes in this blogpost as it is the most common setting for calibration.</d-footnote> A widely used example is weather forecasting: over a long run of days, it should rain on 70% of the days which have 70% chance of rain forecasted. Explicitly, in natural language, a calibrated model is one where,
 
 $$
 \begin{array}{l}
 \text{empirical frequency of outcomes when } \\
-\text{corresponding probabilities are predicted}，
+\text{probabilities for those outcomes are predicted}
 \end{array}
-= \text{ those predicted probabilities}
+= \text{ those predicted probabilities},
 $$
 
-or for a binary event (e.g. rain or no rain), a simpler version is
+or for a binary $\text{event}$ (e.g. rain or no rain), a simpler version is
 
 $$
 \begin{array}{l}
 \text{empirical frequency of event occurring when } \\
 \text{a given probability of event is predicted}
 \end{array}
-= \text{ that predicted probability}，
+= \text{ that predicted probability},
 \tag{1}\label{eq:calib-natlang}
 $$
 
@@ -86,7 +86,7 @@ $$
 \underbrace{P(\text{event} \mid  \pi) = \pi}_\text{actual probability of event is $\pi$},\quad \text{for }\underbrace{\pi={P}_{\theta}(\text{event}\mid \text{conditions}) }_\text{when model predicts probability $\pi$}\text{ in } [0,1], \tag{2}\label{eq:calib-math}
 $$
 
-where $\pi$ is a random variable that captures the value of the probability output by our model with parameters $\theta$. Note that $\pi(\text{event},\text{conditions})$ is a function of $\text{event}$ and $\text{conditions}$. If $\text{event}$ is "rain" then $\text{conditions}$ could be "temperature of the previous day", for example. We will be relying on Eq. \ref{eq:calib-math} a fair amount in this blogpost, however, it is simply formalising the intuition in Eq. \ref{eq:calib-natlang}.
+where $\pi$ is a random variable that captures the value of the probability output by our model with parameters $\theta$. Note that $\pi(\text{event},\text{conditions})$ is a function of $\text{event}$ and $\text{conditions}$. If $\text{event}$ is "rain" then $\text{conditions}$ could be "temperature of the previous day", for example (i.e. the model input). We will be relying on Eq. \ref{eq:calib-math} a fair amount in this blogpost, however, it is simply formalising the intuition in Eq. \ref{eq:calib-natlang}.
 
 In this blogpost we will focus on binary events; however, the intuitions/ideas naturally extend to the general case. We leave the general version here for reference:
 
@@ -117,9 +117,9 @@ In the binary case, how well calibrated a model is can be visualised using a rel
 Left: Reliability diagram showing over and under-confident models. Right: Practical reliability diagram where empirical frequencies are estimated using bins.
 </div>
 
-A well calibrated model's reliability diagram will align with $y=x$ (Eq. \ref{eq:calib-natlang} is satisfied). Deviation below indicates "overconfidence" (real frequency < predicted probability); deviation above indicates "underconfidence" (real frequency > predicted probability). Note that the notion of over/under-confidence is much more specific here than in colloquial usage; we will return to this point later. Also, a model can be overconfident for a certain range of probabilities and underconfident on a different range (i.e. both at the same time), however, for simplicity's sake we'll limit discussion in this blog to models that are either over- or under-confident. The results naturally extend to more general cases.
+A well-calibrated model's reliability diagram will align with $y=x$ (Eq. \ref{eq:calib-natlang} is satisfied). Deviation below indicates "overconfidence" (real frequency < predicted probability); deviation above indicates "underconfidence" (real frequency > predicted probability). Note that the notion of over/under-confidence is much more specific here than in colloquial usage; we will return to this point later. Also, a model can be overconfident for a certain range of probabilities and underconfident on a different range (i.e. both at the same time), however, for simplicity's sake we'll limit discussion in this blog to models that are either over- or under-confident. The results naturally extend to more general cases.
 ### Confidence Calibration
-The above general presentation of calibration doesn't immediately resonate with the idea of mitigating risk in safety-critical scenarios that is present in our quoted excerpt from *On Calibration of Modern Neural Networks* <d-cite key="Guo2017Calibration"></d-cite>, as well as generally throughout the literature. In fact, in *On Calibration of Modern Neural Networks*, Guo et al. choose a binary $\text{event}$ "model prediction is correct" from the scenario of multi-class classification, which then inherently ties calibration to prediction errors and their associated risks/costs. This specific case of calibration is known as *confidence calibration* and is the primary form that is found in the deep learning literature <d-cite key="Guo2017Calibration,Minderer2021Revisiting,Zhang2020MixnMatchCalibration,param_temp_scaling_eccv2022,Xiong2023ProCal"></d-cite>. In this case, Eq. \ref{eq:calib-natlang} becomes:
+The above general presentation of calibration doesn't immediately resonate with the idea of mitigating risk in safety-critical scenarios that is present in our quoted excerpt from *On Calibration of Modern Neural Networks* <d-cite key="Guo2017Calibration"></d-cite>, as well as generally throughout the literature. In fact, in *On Calibration of Modern Neural Networks*, Guo et al. choose a binary $\text{event}$ "model prediction is correct" from the scenario of multi-class classification, which then inherently ties calibration to prediction errors and their associated risks/costs. This specific case of calibration is known as *confidence calibration* and is the primary form that is found in the deep learning literature <d-cite key="Guo2017Calibration,Minderer2021Revisiting,Zhang2020MixnMatchCalibration,param_temp_scaling_eccv2022,Xiong2023ProCal,LeCoz2024EfficientCalibration"></d-cite>. In this case, Eq. \ref{eq:calib-natlang} becomes:
 
 $$
 \begin{array}{l}
@@ -136,9 +136,10 @@ or mathematically for true label $y$, input $x$ and predicted label (top class) 
 $$
 \underbrace{P\bigl(y=\hat y \mid  \pi\bigr) = \pi}_\text{actual classification accuracy is $\pi$},\quad \text{for }\underbrace{\pi=P_{\theta}(y=\hat y\mid x) }_\text{predicts probability $\pi$} \text{ in } [0,1]. \tag{5}\label{eq:conf-calib-math}
 $$
+
 In words: amongst all test points where the model says "the probability of the predicted class label is 80%", the prediction should actually be right 80% of the time.
 
-One nuance the reader should be aware of is that for the purposes of confidence calibration, the model for the binary $\text{event}$ "model prediction is correct" $P_\theta(y=\hat y\mid x)$ is conceptually separate from the underlying classifier $f_\phi(x)$, and does not necessarily have to share parameters. However, when the classifier is a cross-entropy-trained softmax model (i.e. the vast majority of classifiers in deep learning), ${P}_{\theta}(y=\hat y\mid x)$ can be, and almost always is, extracted from the probability vector over classes output by the classifier<d-cite key="LeCoz2024EfficientCalibration"></d-cite>. In this case,
+One nuance the reader should be aware of is that for the purposes of confidence calibration, the model for the binary $\text{event}$ "model prediction is correct" $P_\theta(y=\hat y\mid x)$ is conceptually separate from the underlying classifier $f_\phi(x)$, and does not necessarily have to share parameters. However, when the classifier is a cross-entropy-trained softmax model (i.e. the vast majority of classifiers in deep learning), ${P}_{\theta}(y=\hat y\mid x)$ can be, and almost always is, extracted from the probability vector over classes output by the classifier <d-cite key="LeCoz2024EfficientCalibration"></d-cite>. In this case,
 
 $$
 P_{\theta}(y=\hat y\mid x) =  \text{softmax}\bigl(\text{logits}_\phi(x)\bigr)_\hat{y}~,
@@ -150,7 +151,7 @@ $$
 
 Thus, in this case, $P_\theta(y=\hat y\mid x)$ can be viewed as the confidence of the classifier $f_\phi$ in its own prediction, hence the name *confidence calibration*.
 
-For further discussion of other realisations of calibration (e.g. with different definitions of the binary $\text{event}$), as well as more specifics on how calibration is measured in practice (e.g *Expected Calibration Error*<d-cite key="Naeini2015BBQ"></d-cite>) I recommend this [excellent blogpost](https://iclr-blogposts.github.io/2025/blog/calibration/) by Maja Pavlovic <d-cite key="pavlovic2025understanding"></d-cite>.
+For further discussion of other realisations of calibration (e.g. with different definitions of the binary $\text{event}$), as well as more specifics on how calibration is measured in practice (e.g *Expected Calibration Error* <d-cite key="Naeini2015BBQ"></d-cite>) I recommend this [excellent blogpost](https://iclr-blogposts.github.io/2025/blog/calibration/) by Maja Pavlovic <d-cite key="pavlovic2025understanding"></d-cite>.
 ## What Do Calibrated Probabilities Allow You to Do?
 
 Now that we've understood what a calibrated model is in an abstract sense, we can start to understand what practical benefit it provides. Consider the calibration equation (Eq. \ref{eq:calib-math}) again,
@@ -169,10 +170,7 @@ Illustration of how a confidence-calibrated model allows estimation of expected 
 
 Once we have a reliable estimate of the expected loss/reward we can make downstream decisions, e.g. for a certain deployment scenario the image classifier is not accurate enough and will lead to profit loss from misclassifications, so we decide not to deploy it. Additionally, humans can often reason intuitively about probabilistic information <d-cite key="CosmidesTooby1996IntuitiveStat"></d-cite>,<d-footnote>Imagine you are told a weighted coin returns heads 80% of the time. It's easy to visualise and reason about.</d-footnote> so human decision making can be performed naturally and reliably if model outputs are calibrated probabilities.
 
-Finally, we note that in order to calibrate an uncalibrated model, or indeed to measure the calibration of the model in the first place, we need access to ground truth $\text{event}$ data.<d-cite key="NiculescuMizilCaruana2005,Guo2017Calibration"></d-cite> However, in problem scenarios where access to data at *deployment* time is different to *development* time, e.g. due to privacy or cost constraints, it can be important at deployment to have a model that was calibrated during development. 
-<d-footnote>
-Incidentally this raises the challenging open problem of maintaining calibration under deployment time distribution shift <d-cite key="Ovadia2019Shift"></d-cite>.
-</d-footnote>
+Finally, we note that in order to calibrate an uncalibrated model, or indeed to measure the calibration of the model in the first place, we need access to ground truth $\text{event}$ data <d-cite key="Guo2017Calibration,NiculescuMizilCaruana2005"></d-cite>. However, in problem scenarios where access to data at *deployment* time is different to *development* time, e.g. due to privacy or cost constraints, it can be important at deployment to have a model that was calibrated during development.<d-footnote>Incidentally this raises the challenging open problem of maintaining calibration under deployment time distribution shift <d-cite key="Ovadia2019Shift"></d-cite>.</d-footnote>
 
 > **Key Takeaway.**
 >  *A well-calibrated model enables reliable estimation of average loss/reward from only inputs/conditions without any ground truth events/labels. These reliable estimates can then be used to effectively inform downstream decisions that depend on average behaviour*. 
@@ -233,6 +231,7 @@ $$
 so that the full predicted distribution over $e$ is identified by the single scalar $\pi(c)$: $P_{\theta}(e=1\mid c)=\pi(c)$ and $P_{\theta}(e=0\mid c)=1-\pi(c)$.
 
 If the model is *well calibrated*, then for any $\pi\in[0,1]$ we have
+
 $$
 P(e=1\mid \pi) = \pi,\qquad P(e=0\mid \pi) = 1-\pi,
 $$
@@ -277,7 +276,7 @@ To make this concrete, let’s look at a simple but realistic decision problem w
 
 Explore $\tau$ by varying it to maximise the estimated profit. You should observe that by optimising $\tau$ based on the calibrated model probabilities, the bank can achieve near-optimal profit even without access to default $\text{event}$ data, i.e. the model can be trusted. Now toggle to the uncalibrated models. The average profit estimates become unreliable, leading to choices of $\tau$ that squander profit or even incur losses on the actual customers. The model that is overconfident about the probability of defaulting leads to overly pessimistic estimates of profit, whilst the underconfident model is overly optimistic. 
 
-Note that intuitively, the optimal threshold is on the boundary where expected profit given $\pi$ turns to zero for calibrated $\pi$, i.e. reject loans for all $\pi$ that lose money in expectation. Interestingly this decision rule can be set directly, without any $\text{conditions}$ or $\text{event}$ data, if the model is well calibrated.
+Note that intuitively, the optimal threshold is on the boundary where expected profit given $\pi$ turns to zero for calibrated $\pi$, i.e. reject loans for all $\pi$ that lose money in expectation. Interestingly, this decision rule can be in fact set directly, without any $\text{conditions}$ or $\text{event}$ data, if the model is well calibrated, since the aforementioned boundary value of $\pi$ is independent of the distribution over $\text{conditions}$.
 
 <div class="l-page">
   <iframe
@@ -312,7 +311,6 @@ Illustration of how abstention can improve accuracy by rejecting uncertain predi
 
 However, if we consider another well-calibrated model that predicts the average accuracy $\pi=0.5$ for *all* images, then all predictions have tied confidence and we have no way to discriminate between correct and incorrect predictions, even though for selective classification we would like our model to be more uncertain on errors. The model is well-calibrated but its uncertainties are *useless* for abstaining on potential errors! The key here is that *calibration is related to the accuracy* ***averaged*** *over different inputs* $x$, and does not interrogate the model for each input individually. It only examines $\pi$ with respect to true probability $P(\text{event}\mid \pi)$, not with respect to the per-sample true probability $P(\text{event}\mid \text{conditions})$.
 
-You can think of calibration and discrimination as two orthogonal axes: calibration controls the relationship between predicted probabilities and average frequencies, whilst discrimination controls how well the model is able to *rank* individual inputs by their true likelihood of $\text{event}$ occurring.
 
 {% include figure.liquid path="assets/img/2026-04-27-useful-calibrated-uncertainties/cal_bad_disc.png" class="img-fluid z-depth-1" %}
 
@@ -320,9 +318,11 @@ You can think of calibration and discrimination as two orthogonal axes: calibrat
 Illustration of how a well-calibrated model with no discrimination ability cannot improve accuracy via abstention.
 </div>
 
-Conversely, if a different well-calibrated model for $\text{event}$ "correct prediction" is able to predict $\pi=0.8$ for a subset of half of the images where the classifier has accuracy $80\%$ (different to previous subsets) and $\pi=0.2$ for the other half where accuracy is $20\%$, then the selected images will have an accuracy of $80\%$ when setting $\tau=0.5$. 
- 
- {% include figure.liquid path="assets/img/2026-04-27-useful-calibrated-uncertainties/cal_better_disc.png" class="img-fluid z-depth-1" %}
+Conversely, if a different well-calibrated model for $\text{event}$ "correct prediction" is able to predict $\pi=0.8$ for a subset of half of the images where the classifier has accuracy $80\%$ (different to previous subsets) and $\pi=0.2$ for the other half where accuracy is $20\%$, then the selected images will have an accuracy of $80\%$ when setting $\tau=0.5$. This model is better at discriminating between correct and incorrect events on a per-sample basis.
+
+You can think of calibration and discrimination as two orthogonal axes: calibration controls the relationship between predicted probabilities and average frequencies, whilst discrimination controls how well the model is able to *rank* individual inputs by their true likelihood of $\text{event}$ occurring.
+
+{% include figure.liquid path="assets/img/2026-04-27-useful-calibrated-uncertainties/cal_better_disc.png" class="img-fluid z-depth-1" %}
 
 <div class="caption">
 Illustration of how a well-calibrated model with better discrimination ability can improve accuracy via abstention.
@@ -341,6 +341,7 @@ Illustration of how an uncalibrated model with good discrimination ability can i
 </div>
 
 We note that the above example is purposely reductive as generally speaking $\pi$ will take many possible values rather than just two, and that downstream decisions may involve many possible actions. However, the intuition extends naturally to the general case.
+
 To summarise the above,
 
 > **Key Takeaway.**
@@ -366,14 +367,14 @@ $$
 \underbrace{P(e \mid  c)}_{\text{true prob. given }c} \approx \underbrace{\pi(e,c)={P}_{\theta}(e\mid c)}_{\text{model pred. prob.}}.
 $$
 
-In Bayesian decision theory <d-cite key="Chow1970OptimumReject,Bishop2006PatternRecognition"></d-cite>, the optimal decision rule *requires* knowledge of the true probability $P(e \mid  c)$ for each individual $c$ in order to minimise expected loss/reward on individual inputs. 
+In Bayesian decision theory <d-cite key="Chow1970OptimumReject,Bishop2006PatternRecognition"></d-cite>, the optimal decision rule *requires* knowledge of the true probability $P(e \mid  c)$ for each individual $c$ in order to minimise expected loss/reward on individual inputs, 
 
 $$
 \begin{aligned}
 \text{optimal decision}(c)
 &\in
 \arg\min_{d(c)}
-\mathbb{E}_{e \sim P(\cdot \mid c)}
+\mathbb{E}_{P(e \mid c)}
 \bigl[
   \mathcal{L}\bigl(e,\pi(e,c),d(c)\bigr)
 \bigr] \\
@@ -432,9 +433,9 @@ $$
 $$
 
 and choose the threshold $t$ that minimises $\hat R(t)$. Since every $t$ corresponds to some posterior threshold $\tau$, any strictly monotone (possibly uncalibrated) mapping of $P(e \mid c)$ is sufficient for learning the optimal binary thresholding rule from validation data. -->
-Thus calibration alone does not tell you whether or not you will be able to make good decisions on individual inputs. As an aside, one might ask, why not define calibration in terms of $P(\text{event}\mid \text{conditions}) = \pi(e,c)$ directly? The reason is that this is not typically possible to evaluate in practice as it would require the sampling of multiple $\text{event}$ outcomes for the same $\text{conditions}$. For the rain forecasting example, it would be like being able to rewind time and replay the same day over and over to see if it rains or not.
+Thus, calibration alone does not tell you whether or not you will be able to make good decisions on individual inputs. As an aside, one might ask, why not define calibration in terms of $P(\text{event}\mid \text{conditions}) = \pi(e,c)$ directly? The reason is that this is not typically possible to evaluate in practice, as it would require the sampling of multiple $\text{event}$ outcomes for the same $\text{conditions}$. For the rain forecasting example, it would be like being able to rewind time and replay the same day over and over to see if it rains or not.
 
-Now to concretely discuss our examples of selective classification and loan issuance, note that what matters for decision making performance is how well we can order or distinguish different $\text{conditions}$ using $P_{\theta}(e\mid c)$, not the absolute value of the predicted probability. Note also that the true conditional distribution $P(e\mid c)$ achieves maximal discrimination as any ambiguity it contains is irreducible.
+Now to concretely discuss our examples of selective classification and loan issuance, we aim to show that what matters for decision making performance is how well we can order or distinguish different $\text{conditions}$ using $P_{\theta}(e\mid c)$, not the absolute value of the predicted probability. Note that the true conditional distribution $P(e\mid c)$ achieves maximal discrimination as any ambiguity it contains is irreducible.
 
 Consider again a binary event $e \in \{0,1\}$ and define the true event probability
 
@@ -463,7 +464,7 @@ $$
 so the resulting actions (and hence decision regions) are identical whether we work with $s(c)$ or with $p(c)$. The expected loss of the decision rule can therefore be written as
 
 $$
-R(\eta) := \mathbb{E}_{(e,c)\sim P}\bigl[\mathcal{L}\bigl(e,\pi(e,c),d(c;\eta)\bigr)\bigr] = \mathbb{E}_{(e,c)\sim P}\bigl[\mathcal{L}\bigl(e,\pi(e,c),\tilde g(p(c);\eta')\bigr)\bigr].
+R(\eta) := \mathbb{E}_{P(e,c)}\bigl[\mathcal{L}\bigl(e,\pi(e,c),d(c;\eta)\bigr)\bigr] = \mathbb{E}_{P(e,c)}\bigl[\mathcal{L}\bigl(e,\pi(e,c),\tilde g(p(c);\eta')\bigr)\bigr].
 $$
 
 If we can sample $(e,c)\sim P(e,c)$ (i.e. validation dataset), we can estimate $R(\eta)$ empirically as
@@ -504,9 +505,9 @@ Looking at our motivating paragraph from *On Calibration of Modern Neural Networ
 
 > In real-world decision making systems, classification networks must not only be accurate, but also should indicate when they are likely to be incorrect. As an example, consider a self-driving car that uses a neural network to detect pedestrians and other obstructions. If the detection network is not able to confidently predict the presence or absence of immediate obstructions, the car should rely more on the output of other sensors for braking. Alternatively, in automated health care, control should be passed on to human doctors when the confidence of a disease diagnosis network is low. Specifically, a network should provide a calibrated confidence measure in addition to its prediction. In other words, the probability associated with the predicted class label should reflect its ground truth correctness likelihood.
 
-We can see that in an effort to convey the importance of calibration intuitively, the authors have blended calibration together with selective classification without explicitly communicating the nuances that we've discussed in this blogpost. That is to say, a calibrated model allows the reliable estimation of accuracy and setting of decision rules without validation labels, however, it does not say anything about how well a model is able to separate its own errors from correct predictions. This sort of motivating language, that doesn't explicitly distinguish calibration from selective classification, has become commonplace in the subsequent calibration literature  <d-cite key="Minderer2021Revisiting,param_temp_scaling_eccv2022,Xiong2023ProCal,Nixon2019CVPRW,Zhang2020MixnMatchCalibration,Meronen2024fixoverconfidence"></d-cite>, which can contribute to a fuzzy understanding of calibration’s practical importance in the research community. 
+We can see that in an effort to convey the importance of calibration intuitively, the authors have blended calibration together with selective classification without explicitly communicating the nuances that we've discussed in this blogpost. That is to say, a calibrated model allows the reliable estimation of accuracy and setting of decision rules without validation labels, however, good calibration does not say anything about how well a model is able to separate its own errors from correct predictions on a per-sample basis. From the excerpt, one can see how a reader might mistakenly associate good calibration with good per-sample decision making. This sort of motivating language, that doesn't explicitly clarify the relationship between calibration and selective classification, has become commonplace in the subsequent calibration literature  <d-cite key="Minderer2021Revisiting,Zhang2020MixnMatchCalibration,param_temp_scaling_eccv2022,Xiong2023ProCal,Nixon2019CVPRW,Meronen2024fixoverconfidence"></d-cite>, which can contribute to a fuzzy understanding of calibration’s practical importance in the research community. 
 
-Another factor that leads to confusion is the use of the word "overconfident". A key empirical finding of *On Calibration of Modern Neural Networks* <d-cite key="Guo2017Calibration"></d-cite> is that certain neural networks are overconfident in the *confidence calibration sense*.  This overconfidence result is oft-cited in papers <d-cite key="Minderer2021Revisiting,param_temp_scaling_eccv2022"></d-cite> as motivation without clarifying that overconfidence in calibration *is orthogonal to how well a model can discriminate individual failures/errors* as we've discussed in this blog. As we alluded to earlier, the meaning of "overconfident" in calibration is different to what it means colloquially. Colloquially, overconfidence typically refers to a person's attitude to a given situation (specific $\text{conditions}$): *"He overconfidently decided to choose the hard option only to fail"*. Thus it is not hard to see how someone might conflate the colloquial and calibration meanings of "overconfident" together when engaging with the literature, confusing calibration and selective classification. 
+Another factor that leads to confusion is the use of the word "overconfident". A key empirical finding of *On Calibration of Modern Neural Networks* <d-cite key="Guo2017Calibration"></d-cite> is that certain neural networks are overconfident in the *confidence calibration sense*.  This overconfidence result is oft-cited in papers <d-cite key="Minderer2021Revisiting,param_temp_scaling_eccv2022,LeCoz2024EfficientCalibration"></d-cite> as motivation without clarifying that overconfidence in calibration *is orthogonal to how well a model can discriminate individual failures/errors* as we've discussed in this blog. As we alluded to earlier, the meaning of "overconfident" in calibration is different to what it means colloquially. Colloquially, overconfidence typically refers to a person's attitude to a given situation (specific $\text{conditions}$): *"He overconfidently decided to choose the hard option only to fail"*. Thus it is not hard to see how someone might conflate the colloquial and calibration meanings of "overconfident" together when engaging with the literature, confusing calibration and discrimination. 
 
 Below I've included a few more examples from the literature of imprecise use of language when motivating calibration:
 
@@ -514,7 +515,7 @@ From *Proximity-Informed Calibration for Deep Neural Networks* <d-cite key="Xion
 
 > ...suppose a dark-skinned individual has a high risk of 40% of having the cancer. However, due to their underrepresentation within the data distribution, the model overconfidently assigns them 98% confidence of not having cancer. As a result, these low proximity individuals may be deprived of timely intervention.
 
-Here the authors discuss overconfidence for an *individual* case, mixing together calibration and discrimination.
+Here the authors discuss overconfidence and intervention for an *individual* case, mixing together calibration with per-sample discrimination and decision making.
 
 From *Revisiting the Calibration of Modern Neural Networks* <d-cite key="Minderer2021Revisiting"></d-cite>:
 
@@ -528,20 +529,20 @@ From *Fixing Overconfidence in Dynamic Neural Networks* <d-cite key="Meronen2024
 
 In this case the authors have introduced calibration in the context of dynamic neural networks whose performance depends on their ability to make decisions on a per-sample basis.
 
-Although not all papers mix calibration and discrimination together, examples like the above are commonly found throughout the literature. I hope that after this blogpost the reader is now equipped to avoid the misunderstandings that may arise from such examples.
+Although not all papers mix calibration and discrimination/per-sample decision making together, examples like the above are commonly found throughout the literature. I hope that after this blogpost the reader is now equipped to avoid the misunderstandings that may arise from such examples.
 ### A Brief Retrospective
 
 Readers mainly interested in practical takeaways can skim this section; it’s here to provide some historical context to the rest of the blogpost.
 
-So, how did we get here? Originally calibration was very much grounded in the idea that it was a property of models averaged over many predictions. Early papers (around the 80s) <d-cite key="Dawid1982,degroot1983comparison"></d-cite> pose calibration as simply one potential way to evaluate the quality of probabilistic forecasting models and don't link it to per-sample decision making or notions of safety. Moreover, good calibration was already emphasised as not being sufficient, with the example of a useless but well-calibrated model that always predicts the base rate already present <d-cite key="degroot1983comparison"></d-cite>.
+So, how did we get here? Originally calibration was very much grounded in the idea that it was a property of models averaged over many predictions. Early papers (around the 80s) <d-cite key="degroot1983comparison,Dawid1982"></d-cite> pose calibration as simply one potential way to evaluate the quality of probabilistic forecasting models and don't link it to per-sample decision making or notions of safety. Moreover, good calibration was already emphasised as not being sufficient, with the example of a useless but well-calibrated model that always predicts the base rate already present <d-cite key="degroot1983comparison"></d-cite>.
 
-Around the 2000s, with the increase in popularity of machine learning models such as SVMs, decision trees and neural networks, calibration begins to be emphasised as important for enabling reliable downstream decision making <d-cite key="Platt1999,ZadroznyElkan2001,NiculescuMizilCaruana2005"></d-cite>. The motivation here is generally to do with being able to trust the probabilities to set decision rules based on average performance (without validation labels), e.g. <d-cite key="NiculescuMizilCaruana2005"></d-cite> define a fixed decision threshold that assumes calibrated probabilities and evaluate downstream profits much like in our interactive example. Interestingly, the distinction between discrimination and calibration is not really emphasised, however, since research at this time generally focuses on binary models, the importance of discrimination is already implicitly baked in as a key part of the performance of the model. The line of thought is "by default we already measure discrimination via accuracy/AUROC, we should also measure calibration".
+Around the 2000s, with the increase in popularity of machine learning models such as SVMs, decision trees and neural networks, calibration begins to be emphasised as important for enabling reliable downstream decision making <d-cite key="NiculescuMizilCaruana2005,Platt1999,ZadroznyElkan2001"></d-cite>. The motivation here is generally to do with being able to trust the probabilities to set decision rules based on average performance (without validation labels), e.g. <d-cite key="NiculescuMizilCaruana2005"></d-cite> define a fixed decision threshold that assumes calibrated probabilities and evaluate downstream profits much like in our interactive example. Interestingly, the distinction between discrimination and calibration is not really emphasised, however, since research at this time generally focuses on binary models, the importance of discrimination is already implicitly baked in as a key part of the performance of the model. The line of thought is "by default we already measure discrimination via accuracy/AUROC, we should also measure calibration".
 
-Into the 2010s, as deep learning becomes more popular, Guo et al.'s *On Calibration of Modern Neural Networks* <d-cite key="Guo2017Calibration"></d-cite> firmly associates calibration with notions of safety, uncertainty estimation and per-sample decision making. This motivation is then adopted by the uncertainty community and propagated throughout the literature. Calibration often appears as a key desideratum for uncertainty estimation methods <d-cite key="Nixon2019CVPRW,Lakshminarayanan2017Ensembles,NeurIPS2020TutorialUncertainty,Ovadia2019Shift,malinin2020ensemble"></d-cite>, frequently without clarifying the distinction between calibration and discrimination. Crucially, with the advent of large-scale multi-class classification and definition of the binary $\text{event}$ as "correct prediction", the discrimination of the binary (error detection) model is no longer implicitly emphasised, as it has been replaced by multi-class accuracy. Meanwhile, selective classification research that explicitly focuses on said binary model appears as a separate thread <d-cite key="Geifman2017SelectiveClassification,pmlr-v97-geifman19a"></d-cite>.
+Into the 2010s, as deep learning becomes more popular, Guo et al.'s *On Calibration of Modern Neural Networks* <d-cite key="Guo2017Calibration"></d-cite> firmly associates calibration with notions of safety, uncertainty estimation and per-sample decision making. This motivation is then adopted by the uncertainty community and propagated throughout the literature. Calibration often appears as a key desideratum for uncertainty estimation methods <d-cite key="Ovadia2019Shift,Nixon2019CVPRW,Lakshminarayanan2017Ensembles,NeurIPS2020TutorialUncertainty,malinin2020ensemble"></d-cite>, frequently without clarifying the distinction between calibration and discrimination. Crucially, with the advent of large-scale multi-class classification and the definition of the binary $\text{event}$ as "correct prediction", the discrimination of the binary (error detection) model is no longer implicitly emphasised, as the default performance measure is the base classifier's multi-class accuracy. Meanwhile, selective classification research that explicitly focuses on said binary model appears as a separate thread <d-cite key="Geifman2017SelectiveClassification,geifman2018biasreduced,pmlr-v97-geifman19a"></d-cite>.
 
-Finally, in the 2020s, calibration becomes firmly established as a benchmarked performance metric. Method papers keep motivation brief and imprecise, instead focusing on improving performance <d-cite key="Minderer2021Revisiting,param_temp_scaling_eccv2022,Xiong2023ProCal,Zhang2020MixnMatchCalibration"></d-cite>. As an established "measure of reliability", in the era of large language models, calibration finds itself as a small part of many broader evaluations <d-cite key="Srivastava2022BIGBench,Liang2022HELM"></d-cite>, without much accompanying clarification, even featuring in OpenAI's GPT-4 technical report <d-cite key="OpenAI2023GPT4"></d-cite>.
+Finally, in the 2020s, calibration becomes firmly established as a benchmarked performance metric. Method papers keep motivation brief and often imprecise, instead focusing on improving performance <d-cite key="Minderer2021Revisiting,Zhang2020MixnMatchCalibration,param_temp_scaling_eccv2022,Xiong2023ProCal,LeCoz2024EfficientCalibration"></d-cite>. As an established "measure of reliability", in the era of large language models, calibration finds itself as a small part of many broader evaluations <d-cite key="Srivastava2022BIGBench,Liang2022HELM"></d-cite>, without much accompanying clarification, even featuring in OpenAI's GPT-4 technical report <d-cite key="OpenAI2023GPT4"></d-cite>.
 
-Now one can see how the nuances behind calibration have been somewhat lost over time, leading to the misunderstandings we've discussed in this blogpost. Interestingly, there have been recent works that have started to re-emphasise the distinction between calibration and discrimination <d-cite key="Chidambaram2025reassessing,PerezLebel2023GroupingLoss,Jaeger2023FailureDetection,zhu2022rethinking"></d-cite>, however, this nuance is still not widely appreciated in the community (which is what partially motivated the writing of this blog). 
+Now one can see how the nuances behind calibration have been somewhat lost over time, leading to the "fuzzy impression" we've discussed in this blogpost. Interestingly, there have been recent works that have started to re-emphasise the distinction between calibration and discrimination <d-cite key="Jaeger2023FailureDetection,PerezLebel2023GroupingLoss,Chidambaram2025reassessing,zhu2022rethinking"></d-cite>, however, this nuance is still not widely appreciated in the community (which is what partially motivated the writing of this blog). 
 ## Closing Thoughts and Takeaways
 
 The aim of this blogpost was to clarify the usefulness of calibrated probability estimates in machine learning. We showed that a calibrated model allows reliable estimation of average loss/reward, and consequent decisions based on those estimates, without access to validation labels. However, it does not in any way guarantee good performance on tasks that involve per-sample decision making. For the latter, good discrimination is required instead. We also discussed and highlighted how confidence calibration and selective classification have been mixed together in the literature, leading to potential misunderstandings about the nature of calibration with respect to per-sample decisions. As a practical rule of thumb, whenever you see (or design) a calibration experiment, it’s worth asking: is the downstream decision about average behaviour, about individual cases, or both? The answer should determine whether calibration (or labels at deployment time) or discrimination or both are actually the bottleneck. We hope that the above blogpost has been helpful to the reader and that they now have a clearer understanding of what calibrated probabilities allow you to do, and what they do not guarantee.
