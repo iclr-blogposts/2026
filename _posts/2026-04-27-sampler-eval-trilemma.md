@@ -1,7 +1,7 @@
 ---
 layout: distill
-title: An impossiblity trilemma for data-free sampler evaluation
-description: Neural samplers like diffusion samplers aim to learn to sample a target unnormalized energy potential, which is known but considered challenging to sample from. Here, we prove an impossibility trilemma for data-free sampler evaluation; we can only have two among i) mode-covering metric, ii) stable with finite variance, iii) no dominance cycles. We situate the implications of this trilemma in the broader conceptual landscape of data-driven and data-free sampler evaluation.
+title: Trilemma for data-free sampler evaluation
+description: Neural samplers like diffusion samplers aim to learn to sample a target unnormalized energy potential, which is known but considered challenging to sample from. Here, we prove an impossible trinity (trilemma) for data-free sampler evaluation; we can only have two among i) mode-covering metric, ii) stable with finite variance, iii) no dominance cycles. We situate the implications of this trilemma in the broader conceptual landscape of data-driven and data-free sampler evaluation.
 date: 2026-04-27
 future: true
 htmlwidgets: true
@@ -38,39 +38,39 @@ bibliography: 2026-04-27-sampler-eval-trilemma.bib
 #     for hyperlinks within the post to work correctly.
 #   - please use this format rather than manually creating a markdown table of contents.
 toc:
-  - name: Equations
-  - name: Images and Figures
+  - name: Informal overview of trilemma
+  - name: Stein discrepancy
     subsections:
-      - name: Interactive Figures
+      - name: Mode-coverage pressure analysis via gradient norm
+      - name: Experiment
   - name: Citations
   - name: Footnotes
-  - name: Code Blocks
-  - name: Diagrams
-  - name: Tweets
-  - name: Layouts
-  - name: Other Typography?
+#   - name: Code Blocks
+#   - name: Diagrams
+#   - name: Tweets
+#   - name: Layouts
 
 # Below is an example of injecting additional post-specific styles.
 # This is used in the 'Layouts' section of this post.
 # If you use this post as a template, delete this _styles block.
-_styles: >
-  .fake-img {
-    background: #bbb;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    box-shadow: 0 0px 4px rgba(0, 0, 0, 0.1);
-    margin-bottom: 12px;
-  }
-  .fake-img p {
-    font-family: monospace;
-    color: white;
-    text-align: left;
-    margin: 12px 0;
-    text-align: center;
-    font-size: 16px;
-  }
+# _styles: >
+#   .fake-img {
+#     background: #bbb;
+#     border: 1px solid rgba(0, 0, 0, 0.1);
+#     box-shadow: 0 0px 4px rgba(0, 0, 0, 0.1);
+#     margin-bottom: 12px;
+#   }
+#   .fake-img p {
+#     font-family: monospace;
+#     color: white;
+#     text-align: left;
+#     margin: 12px 0;
+#     text-align: center;
+#     font-size: 16px;
+#   }
 ---
 
-# Sampler evaluation: An impossibility trilemma
+# Trilemma for data-free sampler evaluation
 
 <!-- ## Abstract
 Neural samplers like diffusion samplers aim to learn to sample a target unnormalized energy potential, which is known but considered challenging to sample from. Evaluation of learned sampler quality is a critical aspect for research progress, with mode-covering metrics of particular importance. Two general approaches are common: i) data-free, using only model samples and the target potential, and ii) data-driven, which can use experimental observables, summary statistics, and/or reference MCMC samples used as a gold standard. Data-driven evaluation is common, yet can suffer from misalignment with the target potential, trust issues in reference MCMC samples, and a catch-22 issue when evaluating on new, hard-to-sample densities lacking reference samples. This raises the question how well data-free evaluation could work. Here, we prove an impossibility trilemma for data-free sampler evaluation; we can only have two among: i) mode-covering metric, ii) stable with finite variance, iii) allows sampler ranking without cyclic dominance (disallows A>B>C>A). We situate the implications of this trilemma in the broader conceptual landscape of data-driven and data-free sampler evaluation. -->
@@ -102,9 +102,11 @@ we can achieve a metric stably estimated with only model samples, that is also m
 
 ---
 
-TODO - add definition of O(p/q) mode covering pressure
+# Informal overview of trilemma
 
-TODO - add class of functions considered
+<!-- TODO - add definition of O(p/q) mode covering pressure -->
+
+<!-- TODO - add class of functions considered -->
 
 Unfortunately, satisfying the following two properties is provably impossible:
 
@@ -131,7 +133,7 @@ Having an expectation w.r.t. $q$ significantly dampens the mode-covering pressur
 
 This completes the proof.
 
-# Stein discrepancy is mode-seeking
+# Stein discrepancy
 
 Previously, we pinned down a definition for mode-covering vs. mode-seeking behavior for distributional divergences. When fitting $q$ to a target $p$, we studied the derivative norm of the divergence wrt $q(x)$ where $p(x) > 0$ and $q(x) \to 0$. 
 
@@ -141,7 +143,6 @@ The forward KL has $O(p/q)$ mode-covering pressure, which is exponentially stron
 
 Next, we'll apply our gradient analysis to the Stein discrepancy. We will show that the Stein discrepancy has $O(1)$ pressure (wrt $q$), so mathematically it is even less mode-covering than the reverse KL! Experimentally, we show that Stein discrepancy has a similar loss landscape as reverse KL, and not forward KL.
 
-# Stein discrepancy
 The Stein discrepancy is a measure of distributional similarity which can be used as a sampler evaluation metric, as it does not require iid samples from the target $p$, or its normalized density. Instead, we can compute it using:
 
 - $\nabla_x \log p(x)$, the data score
@@ -169,7 +170,7 @@ $$
 
 where $\mathcal{G}$ must be constrained to keep the supremum finite. One common choice is $\mathcal{G}$ as the unit ball in a reproducing kernel Hilbert space, which corresponds to kernel Stein discrepancy. Another choice is neural Stein discrepancy, where $\mathcal{G}$ is chosen to be the set of functions learnable by a (regularized) neural network.
 
-# Mode-coverage pressure analysis via gradient norm
+## Mode-coverage pressure analysis via gradient norm
 
 Let's denote $g_q^*$ as the $g$ that achieves the supremum. Then,
 
@@ -209,15 +210,13 @@ Thus, the supremum Stein discrepancy, is not mode-covering: it exerts bounded, l
 
 Interestingly, the Stein discrepancy at $O(1)$ pressure (wrt q) is even less mode-covering than the reverse KL at $O(\log(p/q))$ pressure!
 
-
-
-# Experiment
+## Experiment
 
 We repeat the common experiment, where our target $p$ is a mixture of two Gaussians with means -4, +4, and std 1. We consider a model distribution $q$ that is a single Gaussian with free parameters mean and std, and plot the divergence/discrepancy between $p, q$ as the mean and std of $q$ vary.
 
 We compute the reverse and forward KL for comparison, and computed Stein discrepancy using kernel Stein discrepancy with an IMQ kernel with $\beta=0.5$, $c=1$, which are common hyperparameter choices.
 
-<!-- ![divergence_landscapes_with_stein-min](https://hackmd.io/_uploads/ryRq3-5ilx.png) -->
+![divergence_landscapes_with_stein-min](img/2026-04-27-sampler-eval-trilemma/divergence_landscapes_with_stein-min.png)
 
 
 Yellow indicates lower (better) divergence values. The red X's denote the mean and std of the two Gaussians in the target mixture, while the red + denotes the true mean and std of the target mixture, when fitting a single Gaussian to it. 
