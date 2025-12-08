@@ -1,7 +1,7 @@
 ---
 layout: distill
 title: Uncertainty Lifecycle in Deep Learning
-description: Uncertainty modeling in deep learning has different attributes such as uncertainty propagation, uncertainty estimation, uncertainty decomposition, uncertainty attribution and uncertainty sensitivity, that are extensively discussed in literature. However, there is no proper structure explaining how these different components interact with each other at different stages of Deep Learning pipeline. We propose to structure the flow and transformation of uncertainty from input to prediction through the model, by appropriately positioning them. And we call this structure as “Uncertainty Lifecycle”. The “Uncertainty lifecycle” can be represented as a structured process for handling, quantifying, analyzing, and interpreting uncertainties at different stages of Deep Learning pipeline.
+description: Literature discussing uncertainty handling in deep learning considers different tasks such as uncertainty propagation, uncertainty estimation, uncertainty decomposition, uncertainty attribution and uncertainty sensitivity analysis. However, there is no proper structure explaining how these different components interact with each other at different stages of a deep learning pipeline. We propose to structure the these task by considering the flow and transformation of uncertainty through the model and position them accordingly. We call this structure as “uncertainty lifecycle”. The uncertainty lifecycle can be represented as a structured process for handling, quantifying, analyzing, and interpreting uncertainties at different stages of a deep learning pipeline.
 
 date: 2026-04-27
 future: true
@@ -78,7 +78,7 @@ Uncertainty in Machine Learning arises due to <d-cite key="koller2009probabilist
 
 These uncertainties exist either in data or in model or both.The uncertainty in **data** arises due to measurement noise, inherent randomness, and label/feature ambiguity. These uncertainties are called as data uncertainty or **Aleatoric Uncertainty** <d-cite key="der2009aleatory"></d-cite> and are often irreducible even with more data. The uncertainty in the **model** arises due to limited training data, model misspecification, optimization imperfections, or out-of-distribution inputs. These uncertainties are called as model uncertainty, knowledge uncertainty or **Epistemic Uncertainty** <d-cite key="der2009aleatory"></d-cite>, and are often reducible with more data or better modelling. Both uncertainties together are called as **Total Uncertainty (or Predictive Uncertainty)**.
 
-The different concepts in uncertainty as shown in Figure 1, are discussed and studied in the literature extensively <d-cite key="gawlikowski2023survey, abdar2021review, loquercio2020general, wang2024uncertainty, mucsanyi2024benchmarking"></d-cite> either individually or as a combination of one or two component. But there is no such work that highlight and represent their connection and flow in a single framework. 
+The different concepts in uncertainty as shown in Figure 1, are discussed and studied in the literature extensively <d-cite key="gawlikowski2023survey, abdar2021review, loquercio2020general, wang2024uncertainty, mucsanyi2024benchmarking"></d-cite> either individually or as a combination of one or two component. Although, a single framework that highlights and represent their connections, is lacking. 
 
 {% include figure.liquid path="assets/img/2026-04-27-uncertainty-lifecycle-in-deep-learning/Uncertainty_Concepts_1.png" class="img-fluid" %}
 <div class="caption">
