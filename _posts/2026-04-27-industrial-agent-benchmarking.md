@@ -25,7 +25,7 @@ toc:
       - name: Pipeline Architecture
       - name: Hidden Scenarios and Privacy Constraints
       - name: Methodology for Selecting Development vs Testing Instances
-  - name: Community Results: 225 Users, 300+ Agents, One Reality Check
+  - name: "Community Results: 225 Users, 300+ Agents, One Reality Check"
     subsections:
       - name: Leaderboard Behavior
       - name: Observed Failure Patterns
