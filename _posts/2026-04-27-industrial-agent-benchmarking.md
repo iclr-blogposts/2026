@@ -50,7 +50,7 @@ This blog post presents what we learned after systematically evaluating LLM agen
 
 The outcome is blunt: **current agentic AI is far less reliable than leaderboard scores suggest.** The challenge surfaces failure modes that traditional agent benchmarks simply never expose.
 
-{% include figure.liquid path="../assets/img/2026-04-27-industrial-agent-benchmarking/assetopsbench.png" class="img-fluid" %} Figure 1. Architecture of the Multi-Agent System: Time Series Foundation Model (TSFM) Agent, Failure Mode Sensor Relations (FMSR) Agent,Work Order (WO) Agent
+{% include figure.liquid path="assets/img/2026-04-27-industrial-agent-benchmarking/assetopsbench.png" class="img-fluid" %} Figure 1. Architecture of the Multi-Agent System: Time Series Foundation Model (TSFM) Agent, Failure Mode Sensor Relations (FMSR) Agent,Work Order (WO) Agent
 
 ---
 
@@ -148,7 +148,7 @@ AssetOpsBench-Live extends AssetOpsBench into an online, reproducible competitio
 
 ## Pipeline Architecture
 
-{% include figure.liquid path="../assets/img/2026-04-27-industrial-agent-benchmarking/combined_architecture.png" class="img-fluid" %} Figure 2. AssetOpsBench-Live: (left) System architecture integrating AssetOpsBench with Codabench, showing local development, global evaluation, and feedback; (right) visualization of clustered failure modes.
+{% include figure.liquid path="assets/img/2026-04-27-industrial-agent-benchmarking/combined_architecture.png" class="img-fluid" %} Figure 2. AssetOpsBench-Live: (left) System architecture integrating AssetOpsBench with Codabench, showing local development, global evaluation, and feedback; (right) visualization of clustered failure modes.
 
 The full pipeline (see system diagram) includes a high-level description of the workflow, which consists of three key steps:
 
@@ -384,7 +384,7 @@ If teams tie on Final Score:
 
 ## Observations from the Final Results
 
-{% include figure.liquid path="../assets/img/2026-04-27-industrial-agent-benchmarking/R1.png" class="img-fluid" %} Figure 3. Distribution of Team Performance Across Planning, Execution, and Final Composite Scores
+{% include figure.liquid path="assets/img/2026-04-27-industrial-agent-benchmarking/R1.png" class="img-fluid" %} Figure 3. Distribution of Team Performance Across Planning, Execution, and Final Composite Scores
 
 - **Planning track:** larger variation (Std Dev ≈ 9.6), reflecting diverse reasoning strategies  
 - **Execution track:** tighter clustering (Std Dev ≈ 5.7), suggesting greater consistency once a plan is defined  
@@ -396,7 +396,7 @@ If teams tie on Final Score:
 
 We analyzed how team performance evolved across submissions using first-vs-best score curves, submission count correlations, and improvement distributions.
 
-{% include figure.liquid path="../assets/img/2026-04-27-industrial-agent-benchmarking/R2.png" class="img-fluid" %} Figure 4. Effect of Iterative Feedback on Agent Performance Across the Competition
+{% include figure.liquid path="assets/img/2026-04-27-industrial-agent-benchmarking/R2.png" class="img-fluid" %} Figure 4. Effect of Iterative Feedback on Agent Performance Across the Competition
 
 Key findings:
 
