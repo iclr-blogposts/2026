@@ -43,15 +43,13 @@ toc:
 Large Language Model (LLM) agents have quickly become the default way researchers test “autonomous” reasoning, planning, and multi-step tool use. Yet almost all widely used benchmarks evaluate tasks that are far removed from real industrial systems such as web navigation, coding tasks, synthetic puzzles, or curated IT workflows. In practice, industrial operations demand something more difficult: **multi-agent coordination over heterogeneous telemetry, failure modes, work orders, and safety-critical tasks, all under privacy constraints.**
 To understand whether current agents can survive this environment, we built a two-part evaluation ecosystem:
 
-1. **AssetOpsBench** — a multi-modal industrial agent benchmark grounded in real sensor telemetry, failure models, and maintenance workflows.  
-2. **AssetOpsBench-Live** — a real-time, privacy-preserving, Codabench-powered competition platform we deployed to 225+ users, yielding over 300 code-submitted agent evaluations [@assetopsbenchlive2026]. 
+1. **AssetOpsBench** — a multi-modal industrial agent benchmark grounded in real sensor telemetry, failure models, and maintenance workflows. <d-cite key="assetopsbench2025"></d-cite>  
+2. **AssetOpsBench-Live** — a real-time, privacy-preserving, Codabench-powered competition platform we deployed to 225+ users, yielding over 300 code-submitted agent evaluations <d-cite key="assetopsbenchlive2026"></d-cite>. 
 
 This blog post presents what we learned after systematically evaluating LLM agents, not via prompt logs, but through **real code, real trajectories, and real industrial tasks**.
 
 The outcome is blunt: **current agentic AI is far less reliable than leaderboard scores suggest.** The challenge surfaces failure modes that traditional agent benchmarks simply never expose.
-
-{% include figure.liquid path="../assets/img/2026-04-27-industrial-agent-benchmarking/assetopsbench.png" class="img-fluid" %}
-Figure 1. Architecture of the Multi-Agent System: Time Series Foundation Model (TSFM) Agent, Failure Mode Sensor Relations (FMSR) Agent,Work Order (WO) Agent
+{% include figure.liquid path="../assets/img/2026-04-27-industrial-agent-benchmarking/assetopsbench.png" class="img-fluid" %} Figure 1. Architecture of the Multi-Agent System: Time Series Foundation Model (TSFM) Agent, Failure Mode Sensor Relations (FMSR) Agent,Work Order (WO) Agent
 
 ---
 
