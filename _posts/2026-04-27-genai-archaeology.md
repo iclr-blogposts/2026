@@ -43,9 +43,8 @@ One of the earliest examples of human village habitation is found at Göbekli Te
 This village offers important new insights about early farming culture that changed our understanding of early human history.
 Other discoveries are the result of pure luck: the Terracotta Army of Xi'an, China, is one such example.
 This grand funeral act for the First Emperor of China was described in ancient Chinese texts but lost to time; its location was only re-discovered in 1974 by a group of rural farmers. 
-A little closer to the heart of computer scientists, the Antikythera mechanism was found in a shipwreck off the coast of Antikythera, Greece, in 1901.
-This finding is more of a coincidence, since divers were already actively working in the area.
-The mechanism is an analogue computer,  preserved for nearly 2,000 years, that was used to predict the position of celestial bodies.
+A little closer to the heart of computer scientists, the Antikythera mechanism was found by coincidence in a shipwreck off the coast of Antikythera, Greece, in 1901.
+The mechanism is an analogue computer, preserved for nearly 2,000 years, that was used to predict the position of celestial bodies.
 Such is the sophistication of this device, that there is no evidence of similar complexity until 1,400 years later<d-cite key="marchant2006search"></d-cite>.
 
 In contrast to studying historical physical artefacts, Generative AI models, such as LLMs, are digital objects that should not require anyone to search for lost knowledge.
@@ -65,17 +64,17 @@ Open-science initiatives, such as Pythia<d-cite key="biderman2023pythia"></d-cit
 This is in stark contrast to fully closed models<d-footnote>See news reports on the legal cases against OpenAI and Anthropic for recent examples of the lack of information shared about LLM training data: <a href="https://news.bloomberglaw.com/ip-law/openai-risks-billions-as-court-weighs-privilege-in-copyright-row">OpenAI Risks Billions as Court Weights Privilege in Copyright Row</a>. <a href="https://www.npr.org/2025/09/05/nx-s1-5529404/anthropic-settlement-authors-copyright-ai">Anthropic settles with authors in first-of-its-kind AI copyright infringement lawsuit</a>.</d-footnote>, but researchers have managed to learn some of the secrets of the data.
 
 **Tokenizer Data:** Hayase et al. show how to infer properties of the data used to train a tokenizer, which underpins how LLMs process text<d-cite key="hayase2024data"></d-cite>.
-Their approach, illustrated in Figure 2(a), is based on how Byte-Pair Encoding token merge lists are created, and the implications for data used to train the tokenizer.
-This insight allowed them to accurately infer known properties about publicly disclosed models, and to predict the properties of private models.
+Their approach, discovered by coincidence, is based on how Byte-Pair Encoding token merge lists are created.
+The fact that merge lists are based on the frequency of tokens in the corpus, as illustrated in Figure 2(a), allowed them to accurately infer known properties about publicly disclosed models, and to predict the properties of open and closed models.
 
-In personal correspondence with Alisa Liu, she told me that this finding was sparked by manually inspecting the BPE merge list for the Gemma tokenizer, and noticing that the token $$( \; )$$ appeared near the top of the list. Alisa thought this was odd, because one might expect to find high-frequency fragments and stopwords at the top of the merge list, not a parenthesiss. After further reflection, Alisa realized that the prominent position of this token could be because the model was trained on a large volume of programming code, and, by extension, that tokenizer merge lists *must* reveal information about word frequency in the training data.
+In personal correspondence with Alisa Liu, she told me that this finding was sparked by preparing for a reading group. Liu noticed that $$( \; )$$ appeared near the top of the merge list in the Gemma tokenizer, which seemed odd, because one might expect to find high-frequency fragments and stopwords at the top of the merge list, not a parenthesiss. After further reflection, Liu realized that the prominent position of this token could be because the model was trained on a large volume of programming code, and, by extension, that tokenizer merge lists *must* reveal information about word frequency in the training data.
 
 **Pretraining Data:** Carlini et al. show how to extract verbatim sequences from the GPT-2 language model<d-cite key="carlini2021extracting"></d-cite>. 
 Their work is <a href="https://nicholas.carlini.com/writing/2025/privacy-copyright-and-generative-models.html">primarily focused on understanding privacy attacks</a> on language models, in which a model may reveal personal identifying information.
 More directly related to detecting copyright violations, Karamolegkou et al. prompted open and closed LLMs with prefixes of copyrighted material from books<d-cite key="karamolegkou2023copyright"></d-cite>.
-Finally, Nasr et al. demonstrated a simple attack on ChatGPT that involved forcing it to generate the same token repeatedly, as shown in Figure 2(b)<d-cite key="nasr2025scalable"></d-cite>.
+Finally, Nasr et al. demonstrated a simple attack on ChatGPT that involves forcing it to generate the same token repeatedly, as shown in Figure 2(b)<d-cite key="nasr2025scalable"></d-cite>.
 This eventually causes the model to "diverge" from its post-training objective and revert to its base model behaviour, in which it generates memorized training data.
-It was possible to extract strings up-to 4,000 characters long using this method.
+It is possible to extract strings up-to 4,000 characters long using this method.
 
 **Status**: it has never been confirmed if Hayase et al. inferred the true data distribution of any of the studied tokenizers. 
 It has never been confirmed if Carlini et al, Nasr et al, or Karamolegkou et al. succeeded in extracting the training data from the GPT or Claude models.
@@ -88,11 +87,11 @@ Figure 3: Parishad et al. stumbled upon evidence of how the Mistral-7B LLM was p
 Exactly how LLMs are trained is becoming increasingly shrouded in mystery but some noteworthy explanations remain in the open-weight and open-science literature<d-cite key="biderman2023pythia"></d-cite><d-cite key="groeneveld2024olmo"></d-cite><d-cite key="langlais2025pleias"></d-cite>.
 Nevertheless, given an LLM with unknown training process, researchers *can* sometimes discover behaviour that betrays tell-tale signatures of how a model was trained.
 
-In trying to convert a LLM into a sentence embedding model, BenhamGhader et al.<d-cite key="behnamghaderllm2vec"></d-cite> stumbled upon evidence that the Mistral-7B LLM may have been pretrained with bidirectional attention.
-Their approach was to enable bidirectional attention in the LLM, which would allow the model to create better sentence-level representations than unidirectional attention.
-This new ability was trained using a combination of masked next token prediction and unsupervised contrastive learning.
+In trying to convert a LLM into a sentence embedding model, BenhamGhader et al.<d-cite key="behnamghaderllm2vec"></d-cite> stumbled upon evidence, by pure luck, that the Mistral-7B LLM may have been pretrained with bidirectional attention.
+Their LLM2Vec approach involves enabling bidirectional attention in the LLM, which allows the model to create better sentence-level representations than unidirectional attention.
+This new ability is then trained using a combination of masked next token prediction and unsupervised contrastive learning.
 However, it was discovered that the Mistral-7B model constructed nearly identical representations (Figure 3b) when using bidirectional attention or causal attention, compared to LLaMA2-7B (Figure 3a).
-This *innate ability* in Mistral-7B seemed to rule out the possibility that it was only trained on next-token prediction.
+This *innate ability* in Mistral-7B seems to rule out the possibility that it was only trained on next-token prediction.
 
 In personal correspondence with Parishad BenhamGhader, she told me that the bidirectional attention finding came about as a result of a reviewer requesting additional models beyond LLaMa2-7B in the original manuscript.
 The behaviour that was observed for the LLaMA-7B model did not appear in the Mistral-7B model, which sparked the additional analysis of the cosine similarities at different token positions before and after enabling bidirectional attention.
@@ -148,6 +147,7 @@ It is also noted that this technique can also be used to unmask the LLM used by 
 
 The knowledge revealed in these studies has not been lost to time.
 These models are not sitting at the bottom of the Mediterranean Sea, nor are they resting under the fields of Xi'an.
-They are publicly distributed through the HuggingFace Models Hub or accessible through APIs, but they harbour deep secrets about how they were trained.
+They are publicly distributed through the HuggingFace Models Hub or accessible through paid APIs, but they harbour deep secrets about how they were trained.
 In the absence of this knowledge, researchers spend their time trying to decipher what has been secreted away inside startups and corporations.
-This secretive behaviour is often justified with the claim that organizations need to maintain their competitive edge, but more openness could free up our time to focus on innovation instead of reproducing secrets. 
+This secretive behaviour is often justified with the claim that organizations need to maintain their competitive edge, but it has recently been argued that these practices are more similar to the <a href="https://x.com/JitendraMalikCV/status/1995705427070537870">Prisoner's Dilemma</a>.
+Increased openness from resource-rich organizations would allow everyone to focus on scientific innovation, but, if the status quo is maintained, we need to hope that more open organizations, such as EleutherAI, AllenAI, and DeepSeek, will continue to help push science forward with a <a href="https://epoch.ai/data-insights/consumer-gpu-model-gap">6--9 month delay</a>.
