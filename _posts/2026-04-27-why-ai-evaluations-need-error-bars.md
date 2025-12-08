@@ -14,31 +14,31 @@ bibliography: 2026-04-27-why-ai-evaluations-need-error-bars.bib
 
 ---
 toc:
-  - name: Introduction
-  - name: LLMs as Stochastic Systems
-    subsections:
-      - name: Intrinsic sources of stochasticity
-      - name: Stochasticity in multi-step agent behavior
-      - name: Stochasticity in evaluation: LLM-as-judge
-      - name: Environmental and contextual randomness
-  - name: Why Stochasticity Breaks Evaluation
-    subsections:
-      - name: Instability of single-run evaluations
-      - name: Violations of independence assumptions
-      - name: Compounding uncertainty in multi-step and agent evaluations
-      - name: Human evaluation as a noisy measurement process
-      - name: A second-order source of variance: LLM-as-judge
-  - name: Existing Research: Bringing Statistics into LLM Evaluation
-    subsections:
-      - name: Confidence intervals and hypothesis testing
-      - name: Bayesian measurement error models
-      - name: Reliability metrics from psychometrics
-      - name: The current state of agent evaluation
-      - name: Quantifying variance in practice: seeds, items, and distributions
-  - name: What's Still Missing
-  - name: Moving Forward
-  - name: Conclusion
-  - name: References
+- name: Introduction
+- name: LLMs as Stochastic Systems
+subsections:
+    - name: Intrinsic sources of stochasticity
+    - name: Stochasticity in multi-step agent behavior
+    - name: Stochasticity in evaluation: LLM-as-judge
+    - name: Environmental and contextual randomness
+- name: Why Stochasticity Breaks Evaluation
+subsections:
+    - name: Instability of single-run evaluations
+    - name: Violations of independence assumptions
+    - name: Compounding uncertainty in multi-step and agent evaluations
+    - name: Human evaluation as a noisy measurement process
+    - name: A second-order source of variance: LLM-as-judge
+- name: Existing Research: Bringing Statistics into LLM Evaluation
+subsections:
+    - name: Confidence intervals and hypothesis testing
+    - name: Bayesian measurement error models
+    - name: Reliability metrics from psychometrics
+    - name: The current state of agent evaluation
+    - name: Quantifying variance in practice: seeds, items, and distributions
+- name: What's Still Missing
+- name: Moving Forward
+- name: Conclusion
+
 ---
 
 ## Introduction
