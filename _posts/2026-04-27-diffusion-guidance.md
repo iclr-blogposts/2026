@@ -32,7 +32,7 @@ toc:
   - name: Analytical Likelihoods
     subsection:
       - name: Diffusion Posterior Sampling (DPS)
-  - name: Applications in physical sciences
+  - name: Applications for Physical Sciences
     subsection:
       -name: DiffusionPDE
       -name: Inequality constraints for rare event sampling
@@ -485,7 +485,7 @@ The results are displayed in the figure below, where we have:
 
 We note that DPS is only one possible way to estimate the likelihood term $$\textcolor{#00a5cf}{\nabla_{\bz_t} \log p(\mathbf{y} \mid \bz_t)}$$. For interested readers, we recommend the excellent survey by Daras et al. <d-cite key="daras2024survey"></d-cite>, which compares a range of different approaches.
 
-## Applications in physical sciences
+## Applications for Physical Sciences
 
 We now turn to scientific applications and examine how flexible the discussed approaches are in practice, particularly in settings where physical constraints must be respected. The following is just an high level overview.
 
