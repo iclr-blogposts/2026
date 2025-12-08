@@ -55,6 +55,8 @@ toc:
 # Below is an example of injecting additional post-specific styles.
 ---
 
+> We recommend reading this blog with the **white** theme/background ⚪️ for the best experience 🙂
+
 {% include figure.liquid 
   path="assets/img/2026-04-27-zero-rewards/figure1.png" 
   class="img-fluid" 
@@ -123,25 +125,25 @@ All experiments were conducted on four NVIDIA H100 GPUs using `Qwen2.5-1.5B-Inst
 
 **1. Rewarding Progress**
 
-Here, we briefly show dense rewards in the form of a recently proposed method <d-cite key="setlur2024rewarding"></d-cite> fails to solve the task.
+Here, we briefly show dense rewards in the form of a recently proposed method Progress Rewards <d-cite key="setlur2024rewarding"></d-cite> fails to solve the task.
 
-Briefly, this method aims to reward *partial* reasoning traces based on the *progress* they make toward the final answer (akin to intermediate rewards). This essentially means the model being finetuned could be potentially *rewarded* even when the terminal/outcome reward is zero.
+Briefly, Progress Rewards <d-cite key="setlur2024rewarding"></d-cite> aims to reward *partial* reasoning traces based on the *progress* they make toward the final answer (akin to intermediate rewards). This essentially means the model being finetuned could be potentially *rewarded* even when the terminal/outcome reward is zero.
 
 Although the method performs well in the original paper, it is less effective on the Degree-10-Path-10 graph, as shown in Fig. 1. The main reason is the base model’s inability to sample successful trajectories: intermediate rewards are non-zero only when the state value changes before and after a step, but the difficulty of the task makes such changes rare or non-existent.
 
 **2. Encouraging Exploration and Diversity**
 
-Orthogonal to dense rewards, a recent approach modifies the RL objective to better align with inference-time requirements <d-cite key="chow2024inference"></d-cite>. Since the goal is often to obtain a single correct generation out of N attempts, this method encourages the model to produce at least one correct answer among the N generations, promoting sample diversity. The idea is that any one of these diverse samples can receive a non-zero reward, enabling RL training. However, as shown in Fig. 1, success rates remain flat throughout training. As noted earlier, a key reason is again the base model’s inability to sample successful trajectories across multiple attempts.
+Orthogonal to dense rewards, a recent approach modifies the RL objective to better align with inference-time requirements (Best-of-N aware finetuning) <d-cite key="chow2024inference"></d-cite>. Since the goal is often to obtain a single correct generation out of N attempts, this method encourages the model to produce at least one correct answer among the N generations, promoting sample diversity. The idea is that any one of these diverse samples can receive a non-zero reward, enabling RL training. However, as shown in Fig. 1, success rates remain flat throughout training. As noted earlier, a key reason is again the base model’s inability to sample successful trajectories across multiple attempts.
 
 In trying these different baselines out, we implemented our version of these since there was no official code. To rule out any implementation issues, we also test on simpler variants of the task where we find all baselines to perform well.
 
-> We defer detailed discussion of why these methods fail in [Appendix](#appendix).
+> Check out the detailed analysis of why the above methods fail in [Appendix](#appendix).
 
 ## A simple intervention helps — add easy samples in your dataset
 
-Starting with a Degree-10-Path-10 dataset, we added samples from an easier task, such as a Degree-5-Path-5 task, and ran RL training using only outcome rewards with Dr. GRPO. Note that we mixed both datasets in equal proportion. This helped the model to solve the original Degree-10-Path-10 task (refer Fig. 3b) without any other modifications to the algorithm.
+Starting with a Degree-10-Path-10 dataset, we added samples from an *easier* task, such as a Degree-5-Path-5 task, and ran RL training using only outcome rewards with Dr. GRPO. Note that we mixed both datasets in equal proportion. This helped the model to solve the original Degree-10-Path-10 task (refer Fig. 3b) without any other modifications to the algorithm.
 
-Note that we did not provide the model with any instructions on how to solve the hard task. Simply adding easy samples to the dataset helped the model figure out how to solve the hard task.
+Note that we did **not** provide the model with any instructions on how to solve the hard task. Simply adding easy samples to the dataset helped the model figure out how to solve the hard task.
 
 
 <div class="row mt-3">
@@ -188,7 +190,7 @@ On looking at the chain-of-thought traces closely, we observed a few things that
 - In the case where <span style="color: #FF9800;">Degree-5-Path-2 mixed with Degree-10-Path-10</span>, most Degree-5-Path-2 instances were solved using just a single lookup in the edge list, without any search. While this strategy worked for the simpler Degree-5-Path-2 instances, it was not helpful for Degree-10-Path-10 instances, where searching down multiple paths was necessary to arrive at the correct answer. The traces resembled those observed when training a model directly on a Degree-10-Path-10 dataset (see the naive RL fails section [above](#naive-rl-fails)).
 - In the case where <span style="color: #2196F3;">Degree-2-Path-5 is mixed with Degree-10-Path-10</span>, there were instances where, given a Degree-10-Path-10 problem, the model explored only two branches and then 'forced' itself to output the answer path. We believe the model may have learned a strategy that produces an answer after a maximum of two backtracks, which works for Degree-2-Path-5 but is ineffective for Degree-10-Path-10 problems.
 
-Thus, not all easy samples are effective, and it is apriori unclear what a model will learn from a particular dataset. One needs to collect samples of the *right* difficulty, meaning samples that the model can solve correctly and that encourage behavior that transfers to the original task. These requirements make this approach cumbersome 🙁.
+Thus, **not all easy samples are effective**, and it is apriori *unclear* what a model will learn from a particular dataset. One needs to collect samples of the *right* difficulty, meaning samples that the model can solve correctly and that encourage behavior that transfers to the original task. These requirements make this approach cumbersome 🙁.
 
 Another point to note is that, although it might be easier to guess which tasks have solutions that will not generalize to larger instances in a simple graph problem like this (e.g., reading off the edge list works for Degree-5-Path-2 examples but does not generalize to Degree-10-Path-10), in general, for any arbitrary problem, it is difficult to predict what the model will learn and which solutions will generalize to harder instances.
 
@@ -266,26 +268,26 @@ As we discussed above, **a key reason for the failure of some baselines on the D
 Here we provide a more detailed analysis of why each baseline fails in this zero-reward scenario.
 
 Before we begin, here are the quick takeaways:
-- Instantiating Progress Rewards is **practically challenging**.
-- There is a requirement of a capable base model **to begin with** for VinePPO and to possibly resolve unstable training of Best-of-N aware finetuning.
+- Instantiating Progress Rewards <d-cite key="setlur2024rewarding"></d-cite> is **practically challenging**.
+- There is a requirement of a capable base model **to begin with** for VinePPO <d-cite key="kazemnejad2024VinePPO"></d-cite> and to possibly resolve unstable training of Best-of-N aware finetuning <d-cite key="chow2024inference"></d-cite>.
 
 ### 1. Dense rewards are not really dense in VinePPO and Progress Rewards
-Methods like VinePPO and Progress Rewards go beyond Dr.GRPO by computing step-level advantages. **However, non-zero step-level advantages are obtained only when there is a change in the value of the state before and after taking the step.** This means that for VinePPO to produce a non-zero advantage for a step, some of the rollouts under the current policy must succeed. Similarly, for the Progress Rewards, some of the rollouts under the prover policy must succeed. In our setting, we observe that throughout training, neither the current policy nor the policy generates a successful rollout. Thus step-level advantages offer no learning signal.
+Methods like VinePPO <d-cite key="kazemnejad2024VinePPO"></d-cite> and Progress Rewards <d-cite key="setlur2024rewarding"></d-cite> go beyond Dr.GRPO by computing step-level advantages. **However, non-zero step-level advantages are obtained only when there is a change in the value of the state before and after taking the step.** This means that for VinePPO to produce a non-zero advantage for a step, some of the rollouts under the current policy must succeed. Similarly, for the Progress Rewards, some of the rollouts under the prover policy must succeed. In our setting, we observe that throughout training, neither the current policy nor the policy generates a successful rollout. Thus step-level advantages offer no learning signal.
 
 ### 2. Instantiating a helpful prover to get a meaningful Progress Rewards is hard
 
 The Progress Rewards <d-cite key="setlur2024rewarding"></d-cite> work notes that a prover that is *too strong or too weak* is ineffective: a strong prover cannot distinguish between *good* and *bad* steps, while a weak prover fails from most intermediate states, resulting in zero step-level advantages and no learning. Consequently, they identify two desirable properties for provers: (i) the prover should neither be too strong nor too weak, and (ii) it should be reasonably aligned with the policy being optimized.
 
-To satisfy these requirements for the Degree-10-Path-10 graph, we experiment with two provers. The first, $\pi_{5 \times 5}$, is model trained using Dr.GRPO on the Degree-5-Path-5 task and achieves around 65% accuracy on Degree-10-Path-10, partially satisfying the first property. The second, $\pi_{5 \times 5 \text{ mixed with } 10 \times 10}$, is trained using Dr.GRPO on an equal mixture of Degree-5-Path-5 and Degree-10-Path-10 graphs and reaches around 85% accuracy on Degree-10-Path-10.
+To satisfy these requirements for the Degree-10-Path-10 graph, we experiment with two provers. The first prover: $\pi_{5 \times 5}$, is a model trained using Dr.GRPO on the Degree-5-Path-5 task and achieves around 65% accuracy on Degree-10-Path-10, partially satisfying the first property. The second prover, $\pi_{5 \times 5 \text{ mixed with } 10 \times 10}$, is trained using Dr.GRPO on an equal mixture of Degree-5-Path-5 and Degree-10-Path-10 graphs and reaches around 85% accuracy on Degree-10-Path-10.
 
-As shown in Fig. 6, both provers have a reasonable success rate on the Degree-10-Path-10 task from the start, giving non-zero step-level advantages early in training. The $\pi_{5 \times 5}$ prover provides non-zero step-level advantages about 50% of the time, while the $\pi_{5 \times 5 \text{ mixed with } 10 \times 10}$ prover does so about 60% of the time. However, as seen in Fig. 6, this signal does not lead to better task performance. In both cases, the model responses often become degenerate, repeating characters or words to fill the context window. **We believe this happens because the prover policy is not well aligned with the policy being optimized.**
+As shown in Fig. 6, both provers have a reasonable success rate on the Degree-10-Path-10 task from the start, indicated through non-zero step-level advantages early in training. The $\pi_{5 \times 5}$ prover provides non-zero step-level advantages about 50% of the time, while the $\pi_{5 \times 5 \text{ mixed with } 10 \times 10}$ prover does so about 60% of the time. However, as seen in Fig. 6, this signal does not lead to better task performance. In both cases, the model responses often become degenerate, repeating characters or words to fill the context window. **We believe this happens because the prover policy is not well aligned with the policy being optimized,** possibly violating the second desirable property mentioned above, even though the prover was obtained using the same base model as the policy (you'd hope this should be a *good* *alignment*).
 
 <div class="row mt-3">
     <div class="col-sm mt-3 mt-md-0">
         {% include figure.liquid 
             path="assets/img/2026-04-27-zero-rewards/figure6a.jpg" 
             class="img-fluid rounded z-depth-1" 
-            caption="<b>Figure 6a:</b> Fraction of non-zero step advantages ($\hat{A}_{y_{c_i}}^{\mu} \neq 0$ in Equation 6) for two provers: <span style='color: #FF9800;'>μ = Best-of-4(π<sub>5×5</sub>)</span> and <span style='color: #2196F3;'>μ = Best-of-4(π<sub>5×5-mixed-with-10×10</sub>)</span>, where the models were trained on Deg-5-Path-5 alone or mixed with Deg-10-Path-10, respectively. Both models provide non-zero step advantages for Progress Rewards due to their reasonable success rates on the harder task." 
+            caption="<b>Figure 6a:</b> Fraction of non-zero step advantages for two provers: <span style='color: #FF9800;'>μ = Best-of-4(π<sub>5×5</sub>)</span> and <span style='color: #2196F3;'>μ = Best-of-4(π<sub>5×5-mixed-with-10×10</sub>)</span>, where the models were trained on Deg-5-Path-5 alone or mixed with Deg-10-Path-10, respectively. Both models provide non-zero step advantages for Progress Rewards due to their reasonable success rates on the harder task." 
         %}
     </div>
     <div class="col-sm mt-3 mt-md-0">
@@ -299,9 +301,9 @@ As shown in Fig. 6, both provers have a reasonable success rate on the Degree-10
 
 ### 3. Unstable training in Best-of-N aware finetuning
 
-We followed the practices suggested in <d-cite key="chow2024inference"></d-cite>, including (a) using a KL schedule and (b) clipping the sample-dependent weights multiplied by the log probability (Eq. 9, Lemma 3 in <d-cite key="chow2024inference"></d-cite>). Notably, the KL schedule in <d-cite key="chow2024inference"></d-cite> is quite aggressive, starting with a coefficient of 1 and decaying to 0.001, whereas the current standard is to keep it constant at 0.001 <d-cite key="kazemnejad2024VinePPO"></d-cite>. They also clip the failure probability ($$p_{\text{fail}}$$). Despite these strategies, we observed large sample-dependent weights ($$g_N^+$$ and $$g_N^-$$ in Eq. 9, Lemma 3 in <d-cite key="chow2024inference"></d-cite>), which we countered by directly clipping them to stabilize training. Unfortunately, none of these interventions enabled the model to solve the Degree-10-Path-10 dataset.
+We followed the practices suggested in <d-cite key="chow2024inference"></d-cite>, including (a) using a KL schedule and (b) clipping the sample-dependent weights multiplied by the log probability (Eq. 9, Lemma 3 in <d-cite key="chow2024inference"></d-cite>). Notably, we observed that the KL schedule in <d-cite key="chow2024inference"></d-cite> is quite aggressive, starting with a coefficient of 1 and decaying to 0.001, whereas the current standard is to keep it constant at 0.001 <d-cite key="kazemnejad2024VinePPO"></d-cite>. They also clip the failure probability ($$p_{\text{fail}}$$). During trainin, we observed large sample-dependent weights ($$g_N^+$$ and $$g_N^-$$ in Eq. 9, Lemma 3 in <d-cite key="chow2024inference"></d-cite>) -- we countered these large weights by directly clipping them to stabilize training. Unfortunately, interventions did not enable the model to solve the Degree-10-Path-10 dataset.
 
-To investigate further, we applied the method to the Degree-5-Path-5 dataset which Dr.GRPO can effectively solve (see Fig. 7). We believe a major reason is the presence of very high negative gradients. When the failure probability ($$p_{\text{fail}}$$) is close to 1, the sample-dependent weights become large, and multiplying them by negative log probabilities produces high magnitude negative gradients. This drives the model responses toward degeneracy where it repeats the same set of characters. Fig. 7 shows this effect: with a <span style="color: #FF9800;">lower KL penalty</span> (0.001), the model's response lengths increase rapidly, and inspection of the outputs confirms degeneracy, while success rates remain zero. Using a <span style="color: #2196F3;">strong-to-weak KL penalty</span> (0.1 to 0.001) stabilizes training but does not help solve the hard task.
+To investigate further, we applied the method to the Degree-5-Path-5 dataset which Dr.GRPO can effectively solve (see Fig. 7). The model still did not solve the task. We believe a major reason is the presence of very high negative gradients. When the failure probability ($$p_{\text{fail}}$$) is close to 1, the sample-dependent weights become large, and multiplying them by negative log probabilities produces high magnitude negative gradients. This drives the model responses toward degeneracy where it repeats the same set of characters. Fig. 7 shows this effect: with a <span style="color: #FF9800;">lower KL penalty</span> (0.001), the model's response lengths increase rapidly, and inspection of the outputs confirms degeneracy, while success rates remain zero. Using a <span style="color: #2196F3;">strong-to-weak KL penalty</span> (0.1 to 0.001) stabilizes training but does not help solve the hard task.
 
 We believe that the issue of high negative gradients can be mitigated by starting with a capable base model. Such a model has a lower failure probability ($$p_{\text{fail}}$$ in Eq. 9, Lemma 3 in <d-cite key="chow2024inference"></d-cite>), which keeps the sample-dependent weights $$g_N^+$$ and $$g_N^-$$ (in Eq. 9, Lemma 3 in <d-cite key="chow2024inference"></d-cite>) within a reasonable range, thus ensuring stable training. As shown in Fig. 8, Best-of-N aware finetuning is able to solve the Degree-3-Path-3 task, likely due to its relatively lower initial failure rates compared to Degree-5-Path-5.
 
