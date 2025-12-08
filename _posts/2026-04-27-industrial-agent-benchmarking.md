@@ -39,7 +39,7 @@ toc:
   - name: References
 ---
 
-# Introduction
+## Introduction
 Large Language Model (LLM) agents have quickly become the default way researchers test “autonomous” reasoning, planning, and multi-step tool use. Yet almost all widely used benchmarks evaluate tasks that are far removed from real industrial systems such as web navigation, coding tasks, synthetic puzzles, or curated IT workflows. In practice, industrial operations demand something more difficult: **multi-agent coordination over heterogeneous telemetry, failure modes, work orders, and safety-critical tasks, all under privacy constraints.**
 To understand whether current agents can survive this environment, we built a two-part evaluation ecosystem:
 
@@ -55,7 +55,7 @@ Figure 1. Architecture of the Multi-Agent System: Time Series Foundation Model (
 
 ---
 
-# Why Industrial Agent Evaluation Needs a Rethink
+## Why Industrial Agent Evaluation Needs a Rethink
 
 Industrial tasks do not behave like web navigation or software debugging. A single query may require:
 
@@ -385,8 +385,7 @@ If teams tie on Final Score:
 
 ## Observations from the Final Results
 
-{% include figure.liquid path="assets/img/2026-04-27-industrial-agent-benchmarking/R1.png" class="img-fluid" %}
-Figure 3. Distribution of Team Performance Across Planning, Execution, and Final Composite Scores
+{% include figure.liquid path="../assets/img/2026-04-27-industrial-agent-benchmarking/R1.png" class="img-fluid" %} Figure 3. Distribution of Team Performance Across Planning, Execution, and Final Composite Scores
 
 - **Planning track:** larger variation (Std Dev ≈ 9.6), reflecting diverse reasoning strategies  
 - **Execution track:** tighter clustering (Std Dev ≈ 5.7), suggesting greater consistency once a plan is defined  
@@ -398,8 +397,7 @@ Figure 3. Distribution of Team Performance Across Planning, Execution, and Final
 
 We analyzed how team performance evolved across submissions using first-vs-best score curves, submission count correlations, and improvement distributions.
 
-{% include figure.liquid path="assets/img/2026-04-27-industrial-agent-benchmarking/R2.png" class="img-fluid" %}
-Figure 4. Effect of Iterative Feedback on Agent Performance Across the Competition
+{% include figure.liquid path="../assets/img/2026-04-27-industrial-agent-benchmarking/R2.png" class="img-fluid" %} Figure 4. Effect of Iterative Feedback on Agent Performance Across the Competition
 
 Key findings:
 
