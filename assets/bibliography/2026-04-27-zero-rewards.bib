@@ -1,0 +1,338 @@
+@article{shao2024deepseekmath,
+  title={Deepseekmath: Pushing the limits of mathematical reasoning in open language models},
+  author={Shao, Zhihong and Wang, Peiyi and Zhu, Qihao and Xu, Runxin and Song, Junxiao and Bi, Xiao and Zhang, Haowei and Zhang, Mingchuan and Li, YK and Wu, Yang and others},
+  journal={arXiv preprint arXiv:2402.03300},
+  year={2024}
+}
+
+@article{eysenbach2025self,
+  title={Self-Supervised Reinforcement Learning},
+  author={Eysenbach, Benjamin},
+  journal={Tutorial, https://ben-eysenbach.github.io/self-supervised-rl/},
+  year={2025}
+}
+
+
+@inproceedings{setlur2024rewarding,
+  author       = {Amrith Setlur and
+                  Chirag Nagpal and
+                  Adam Fisch and
+                  Xinyang Geng and
+                  Jacob Eisenstein and
+                  Rishabh Agarwal and
+                  Alekh Agarwal and
+                  Jonathan Berant and
+                  Aviral Kumar},
+  title        = {Rewarding Progress: Scaling Automated Process Verifiers for {LLM}
+                  Reasoning},
+  booktitle    = {The Thirteenth International Conference on Learning Representations,
+                  {ICLR} 2025, Singapore, April 24-28, 2025},
+  publisher    = {OpenReview.net},
+  year         = {2025},
+  url          = {https://openreview.net/forum?id=A6Y7AqlzLW},
+  timestamp    = {Thu, 15 May 2025 17:19:05 +0200},
+  biburl       = {https://dblp.org/rec/conf/iclr/SetlurNFGEAABK25.bib},
+  bibsource    = {dblp computer science bibliography, https://dblp.org}
+}
+
+
+@inproceedings{chow2024inference,
+  author       = {Yinlam Chow and
+                  Guy Tennenholtz and
+                  Izzeddin Gur and
+                  Vincent Zhuang and
+                  Bo Dai and
+                  Aviral Kumar and
+                  Rishabh Agarwal and
+                  Sridhar Thiagarajan and
+                  Craig Boutilier and
+                  Aleksandra Faust},
+  title        = {Inference-Aware Fine-Tuning for Best-of-N Sampling in Large Language
+                  Models},
+  booktitle    = {The Thirteenth International Conference on Learning Representations,
+                  {ICLR} 2025, Singapore, April 24-28, 2025},
+  publisher    = {OpenReview.net},
+  year         = {2025},
+  url          = {https://openreview.net/forum?id=77gQUdQhE7},
+  timestamp    = {Thu, 15 May 2025 17:19:05 +0200},
+  biburl       = {https://dblp.org/rec/conf/iclr/ChowTGZ0KATBF25.bib},
+  bibsource    = {dblp computer science bibliography, https://dblp.org}
+}
+
+
+@misc{kazemnejad2024VinePPO,
+      title={VinePPO: Unlocking RL Potential For LLM Reasoning Through Refined Credit Assignment}, 
+      author={Amirhossein Kazemnejad and Milad Aghajohari and Eva Portelance and Alessandro Sordoni and Siva Reddy and Aaron Courville and Nicolas Le Roux},
+      year={2024},
+      eprint={2410.01679},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2410.01679}, 
+}
+
+@inproceedings{liu2025understanding,
+  title={Understanding r1-zero-like training: A critical perspective},
+  author={Liu, Zichen and Chen, Changyu and Li, Wenjun and Qi, Penghui and Pang, Tianyu and Du, Chao and Lee, Wee Sun and Lin, Min},
+  booktitle={Conference on Language Modeling (COLM)},
+  year={2025}
+}
+
+@misc{stojanovski2025reasoninggymreasoningenvironments,
+      title={REASONING GYM: Reasoning Environments for Reinforcement Learning with Verifiable Rewards},
+      author={Zafir Stojanovski and Oliver Stanley and Joe Sharratt and Richard Jones and Abdulhakeem Adefioye and Jean Kaddour and Andreas Köpf},
+      year={2025},
+      eprint={2505.24760},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2505.24760},
+}
+
+@article{guo2025deepseek,
+  title={Deepseek-r1: Incentivizing reasoning capability in llms via reinforcement learning},
+  author={Guo, Daya and Yang, Dejian and Zhang, Haowei and Song, Junxiao and Zhang, Ruoyu and Xu, Runxin and Zhu, Qihao and Ma, Shirong and Wang, Peiyi and Bi, Xiao and others},
+  journal={arXiv preprint arXiv:2501.12948},
+  year={2025}
+}
+
+@InProceedings{bachmann2024pitfalls,
+  title = 	 {The Pitfalls of Next-Token Prediction},
+  author =       {Bachmann, Gregor and Nagarajan, Vaishnavh},
+  booktitle = 	 {Proceedings of the 41st International Conference on Machine Learning},
+  pages = 	 {2296--2318},
+  year = 	 {2024},
+  editor = 	 {Salakhutdinov, Ruslan and Kolter, Zico and Heller, Katherine and Weller, Adrian and Oliver, Nuria and Scarlett, Jonathan and Berkenkamp, Felix},
+  volume = 	 {235},
+  series = 	 {Proceedings of Machine Learning Research},
+  month = 	 {21--27 Jul},
+  publisher =    {PMLR},
+  pdf = 	 {https://raw.githubusercontent.com/mlresearch/v235/main/assets/bachmann24a/bachmann24a.pdf},
+  url = 	 {https://proceedings.mlr.press/v235/bachmann24a.html},
+  abstract = 	 {Can a mere next-token predictor faithfully model human thinking? Our work is aimed at crystallizing this intuitive concern, which is currently fragmented in the literature. First, we emphasize isolating the two phases of next-token prediction that are often conflated: autoregression during inference vs. teacher-forcing during training. We argue that the previously-identified problem of "exponential error accumulation" is a symptom of autoregressive inference. But more concerningly, we identify that teacher-forcing can let the model fit the training data by cheating, causing total in-distribution failure. We design a minimal planning task where empirically both the Transformer and the Mamba architecture fail in this manner - remarkably, despite the task being easy to learn. Overall, our work consolidates these and other essential arguments surrounding next-token prediction. We hope this effort can ground future discussions and inspire explorations beyond the next-token prediction paradigm.}
+}
+
+
+@article{yue2025does,
+  title={Does reinforcement learning really incentivize reasoning capacity in llms beyond the base model?},
+  author={Yue, Yang and Chen, Zhiqi and Lu, Rui and Zhao, Andrew and Wang, Zhaokai and Song, Shiji and Huang, Gao},
+  journal={arXiv preprint arXiv:2504.13837},
+  year={2025}
+}
+
+@article{qu2025optimizing,
+  title={Optimizing test-time compute via meta reinforcement fine-tuning},
+  author={Qu, Yuxiao and Yang, Matthew YR and Setlur, Amrith and Tunstall, Lewis and Beeching, Edward Emanuel and Salakhutdinov, Ruslan and Kumar, Aviral},
+  journal={arXiv preprint arXiv:2503.07572},
+  year={2025}
+}
+
+@article{williams92reinforce,
+author = {Williams, Ronald J.},
+title = {Simple Statistical Gradient-Following Algorithms for Connectionist Reinforcement Learning},
+year = {1992},
+issue_date = {May 1992},
+publisher = {Kluwer Academic Publishers},
+address = {USA},
+volume = {8},
+number = {3–4},
+issn = {0885-6125},
+url = {https://doi.org/10.1007/BF00992696},
+doi = {10.1007/BF00992696},
+journal = {Mach. Learn.},
+month = may,
+pages = {229–256},
+numpages = {28},
+keywords = {mathematical analysis, gradient descent, connectionist networks, Reinforcement learning}
+}
+
+@article{putta2024agent,
+  title={Agent q: Advanced reasoning and learning for autonomous ai agents},
+  author={Putta, Pranav and Mills, Edmund and Garg, Naman and Motwani, Sumeet and Finn, Chelsea and Garg, Divyansh and Rafailov, Rafael},
+  journal={arXiv preprint arXiv:2408.07199},
+  year={2024}
+}
+
+@article{novikov2025alphaevolve,
+  title={AlphaEvolve: A coding agent for scientific and algorithmic discovery},
+  author={Novikov, Alexander and V{\~u}, Ng{\^a}n and Eisenberger, Marvin and Dupont, Emilien and Huang, Po-Sen and Wagner, Adam Zsolt and Shirobokov, Sergey and Kozlovskii, Borislav and Ruiz, Francisco JR and Mehrabian, Abbas and others},
+  journal={arXiv preprint arXiv:2506.13131},
+  year={2025}
+}
+
+@misc{gandhi2025cognitivebehaviorsenableselfimproving,
+      title={Cognitive Behaviors that Enable Self-Improving Reasoners, or, Four Habits of Highly Effective STaRs}, 
+      author={Kanishk Gandhi and Ayush Chakravarthy and Anikait Singh and Nathan Lile and Noah D. Goodman},
+      year={2025},
+      eprint={2503.01307},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2503.01307}, 
+}
+
+@article{fawzi2022discovering,
+  title={Discovering faster matrix multiplication algorithms with reinforcement learning},
+  author={Fawzi, Alhussein and Balog, Matej and Huang, Aja and Hubert, Thomas and Romera-Paredes, Bernardino and Barekatain, Mohammadamin and Novikov, Alexander and R. Ruiz, Francisco J and Schrittwieser, Julian and Swirszcz, Grzegorz and others},
+  journal={Nature},
+  volume={610},
+  number={7930},
+  pages={47--53},
+  year={2022},
+  publisher={Nature Publishing Group UK London}
+}
+
+@article{setlur2025e3,
+  title={e3: Learning to Explore Enables Extrapolation of Test-Time Compute for LLMs},
+  author={Setlur, Amrith and Yang, Matthew YR and Snell, Charlie and Greer, Jeremy and Wu, Ian and Smith, Virginia and Simchowitz, Max and Kumar, Aviral},
+  journal={arXiv preprint arXiv:2506.09026},
+  year={2025}
+}
+
+@inproceedings{curriculumYoshua,
+author = {Bengio, Yoshua and Louradour, J\'{e}r\^{o}me and Collobert, Ronan and Weston, Jason},
+title = {Curriculum learning},
+year = {2009},
+isbn = {9781605585161},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/1553374.1553380},
+doi = {10.1145/1553374.1553380},
+abstract = {Humans and animals learn much better when the examples are not randomly presented but organized in a meaningful order which illustrates gradually more concepts, and gradually more complex ones. Here, we formalize such training strategies in the context of machine learning, and call them "curriculum learning". In the context of recent research studying the difficulty of training in the presence of non-convex training criteria (for deep deterministic and stochastic neural networks), we explore curriculum learning in various set-ups. The experiments show that significant improvements in generalization can be achieved. We hypothesize that curriculum learning has both an effect on the speed of convergence of the training process to a minimum and, in the case of non-convex criteria, on the quality of the local minima obtained: curriculum learning can be seen as a particular form of continuation method (a general strategy for global optimization of non-convex functions).},
+booktitle = {Proceedings of the 26th Annual International Conference on Machine Learning},
+pages = {41–48},
+numpages = {8},
+location = {Montreal, Quebec, Canada},
+series = {ICML '09}
+}
+
+@article{liu2025prorl,
+  title={Prorl: Prolonged reinforcement learning expands reasoning boundaries in large language models},
+  author={Liu, Mingjie and Diao, Shizhe and Lu, Ximing and Hu, Jian and Dong, Xin and Choi, Yejin and Kautz, Jan and Dong, Yi},
+  journal={arXiv preprint arXiv:2505.24864},
+  year={2025}
+}
+
+@article{chen2025self,
+  title={Self-Questioning Language Models},
+  author={Chen, Lili and Prabhudesai, Mihir and Fragkiadaki, Katerina and Liu, Hao and Pathak, Deepak},
+  journal={arXiv preprint arXiv:2508.03682},
+  year={2025}
+}
+
+@misc{fang2025serlselfplayreinforcementlearning,
+      title={SeRL: Self-Play Reinforcement Learning for Large Language Models with Limited Data}, 
+      author={Wenkai Fang and Shunyu Liu and Yang Zhou and Kongcheng Zhang and Tongya Zheng and Kaixuan Chen and Mingli Song and Dacheng Tao},
+      year={2025},
+      eprint={2505.20347},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2505.20347}, 
+}
+
+@inproceedings{chen2024selfplay,
+author = {Chen, Zixiang and Deng, Yihe and Yuan, Huizhuo and Ji, Kaixuan and Gu, Quanquan},
+title = {Self-play fine-tuning convertsweak language models to strong language models},
+year = {2024},
+publisher = {JMLR.org},
+booktitle = {Proceedings of the 41st International Conference on Machine Learning},
+articleno = {256},
+numpages = {22},
+location = {Vienna, Austria},
+series = {ICML'24}
+}
+
+@misc{xi2024traininglargelanguagemodels,
+      title={Training Large Language Models for Reasoning through Reverse Curriculum Reinforcement Learning}, 
+      author={Zhiheng Xi and Wenxiang Chen and Boyang Hong and Senjie Jin and Rui Zheng and Wei He and Yiwen Ding and Shichun Liu and Xin Guo and Junzhe Wang and Honglin Guo and Wei Shen and Xiaoran Fan and Yuhao Zhou and Shihan Dou and Xiao Wang and Xinbo Zhang and Peng Sun and Tao Gui and Qi Zhang and Xuanjing Huang},
+      year={2024},
+      eprint={2402.05808},
+      archivePrefix={arXiv},
+      primaryClass={cs.AI},
+      url={https://arxiv.org/abs/2402.05808}, 
+}
+
+@misc{
+qiu2025wisdom,
+title={{WISDOM}: Progressive Curriculum Synthesis Makes {LLM}s Better Mathematical Reasoner},
+author={Chenhao Qiu and Qianglong Chen and Jintang Li and Caiyu Wang and Runsen Hua and Minghui Li and Shengshan Hu and Yechao Zhang},
+year={2025},
+url={https://openreview.net/forum?id=hFFAg5Dmw9}
+}
+
+@misc{chen2025selfevolvingcurriculumllmreasoning,
+      title={Self-Evolving Curriculum for LLM Reasoning}, 
+      author={Xiaoyin Chen and Jiarui Lu and Minsu Kim and Dinghuai Zhang and Jian Tang and Alexandre Piché and Nicolas Gontier and Yoshua Bengio and Ehsan Kamalloo},
+      year={2025},
+      eprint={2505.14970},
+      archivePrefix={arXiv},
+      primaryClass={cs.AI},
+      url={https://arxiv.org/abs/2505.14970}, 
+}
+
+@inproceedings{cheng2024selfplayadversarial,
+ author = {Cheng, Pengyu and Dai, Yong and Hu, Tianhao and Xu, Han and Zhang, Zhisong and Han, Lei and Du, Nan and Li, Xiaolong},
+ booktitle = {Advances in Neural Information Processing Systems},
+ editor = {A. Globerson and L. Mackey and D. Belgrave and A. Fan and U. Paquet and J. Tomczak and C. Zhang},
+ pages = {126515--126543},
+ publisher = {Curran Associates, Inc.},
+ title = {Self-playing Adversarial Language Game Enhances LLM Reasoning},
+ url = {https://proceedings.neurips.cc/paper_files/paper/2024/file/e4be7e9867ef163563f4a5e90cec478f-Paper-Conference.pdf},
+ volume = {37},
+ year = {2024}
+}
+
+
+@inproceedings{
+wang2025improving,
+title={Improving Rationality in the Reasoning Process of Language Models through Self-playing Game},
+author={Pinzheng Wang and Juntao Li and Zecheng Tang and Haijia Gui and Min zhang},
+booktitle={Forty-second International Conference on Machine Learning},
+year={2025},
+url={https://openreview.net/forum?id=PPsiS5nSlv}
+}
+
+@article{andrychowicz2017hindsight,
+  title={Hindsight experience replay},
+  author={Andrychowicz, Marcin and Wolski, Filip and Ray, Alex and Schneider, Jonas and Fong, Rachel and Welinder, Peter and McGrew, Bob and Tobin, Josh and Pieter Abbeel, OpenAI and Zaremba, Wojciech},
+  journal={Advances in neural information processing systems},
+  volume={30},
+  year={2017}
+}
+
+@article{lyu2025exploring,
+  title={Exploring the limit of outcome reward for learning mathematical reasoning},
+  author={Lyu, Chengqi and Gao, Songyang and Gu, Yuzhe and Zhang, Wenwei and Gao, Jianfei and Liu, Kuikun and Wang, Ziyi and Li, Shuaibin and Zhao, Qian and Huang, Haian and others},
+  journal={arXiv preprint arXiv:2502.06781},
+  year={2025}
+}
+
+@article{schulman2017proximal,
+  title={Proximal policy optimization algorithms},
+  author={Schulman, John and Wolski, Filip and Dhariwal, Prafulla and Radford, Alec and Klimov, Oleg},
+  journal={arXiv preprint arXiv:1707.06347},
+  year={2017}
+}
+
+@misc{sun2025deltacodedoesrlunlock,
+      title={DELTA-Code: How Does RL Unlock and Transfer New Programming Algorithms in LLMs?}, 
+      author={Yiyou Sun and Yuhan Cao and Pohao Huang and Haoyue Bai and Hannaneh Hajishirzi and Nouha Dziri and Dawn Song},
+      year={2025},
+      eprint={2509.21016},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2509.21016}, 
+}
+
+@inproceedings{
+saparov2025transformers,
+title={Transformers Struggle to Learn to Search},
+author={Abulhair Saparov and Srushti Ajay Pawar and Shreyas Pimpalgaonkar and Nitish Joshi and Richard Yuanzhe Pang and Vishakh Padmakumar and Mehran Kazemi and Najoung Kim and He He},
+booktitle={The Thirteenth International Conference on Learning Representations},
+year={2025},
+url={https://openreview.net/forum?id=9cQB1Hwrtw}
+}
+
+@article{chen2025self,
+  title={Self-questioning language models},
+  author={Chen, Lili and Prabhudesai, Mihir and Fragkiadaki, Katerina and Liu, Hao and Pathak, Deepak},
+  journal={arXiv preprint arXiv:2508.03682},
+  year={2025}
+}
