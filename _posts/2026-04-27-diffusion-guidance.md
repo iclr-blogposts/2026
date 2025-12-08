@@ -212,7 +212,7 @@ Applying the logarithm and differentiating with respect to $\mathbf{x}$, allows 
 
 $$
   \begin{equation}
-    \textcolor{#A125A1}{\nabla_{\mathbf{x}} \log \, p(\mathbf{x} \mid \mathbf{y})} = \textcolor{#25a18e}{\nabla_{\mathbf{x}}  \log p(\mathbf{x})} + \textcolor{#00a5cf}{\nabla_{\mathbf{x}} \log p(\mathbf{y} \mid \mathbf{x})} .
+    \nabla_{\mathbf{x}} \log \, p(\mathbf{x} \mid \mathbf{y}) = \nabla_{\mathbf{x}}  \log p(\mathbf{x}) + \nabla_{\mathbf{x}} \log p(\mathbf{y} \mid \mathbf{x}) .
   \end{equation}
 $$
 
@@ -354,7 +354,7 @@ $$
 
 Typical inverse problems are:
 
-- **Inpainting**, where the operator $\mathcal{A}$ acts as a mask that zeros out out certain pixels, requiring the model to fill in the missing areas.
+- **Inpainting**, where the operator $\mathcal{A}$ acts as a mask that zeros out certain pixels, requiring the model to fill in the missing areas.
 
 - **Super-resolution**, where the operator $\mathcal{A}$ performs a downsampling operation and the model’s task is to generate the image at high resolution.
 
