@@ -8,7 +8,7 @@ nav_order: 2
 ---
 
 # Key Dates
-- **Abstract & Submission deadline**: December 1st, 2025 23:59 AOE
+- **Abstract & Submission deadline**: December 7th, 2025 23:59 AOE
   - [Submit to OpenReview](https://openreview.net/group?id=ICLR.cc/2026/BlogPosts)
   - Any modifications to your blog post, via a pull request on github
 - **Notification of acceptance**: February 21st, 2026
