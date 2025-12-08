@@ -1,7 +1,7 @@
 ---
 layout: distill
 title: "A Hitchhiker's Guide to Agent Evaluation"
-description: A comprehensive guide to understanding how LLM agents are evaluated, covering the key differences from traditional LLM evaluation, metrics for measuring agent performance, safety considerations, trajectory analysis, and open challenges in the field.
+description: An introductory guide to LLM-based agents' evaluation. We explore what makes agent evaluation different from traditional LLM benchmarks, how to measure success, safety, and trajectory quality, and highlight open challenges in the field.
 date: 2026-04-28
 future: true
 htmlwidgets: true
