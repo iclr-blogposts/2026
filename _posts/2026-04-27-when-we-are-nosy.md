@@ -2,14 +2,14 @@
 layout: distill
 title: When We are Nosy
 description: Machine learning systems are defined for many people, and for the design of in particular language models, calls for “social choice–based’’ methods are increasing. This seems to run counter to the practice in machine learning to “personalize’’ models. This blogpost clarifies when personalization and when social choice has its place, using the Impossibility of a Paretian Liberal by Amartya Sen.
-date: 2025-12-07
+date: 2026-04-27
 future: true
 htmlwidgets: true
 
 authors:
   - name: Anonymous
 
-bibliography: 2025-12-07-when-we-are-nosy.bib
+bibliography: 2026-04-27-when-we-are-nosy.bib
 
 toc:
   - name: 1. Disagreement All the Way Down
