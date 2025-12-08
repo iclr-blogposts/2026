@@ -4,42 +4,29 @@ title: "Why AI Evaluations Need Error Bars"
 description: "AI evaluations often rely on single-run scores even though models, agents, and judges are inherently stochastic, making many reported differences unstable. This post surveys statistical tools—error bars, reliability measures, Bayesian models—that show and help manage this variance. Overall, it highlights how incorporating established statistical practices can make evaluations more trustworthy and informative."
 date: 2026-04-27
 future: true
-htmlwidgets: true
-
-# anonymize when submitting
 authors:
   - name: Anonymous
 
+tags: [evaluation, statistics, llms, agents, benchmarking]
+math: true
+
 bibliography: 2026-04-27-why-ai-evaluations-need-error-bars.bib
 
----
 toc:
-- name: Introduction
-- name: LLMs as Stochastic Systems
-subsections:
-    - name: Intrinsic sources of stochasticity
-    - name: Stochasticity in multi-step agent behavior
-    - name: Stochasticity in evaluation: LLM-as-judge
-    - name: Environmental and contextual randomness
-- name: Why Stochasticity Breaks Evaluation
-subsections:
-    - name: Instability of single-run evaluations
-    - name: Violations of independence assumptions
-    - name: Compounding uncertainty in multi-step and agent evaluations
-    - name: Human evaluation as a noisy measurement process
-    - name: A second-order source of variance: LLM-as-judge
-- name: Existing Research: Bringing Statistics into LLM Evaluation
-subsections:
-    - name: Confidence intervals and hypothesis testing
-    - name: Bayesian measurement error models
-    - name: Reliability metrics from psychometrics
-    - name: The current state of agent evaluation
-    - name: Quantifying variance in practice: seeds, items, and distributions
-- name: What's Still Missing
-- name: Moving Forward
-- name: Conclusion
-
+  - name: "Introduction"
+  - name: "1. LLMs as Stochastic Systems"
+    subsections:
+      - name: "1.1 Intrinsic sources of stochasticity"
+      - name: "1.2 Stochasticity in multi-step agent behavior"
+      - name: "1.3 Stochasticity in evaluation: LLM-as-judge"
+      - name: "1.4 Environmental and contextual randomness"
+  - name: "2. Why Stochasticity Breaks Evaluation"
+  - name: "3. Existing Research: Bringing Statistics into LLM Evaluation"
+  - name: "4. What is Still Missing"
+  - name: "5. Moving Forward"
+  - name: "6. Conclusion"
 ---
+
 
 ## Introduction
 
@@ -138,10 +125,10 @@ LLMEval-3 (2024)<d-cite key="llmeval32024"></d-cite> quantified this by holding 
 Crucially, when the model under evaluation and the judge are both stochastic, the total uncertainty is additive. Yet most evaluation pipelines treat judge outputs as if they were deterministic decisions. This creates a false sense of precision: a model “wins” a comparison because the judge happened to prefer it in a noisy setting.
 
 
-## 4. Existing Research: Bringing Statistics into LLM Evaluation
+## 3. Existing Research: Bringing Statistics into LLM Evaluation
 The measurement failures described above are not new to other fields. Statistics, psychometrics, and biostatistics have long dealt with noisy measurements, clustered data, and imperfect raters. Over the last one to two years, several works have begun importing these tools into LLM and agent evaluation. This section summarizes some of the most relevant strands: frequentist error bars and hypothesis tests, Bayesian measurement error models, reliability metrics, agent-specific issues, and variance-aware benchmarking.
 
-### 4.1 Confidence intervals and hypothesis testing
+### 3.1 Confidence intervals and hypothesis testing
 Evan Miller’s *Adding Error Bars to Evals* (2024)<d-cite key="miller2024errorbars"></d-cite> makes a straightforward but under-applied argument: evaluation is an experiment, and we should analyze it like one.  
 If a model is evaluated on $(n)$ questions with empirical accuracy $(\hat{p})$, a first-pass standard error is:
 
@@ -176,7 +163,7 @@ $$
 
 where $\sigma^2$ can be estimated from pilot evaluations. The recommendation is practical: report confidence intervals alongside point estimates, adjust for clustering when items are not independent, and plan evaluation sample sizes to achieve meaningful power rather than recycling whatever dataset happens to be available.
 
-### 4.2 Bayesian measurement error models
+### 3.2 Bayesian measurement error models
 
 Zhang and Martinez’s *From Stochasticity to Signal* (2024)<d-cite key="zhang2024stochasticity"></d-cite> reframes LLM stochasticity as a measurement error problem and uses it rather than fighting it.  
 Consider using an LLM to classify text—for instance, labeling customer satisfaction. For each item $(i)$, we can query the LLM multiple times and obtain different ratings $(r_{ij})$. A naive pipeline either:
@@ -201,7 +188,7 @@ The practical payoff is twofold:
 
 This framework also extends to the case where the LLM is used as a noisy annotator for training data. <d-cite key="baumann2025noisylabels"></d-cite> show that such noisy labeling can introduce prevalence-dependent bias into downstream evaluations; explicit modeling of the error process, as in Zhang and Martinez, offers a principled way to correct for this.
 
-### 4.3 Reliability metrics from psychometrics
+### 3.3 Reliability metrics from psychometrics
 
 Psychometrics has long treated human evaluation as a noisy measurement process and developed tools to quantify reliability. One such tool is the intraclass correlation coefficient (ICC), which measures how consistently different raters evaluate the same items.
 
@@ -218,7 +205,7 @@ where $(BMS)$ is the between-subject mean square, $(WMS)$ is the within-subject 
 Despite being well suited to multi-rater, multi-item settings, ICC and similar metrics are rarely reported in LLM evaluation. This is especially notable in agent benchmarks, where repeated trials on the same tasks are standard and run-to-run variability is high. In those settings, reliability metrics would quantify how much of the observed variance stems from the system under test versus the evaluation procedure itself.
 
 
-### 4.4 The current state of agent evaluation
+### 3.4 The current state of agent evaluation
 
 Agent evaluations introduce additional statistical challenges that are only partly addressed in current work. Surveys such as Yehudai et al. (2025)<d-cite key="yehudai2025agentsurvey"></d-cite> and Trivedi et al. (2024)<d-cite key="trivedi2024agentsmatter"></d-cite> 
  point to several recurring issues.
@@ -231,7 +218,7 @@ A third factor is the heavy reliance on **LLM-as-judge** to score outputs. Judge
 
 Finally, **cost** often receives too little attention. *AI Agents That Matter* (Trivedi et al., 2024)<d-cite key="trivedi2024agentsmatter"></d-cite>  shows that maximizing accuracy alone can lead to over-engineered, expensive agents that are not Pareto-efficient. Simple baselines that exploit stochasticity—such as retrying a call several times at temperature 0—can match or exceed the performance of more elaborate architectures on benchmarks like HumanEval at dramatically lower cost. This makes a strong case for treating evaluation as a multi-objective comparison rather than a one-metric contest.
 
-### 4.5 Quantifying variance in practice: seeds, items, and distributions
+### 3.5 Quantifying variance in practice: seeds, items, and distributions
 
 Several recent works study evaluation variance directly at scale. Meta’s *Quantifying Variance in Evaluation Benchmarks* (2024)<d-cite key="meta2024quantifying"></d-cite> systematically measures how benchmark results shift under different random seeds, bootstrap resampling, and model checkpoints. Key findings include:
 
@@ -243,7 +230,7 @@ To make better use of limited evaluation budgets, Meta applies **item response t
 
 Complementary work on **risk-aware benchmarking** treats evaluation as comparing multivariate performance distributions rather than just average metrics. Tools such as stochastic dominance or copulas allow comparisons that focus on worst-case behavior or tail risk, and significance is assessed using bootstrapped confidence intervals. This brings distributional thinking into the center of model comparison rather than leaving it as an afterthought.
 
-## 5. What’s Still Missing
+## 4. What is Still Missing
 
 Taken together, the work surveyed so far shows that the community has begun to import serious statistical ideas into LLM and agent evaluation. Yet several gaps remain before these ideas become routine practice rather than isolated examples.
 
@@ -259,7 +246,7 @@ Finally, there is a broader gap around distributional thinking. Most evaluations
 
 ---
 
-## 6. Moving Forward
+## 5. Moving Forward
 
 The encouraging part of this story is that the necessary tools already exist. Confidence intervals, hypothesis tests, measurement error models, reliability coefficients, and item response theory have all been developed, debated, and refined in other domains. The open question is not whether we can build new statistics for LLMs, but whether we are willing to treat statistical evaluation as a default rather than an optional embellishment.
 
@@ -285,7 +272,7 @@ The aim is not to make evaluation more elaborate for its own sake. The goal is t
 
 ---
 
-## 7. Conclusion
+## 6. Conclusion
 
 LLMs and agents are stochastic systems. Their evaluations—whether through benchmarks, human raters, or automated judges—are themselves stochastic processes. Ignoring this reality leads to misleading scientific claims, unstable engineering systems, and unreliable deployment decisions.
 
