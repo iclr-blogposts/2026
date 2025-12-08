@@ -1,7 +1,7 @@
 ---
 layout: distill
 title: "Beyond Black-Box Predictions: Neural Operators as a Bridge to Interpretable Governing Equations in Biology"
-description: The mathematical modeling of biological systems—such as gene regulatory networks and signaling cascades—is frequently hindered by the scarcity of time-series data and the presence of unobserved state variables. While deep learning offers powerful predictive capabilities, it often results in "black-box" models that lack the interpretability of mechanistic ordinary differential equations (ODEs). This study proposes a hybrid framework that integrates Neural Operators (NOs) with Sparse Identification of Nonlinear Dynamics (SINDy) to recover interpretable governing equations from partially observed, sparse measurements. Using a five-dimensional NF-κB signaling model as a case study, we demonstrate that a Fourier Neural Operator (FNO) can effectively learn the mapping from initial conditions to full solution trajectories, successfully reconstructing hidden species from as few as twenty measurement points. Subsequently, SINDy is applied to these operator-generated dense trajectories to identify parsimonious dynamical laws. Our results indicate that the FNO functions as a robust, resolution-independent surrogate, enabling symbolic discovery in regimes where classical inference is ill-posed. While the complexity of biological kinetics presents ongoing challenges for library design, this operator-plus-symbolic paradigm provides a scalable workflow for extracting mechanistic insights from limited experimental readouts, with promising applications in PDE-based morphogen gradients and single-cell dynamics.
+description: "This study introduces a hybrid computational framework that integrates Neural Operators with Sparse Identification of Nonlinear Dynamics (SINDy) to recover interpretable governing equations from sparse, partially observed biological data. Using an NF-κB signaling model, we demonstrate that Fourier Neural Operators effectively reconstruct hidden state trajectories from limited measurements, serving as a resolution-independent surrogate that enables the discovery of parsimonious dynamical laws. This operator-plus-symbolic paradigm offers a scalable workflow for extracting mechanistic insights from experimental readouts where classical inference methods typically fail."
 
 date: 2026-04-27
 future: true
@@ -73,10 +73,10 @@ In practice, however, biological data sit in an awkward regime for most existing
 
 Two strands of recent work point toward an interesting different perspective:
 
-- **Neural Operators (NOs)** learn maps between *function spaces*, such as initial conditions or input signals to full solution trajectories, with architectures that are approximately mesh / resolution independent <d-cite key="kovachki2023neural, li2020fourier"></d-cite>.
-- **Sparse Identification of Nonlinear Dynamics (SINDy)** discovers parsimonious governing equations from time-series data by selecting a small number of terms from a library of candidate nonlinear functions <d-cite key="desilva2020pysindy, brunton2016sindy, champion2022ensemble"></d-cite>.
+- **Neural Operators (NOs)** learn maps between *function spaces*, such as initial conditions or input signals to full solution trajectories, with architectures that are approximately mesh / resolution independent <d-cite key="kovachki2023neural, li2021fourier"></d-cite>.
+- **Sparse Identification of Nonlinear Dynamics (SINDy)** discovers parsimonious governing equations from time-series data by selecting a small number of terms from a library of candidate nonlinear functions <d-cite key="desilva2020pysindy, brunton2016discovering, champion2022ensemble"></d-cite>.
 
-This post investigates how these two ideas can be combined to move “beyond black-box predictions” in biology. The case study is a five-dimensional ODE model inspired by NF-κB signaling, in which only three species are treated as observed; a Fourier Neural Operator (FNO) is trained to reconstruct full trajectories, including hidden variables, from roughly twenty measurements per trajectory, after which SINDy is applied to dense trajectories from either the ground-truth simulator or the learned operator <d-cite key="hoffmann2002ikb"></d-cite>. Empirically, the FNO accurately interpolates unobserved species with Hill-type nonlinearities and supports arbitrary temporal resampling, while SINDy finds only approximate governing equations and performs similarly on simulator- and FNO-generated data—suggesting that the bottleneck lies in the complexity of biological dynamics and library design, not in operator learning itself.
+This post investigates how these two ideas can be combined to move “beyond black-box predictions” in biology. The case study is a five-dimensional ODE model inspired by NF-κB signaling, in which only three species are treated as observed; a Fourier Neural Operator (FNO) is trained to reconstruct full trajectories, including hidden variables, from roughly twenty measurements per trajectory, after which SINDy is applied to dense trajectories from either the ground-truth simulator or the learned operator <d-cite key="hoffmann2002ikb"></d-cite>. Empirically, the FNO accurately interpolates unobserved species with Hill-type nonlinearities and supports arbitrary temporal resampling, while SINDy finds only approximate governing equations and performs similarly on simulator- and FNO-generated data—suggesting that the bottleneck lies in the complexity of biological dynamics and library design, not in operator learning itself. A GitHub repository with the code for experiments performed in this post is [available here](https://github.com/karthik-d/neurops-with-sindy).
 
 ---
 
@@ -119,7 +119,7 @@ In practice, SINDy works best when:
 - The true dynamics can be represented by a relatively small number of basis functions present in $\Theta$.
 - The measurement space is not too high-dimensional and does not mix many hidden processes.
 
-Extensions such as SINDy-PI for implicit dynamics, Ensemble-SINDy for robustness to low-data and noise, and SINDy-CRN / Reactive SINDy for biochemical reaction networks broaden the method’s applicability and robustness.
+Extensions such as SINDy-PI for implicit dynamics <d-cite key="kaheman2020sindypi"></d-cite>, Ensemble-SINDy <d-cite key="fasel2022ensemble"></d-cite> for robustness to low-data and noise, and SINDy-CRN / Reactive SINDy for biochemical reaction networks broaden the method’s applicability and robustness.
 
 Biological systems pose challenges for SINDy: hidden species, cooperative Hill nonlinearities with unknown exponents, and stiff binding/unbinding kinetics can all make sparse recovery difficult, especially from realistically noisy, sparse data.
 
@@ -178,6 +178,8 @@ Appropriate parameter choices yield rich transient and oscillatory-like response
 
 ## 5. Methods
 
+A GitHub repository with the code for experiments performed in this post is [available here](https://github.com/karthik-d/neurops-with-sindy).
+
 ### 5.1 Synthetic data generation
 
 To emulate realistic biological experiments, an ensemble of trajectories is generated by numerically integrating the NF-κB ODE system under multiple initial conditions and small parameter variation.
@@ -213,7 +215,7 @@ To query the FNO on a finer time grid, these sparse observations are first linea
 
 {% include figure.liquid path="assets/img/2026-04-27-neural-ops-in-biology/interpolation-fno.png" class="img-fluid" %}
 <div class="caption">
-  Shown are thr ODE simulation ground truth (grey), dense timepoints generated by linear interpolation between sparse (synthetic) experimental points used to train the FNO (blue), and the FNO predictions using the dense timepoints (red). Notice that although the interpolated points show stark linear trends, FNO predictions have a smoothing effect that predicts a system closer to ground truth. 
+  Shown are the ODE simulation ground truth (grey), dense timepoints generated by linear interpolation between sparse (synthetic) experimental points used to train the FNO (blue), and the FNO predictions using the dense timepoints (red). Notice that although the interpolated points show stark linear trends, FNO predictions have a smoothing effect that predicts a system closer to ground truth. 
 </div>
 
 The important dynamical structure actually comes from the trained FNO itself. Once trained, the FNO represents an operator that maps any reasonable time series of observables (including their interpolated versions) to a full-state trajectory consistent with what it learned during training.[@kovachki2023neural; @li2021fourier] When fed linearly interpolated inputs on a dense grid, the FNO effectively smooths and regularizes the observable channels and, at the same time, predicts the hidden species at those new timepoints according to the learned dynamics. In other words, the operator “fills in” the trajectory in a way that is constrained by the NF-κB-like ODE behavior it has internalized, rather than simply connecting the dots between measurements.
@@ -312,14 +314,8 @@ To benchmark the quality of FNO-generated dense data, SINDy is also applied to d
 
 Despite improvements afforded by dense data, SINDy’s ability to recover accurate governing equations remains limited by intrinsic biological complexities. The NF-κB model features nonlinear Hill functions with sharp sensitivities that challenge sparse regression techniques, while complex formation, multi-timescale feedback, and partial observability further complicate equation recovery. Additionally, many inferred equations, as shown below, include low-magnitude, spurious terms lacking biological meaning, revealing a critical challenge: the design and selection of an appropriate function library for SINDy strongly influence both model fidelity and interpretability. 
 
-<div class="row mt-3">
-    <div class="col-sm mt-3 mt-md-0">
-        {% include figure.liquid path="assets/img/2026-04-27-neural-ops-in-biology/sindy-ode_high.png" class="img-fluid"  %}
-    </div>
-    <div class="col-sm mt-3 mt-md-0">
-        {% include figure.liquid path="assets/img/2026-04-27-neural-ops-in-biology/sindy-ode_ideal.png" class="img-fluid"  %}
-    </div>
-</div>
+
+{% include figure.liquid path="assets/img/2026-04-27-neural-ops-in-biology/sindy-ode_high.png" class="img-fluid"  %}
 <div class="caption">
 ODE forms inferred by SINDy using dense FNO predicted timepoints (left) and using dense ODE simulated timepoints (right).
 </div>
