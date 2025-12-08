@@ -100,47 +100,6 @@ _styles: >
 
 {% include figure.liquid path="assets/img/2026-04-27-diffusion-guidance/diff_prior.png" class="img-fluid" %}
 
-$$
-% Define macros for common notation
-\newcommand{\bx}{\mathbf{x}}
-\newcommand{\bc}{\mathbf{c}}
-\newcommand{\bu}{\mathbf{u}}
-\newcommand{\by}{\mathbf{y}}
-\newcommand{\bz}{\mathbf{z}}
-\newcommand{\bI}{\mathbf{I}}
-\newcommand{\w}{\mathbf{w}}
-\newcommand{\bzt}{\mathbf{z}_t}
-\newcommand{\xs}{\mathbf{x}_s}
-\newcommand{\xzero}{\mathbf{x}_0}
-\newcommand{\bf}{\mathbf{f}}
-\newcommand{\gt}{\mathrm{g}_t}
-\newcommand{\fg}{\mathrm{g}}
-\newcommand{\ff}{\mathrm{f}}
-\newcommand{\at}{\alpha_t}
-\newcommand{\st}{\sigma_t}
-\newcommand{\eps}{\boldsymbol{\epsilon}}
-\newcommand{\thetav}{\boldsymbol{\theta}}
-\newcommand{\muv}{\boldsymbol{\mu}}
-\newcommand{\sigmav}{\boldsymbol{\sigma}}
-\newcommand{\logp}{\log p}
-\newcommand{\score}{\nabla_{\mathbf{x}_t} \log p(\mathbf{x}_t)}
-\newcommand{\scoreprior}{\nabla_{\mathbf{x}_t} \log p(\mathbf{x}_t)}
-\newcommand{\scorepost}{\nabla_{\mathbf{x}_t} \log p(\mathbf{x}_t \mid \mathbf{y})}
-\newcommand{\scorelike}{\nabla_{\mathbf{x}_t} \log p(\mathbf{y} \mid \mathbf{x}_t)}
-\newcommand{\posterior}{p(\mathbf{x} \mid \mathbf{y})}
-\newcommand{\prior}{p(\mathbf{x})}
-\newcommand{\likelihood}{p(\mathbf{y} \mid \mathbf{x})}
-\newcommand{\evidence}{p(\mathbf{y})}
-\newcommand{\E}{\mathbb{E}}
-\newcommand{\Var}{\mathbb{V}}
-\newcommand{\Cov}{\mathrm{Cov}}
-\newcommand{\dt}{\mathrm{d}t}
-\newcommand{\dw}{d\mathbf{w}}
-\newcommand{\SDE}{d\bzt}
-\newcommand{\normal}{\mathcal{N}}
-\newcommand{\uniform}{\mathcal{U}}
-$$
-
 ## Introduction
 
 Diffusion models have emerged as a state-of-the-art approach for sampling from complex probability distributions. Prominent examples are image-generation models like Stable Diffusion, where the model generates a high-quality image within seconds based on a given text prompt like _"A corgi with sunglasses on the beach"_. What makes these models stand out is their ability to faithfully adhere to a given prompt.
@@ -149,7 +108,7 @@ These capabilities arise from techniques collectively known as guidance, which d
 
 $$
   \begin{equation*}
-    \textcolor{#A125A1}{\nabla_{\bx} \log \, p(\bx \mid \by)} = \textcolor{#25a18e}{\nabla_{\bx}  \log p(\bx)} + \textcolor{#00a5cf}{\nabla_{\bx} \log p(\mathbf{y} \mid \bx)}
+    \textcolor{#A125A1}{\nabla_{\mathbf{x}} \log \, p(\mathbf{x} \mid \mathbf{y})} = \textcolor{#25a18e}{\nabla_{\mathbf{x}}  \log p(\mathbf{x})} + \textcolor{#00a5cf}{\nabla_{\mathbf{x}} \log p(\mathbf{y} \mid \mathbf{x})}
   \end{equation*}
 $$
 
@@ -169,21 +128,21 @@ A _forward_ diffusion process, which gradually destroys data over time, can be d
 
 $$
   \begin{equation}
-    d\bzt = \bf(\bzt, t) \; dt + \fg(t) \; \dw \textrm{,}
+    d\mathbf{z}_t = \mathbf{f}(\mathbf{z}_t, t) \; \mathrm{d}t + \mathrm{g}(t) \; d\mathbf{w} \textrm{,}
   \end{equation}
 $$
 
-where $\bf$ and $\fg$ are determined by the noise schedule, and $\dw$ is a Brownian motion. For an affine drift $\bf$, the forward process can be rewritten in closed form:
+where $\mathbf{f}$ and $\mathrm{g}$ are determined by the noise schedule, and $d\mathbf{w}$ is a Brownian motion. For an affine drift $\mathbf{f}$, the forward process can be rewritten in closed form:
 
 $$
   \begin{equation}
     \label{eq:diff_co}
-    \bz_t = \alpha_t \bx + \sigma_t \boldsymbol{\epsilon} ,
+    \mathbf{z}_t = \alpha_t \mathbf{x} + \sigma_t \boldsymbol{\epsilon} ,
   \end{equation}
 $$
 
-with $\bx \sim p_{\text{data}}(\bx)$ sampled from the data distribution and $\epsilon \sim \normal(\mathbf{0}, \mathbf{I})$ drawn from a standard gaussian distribution.
-The forward diffusion processes starts with a clean data sample $\bz_0=\bx$ (where $\alpha_0=1$ and $\sigma_0=0$), and gradually adds noise.
+with $\mathbf{x} \sim p_{\text{data}}(\mathbf{x})$ sampled from the data distribution and $\epsilon \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$ drawn from a standard gaussian distribution.
+The forward diffusion processes starts with a clean data sample $\mathbf{z}_0=\mathbf{x}$ (where $\alpha_0=1$ and $\sigma_0=0$), and gradually adds noise.
 In the case of a variance-exploding noise schedule, $\alpha_t$ remains $1$ and $\sigma_t$ grows with $t$.
 
 <!-- <details>
@@ -226,11 +185,11 @@ The _reverse_ process<d-cite key="song2021generative,anderson1982reverse"></d-ci
 $$
   \begin{equation}
   \label{eq:reverse_process}
-    \mathrm{d}\bzt = [\bf(\bzt, t) - \fg(t)^2 \; \textcolor{#25a18e}{\nabla_{\bzt} \log p(\bzt)}]\; dt + \fg(t) \; \dw ,
+    \mathrm{d}\mathbf{z}_t = [\mathbf{f}(\mathbf{z}_t, t) - \mathrm{g}(t)^2 \; \textcolor{#25a18e}{\nabla_{\mathbf{z}_t} \log p(\mathbf{z}_t)}]\; \mathrm{d}t + \mathrm{g}(t) \; d\mathbf{w} ,
   \end{equation}
 $$
 
-where $\textcolor{#25a18e}{\nabla_{\bzt} \log p(\bzt)}$ is called the score function (aka Stein score), and is approximated by a neuronal network $s_{\theta}(\bzt, t) \approx \nabla_{\bzt} \log p(\bzt)$ using denoising score matching<d-cite key="hyvarinen2005estimation"></d-cite>.
+where $$\textcolor{#25a18e}{\nabla_{\mathbf{z}_t} \log p(\mathbf{z}_t)}$$ is called the score function (aka Stein score), and is approximated by a neuronal network $$s_{\theta}(\mathbf{z}_t, t) \approx \nabla_{\mathbf{z}_t} \log p(\mathbf{z}_t)$$ using denoising score matching<d-cite key="hyvarinen2005estimation"></d-cite>.
 
 The score function defines a **time-dependent vector field** that guides points toward the data distribution.
 
@@ -241,19 +200,19 @@ Observe the red sampling trajectories: they begin with large movements toward th
 
 ### Conditional Diffusion Models
 
-Previously, we demonstrated how to create a process for sampling from an unconditional distribution. Extending this to the conditional case, we aim to sample from a posterior $p(\bx \mid \by) \text{,}$ which we can decompose using Bayes' rule:
+Previously, we demonstrated how to create a process for sampling from an unconditional distribution. Extending this to the conditional case, we aim to sample from a posterior $p(\mathbf{x} \mid \mathbf{y}) \text{,}$ which we can decompose using Bayes' rule:
 
 $$
   \begin{equation}
-    p(\bx \mid \by) = \frac{p(\by \mid \bx) p(\bx)}{p(\by)} .
+    p(\mathbf{x} \mid \mathbf{y}) = \frac{p(\mathbf{y} \mid \mathbf{x}) p(\mathbf{x})}{p(\mathbf{y})} .
   \end{equation}
 $$
 
-Applying the logarithm and differentiating with respect to $\bx$, allows us to define a conditional form of the score function (relying on the fact that the denominator does not depend on $\bx$):
+Applying the logarithm and differentiating with respect to $\mathbf{x}$, allows us to define a conditional form of the score function (relying on the fact that the denominator does not depend on $\mathbf{x}$):
 
 $$
   \begin{equation}
-    \textcolor{#A125A1}{\nabla_{\bx} \log \, p(\bx \mid \by)} = \textcolor{#25a18e}{\nabla_{\bx}  \log p(\bx)} + \textcolor{#00a5cf}{\nabla_{\bx} \log p(\mathbf{y} \mid \bx)} .
+    \textcolor{#A125A1}{\nabla_{\mathbf{x}} \log \, p(\mathbf{x} \mid \mathbf{y})} = \textcolor{#25a18e}{\nabla_{\mathbf{x}}  \log p(\mathbf{x})} + \textcolor{#00a5cf}{\nabla_{\mathbf{x}} \log p(\mathbf{y} \mid \mathbf{x})} .
   \end{equation}
 $$
 
@@ -261,25 +220,25 @@ Where the conditional _reverse process_ from Eq. \eqref{eq:reverse_process} is g
 
 $$
   \begin{equation}
-    \mathrm{d}\bzt = [\bf(\bzt, t) - \fg(t)^2 \; (\textcolor{#25a18e}{\nabla_{\bzt}  \log p(\bz_t)} + \textcolor{#00a5cf}{\nabla_{\bz_t} \log p(\mathbf{y} \mid \bz_t)})] \; dt + \fg(t) \; d\mathbf{w} .
+    \mathrm{d}\mathbf{z}_t = [\mathbf{f}(\mathbf{z}_t, t) - \mathrm{g}(t)^2 \; (\textcolor{#25a18e}{\nabla_{\mathbf{z}_t}  \log p(\mathbf{z}_t)} + \textcolor{#00a5cf}{\nabla_{\mathbf{z}_t} \log p(\mathbf{y} \mid \mathbf{z}_t)})] \; \mathrm{d}t + \mathrm{g}(t) \; d\mathbf{w} .
   \end{equation}
 $$
 
-This formulation allows us to reuse our unconditional model ($\textcolor{#25a18e}{\nabla_{\bzt} \log p(\bz_t)}$) and simply add a guidance term $\textcolor{#00a5cf}{\nabla_{\bz_t} \log p(\mathbf{y} \mid \bz_t)}$. The guidance term acts like a force pushing our samples to be consistent with the condition $\by$. The remaining practical challenge is deriving
+This formulation allows us to reuse our unconditional model ($$\textcolor{#25a18e}{\nabla_{\mathbf{z}_t} \log p(\mathbf{z}_t)}$$) and simply add a guidance term $$\textcolor{#00a5cf}{\nabla_{\mathbf{z}_t} \log p(\mathbf{y} \mid \mathbf{z}_t)}$$. The guidance term acts like a force pushing our samples to be consistent with the condition $$\mathbf{y}$$. The remaining practical challenge is deriving
 
 $$
-    \textcolor{#00a5cf}{\nabla_{\bz_t} \log p(\mathbf{y} \mid \bz_t)} .
+    \textcolor{#00a5cf}{\nabla_{\mathbf{z}_t} \log p(\mathbf{y} \mid \mathbf{z}_t)} .
 $$
 
 There are two distinct strategies for doing so:
 
 <div style="padding: 10px 10px 10px 10px; border-left: 6px solid #FFD700; margin-bottom: 20px;">
   <p>1. <strong>Classifier Guidance (Learning the Likelihood)</strong>: <br>Learn a time-dependent classifier that approximates the likelihood score through supervised training on labeled data.</p>
-  <p style="margin: 0;">2. <strong>Analytical Likelihoods (Defining the Likelihood)</strong>: <br>Leverage analytically tractable likelihood functions, which are particularly valuable for inverse problems, where paired training data $(\bx, \by)$ is scarce or unavailable.</p>
-  <!-- <p style="margin: 0;"> <strong>In both approaches, the diffusion model itself remains frozen</strong>, serving only as a fixed prior distribution $p(\bx)$. We are left to define or learn how to assess likelihoods, particularly their gradients, which makes this framework highly data-efficient for adapting to new tasks.</p> -->
+  <p style="margin: 0;">2. <strong>Analytical Likelihoods (Defining the Likelihood)</strong>: <br>Leverage analytically tractable likelihood functions, which are particularly valuable for inverse problems, where paired training data $(\mathbf{x}, \mathbf{y})$ is scarce or unavailable.</p>
+  <!-- <p style="margin: 0;"> <strong>In both approaches, the diffusion model itself remains frozen</strong>, serving only as a fixed prior distribution $p(\mathbf{x})$. We are left to define or learn how to assess likelihoods, particularly their gradients, which makes this framework highly data-efficient for adapting to new tasks.</p> -->
 </div>
 
-<strong>In both approaches, the diffusion model itself remains frozen</strong>, serving only as a fixed prior distribution $p(\bx)$. We are left to define or learn how to assess likelihoods, particularly their gradients, which makes this framework highly data-efficient for adapting to new tasks.
+<strong>In both approaches, the diffusion model itself remains frozen</strong>, serving only as a fixed prior distribution $p(\mathbf{x})$. We are left to define or learn how to assess likelihoods, particularly their gradients, which makes this framework highly data-efficient for adapting to new tasks.
 
 ## Classifier Guidance (CG)
 
@@ -287,26 +246,26 @@ Classifier Guidance<d-cite key="dhariwal2021diffusion"></d-cite> trains a time-d
 
 $$
   \begin{equation}
-    p_{\phi}(\by \mid \bzt, t) \approx p(\by \mid \bzt, t) .
+    p_{\phi}(\mathbf{y} \mid \mathbf{z}_t, t) \approx p(\mathbf{y} \mid \mathbf{z}_t, t) .
   \end{equation}
 $$
 
-We therefore train a classifier whose inputs are noisy samples that resemble the intermediate steps of the reverse diffusion process. In particular, given a dataset of paired samples $(\bx,\by)$, we can train a time-conditional classifier $p_{\phi}(\by \mid \bzt, t)$ by minimizing
+We therefore train a classifier whose inputs are noisy samples that resemble the intermediate steps of the reverse diffusion process. In particular, given a dataset of paired samples $(\mathbf{x}, \mathbf{y})$, we can train a time-conditional classifier $p_{\phi}(\mathbf{y} \mid \mathbf{z}_t, t)$ by minimizing
 
 $$
   \begin{equation*}
-    \E_{t \sim \uniform(0, T), (\bx, \by) \sim p_{\text{data}}, \boldsymbol{\epsilon} \sim \normal(\mathbf{0}, \mathbf{I})}[-\log p_{\phi}(\by \mid \bzt, t)] ,
+    \mathbb{E}_{t \sim \mathcal{U}(0, T), (\mathbf{x}, \mathbf{y}) \sim p_{\text{data}}, \boldsymbol{\epsilon} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})}[-\log p_{\phi}(\mathbf{y} \mid \mathbf{z}_t, t)] ,
   \end{equation*}
 $$
 
-with the noisy sample $\bz_t = \alpha_t \bx + \sigma_t \boldsymbol{\epsilon}$.
+with the noisy sample $\mathbf{z}_t = \alpha_t \mathbf{x} + \sigma_t \boldsymbol{\epsilon}$.
 Handling inputs at varying noise levels allows the classifier to operate across the entire diffusion trajectory.
 
 The trained classifier can be used as an approximation of the <strong><span style="color: var(--color-likelihood);">log-likelihood gradient</span></strong>:
 
 $$
   \begin{equation}
-     \textcolor{#00a5cf}{\nabla_{\bzt} \log p(\mathbf{y} \mid \bzt)} \approx \textcolor{#00a5cf}{\nabla_{\bzt} \log p_{\phi}(\by \mid \bzt, t)} ,
+     \textcolor{#00a5cf}{\nabla_{\mathbf{z}_t} \log p(\mathbf{y} \mid \mathbf{z}_t)} \approx \textcolor{#00a5cf}{\nabla_{\mathbf{z}_t} \log p_{\phi}(\mathbf{y} \mid \mathbf{z}_t, t)} ,
   \end{equation}
 $$
 
@@ -316,7 +275,7 @@ Finally we combine the prior score with the log likelihood gradient. In practice
 
 $$
   \begin{equation}
-    \textcolor{#A125A1}{\nabla_{\bz_t} \log \, p_{\gamma}(\bz_t \mid \by)} = \textcolor{#25a18e}{\nabla_{\bz_t} \log p(\bz_t)} + \gamma \textcolor{#00a5cf}{\nabla_{\bz_t} \log p(\mathbf{y} \mid \bz_t)} .
+    \textcolor{#A125A1}{\nabla_{\mathbf{z}_t} \log \, p_{\gamma}(\mathbf{z}_t \mid \mathbf{y})} = \textcolor{#25a18e}{\nabla_{\mathbf{z}_t} \log p(\mathbf{z}_t)} + \gamma \textcolor{#00a5cf}{\nabla_{\mathbf{z}_t} \log p(\mathbf{y} \mid \mathbf{z}_t)} .
   \end{equation}
 $$
 
@@ -338,19 +297,19 @@ Classifier-free guidance can be derived in a similar manner, the main difference
 Applying Bayes' rule to
 
 $$
-    \nabla_{\bz_t}\,p(\by \mid \bz_t)
+    \nabla_{\mathbf{z}_t}\,p(\mathbf{y} \mid \mathbf{z}_t)
 $$
 
 results in
 
 $$
-  \nabla_{\bz_t}\,p(\by \mid \bz_t)=\nabla_{\bz_t}\,p(\bz_t \mid \by) - \nabla_{\bz_t}\,p(\bz_t).
+  \nabla_{\mathbf{z}_t}\,p(\mathbf{y} \mid \mathbf{z}_t)=\nabla_{\mathbf{z}_t}\,p(\mathbf{z}_t \mid \mathbf{y}) - \nabla_{\mathbf{z}_t}\,p(\mathbf{z}_t).
 $$
 
 To avoid training of an unconditional and a conditional model, we train one single model with an additional condition:
 
 $$
-  \nabla_{\bz_t}\,p(\by \mid \bz_t)=\nabla_{\mathbf{\bz_t}}\,p(\bz_t \mid \by) - \nabla_{\bz_t}\,p(\bz_t \mid \emptyset),
+  \nabla_{\mathbf{z}_t}\,p(\mathbf{y} \mid \mathbf{z}_t)=\nabla_{\mathbf{z}_t}\,p(\mathbf{z}_t \mid \mathbf{y}) - \nabla_{\mathbf{z}_t}\,p(\mathbf{z}_t \mid \emptyset),
 $$
 
 where we condition the model on the null token $\emptyset$, to represent the unconditional model.
@@ -358,13 +317,13 @@ where we condition the model on the null token $\emptyset$, to represent the unc
 We can now replace the likelihood term in classifier guidance:
 
 $$
-  \nabla_{\bz_t} \log \, p_{\gamma}(\bz_t \mid \by) = (1 - \gamma) \nabla_{\bz_t} \log p(\bz_t, \mid \emptyset) + \gamma \nabla_{\mathbf{\bz_t}}\,p(\bz_t \mid \by)
+  \nabla_{\mathbf{z}_t} \log \, p_{\gamma}(\mathbf{z}_t \mid \mathbf{y}) = (1 - \gamma) \nabla_{\mathbf{z}_t} \log p(\mathbf{z}_t, \mid \emptyset) + \gamma \nabla_{\mathbf{z}_t}\,p(\mathbf{z}_t \mid \mathbf{y})
 $$
 
 </div>
 <!-- $$
   \begin{equation}
-    \nabla_{\bx} \, \log p(\mathbf{y} \mid \bz_t) = \textcolor{#00a5cf}{\nabla_{\bz_t} \log p(\bz_t) + \gamma \nabla_{\bz_t} \log p(\mathbf{y} \mid \bz_t)}
+    \nabla_{\mathbf{x}} \, \log p(\mathbf{y} \mid \bz_t) = \textcolor{#00a5cf}{\nabla_{\bz_t} \log p(\bz_t) + \gamma \nabla_{\bz_t} \log p(\mathbf{y} \mid \bz_t)}
   \end{equation}
 $$ -->
 
@@ -374,22 +333,22 @@ $$ -->
 
 In the last section, we discussed how to train an additional model serving as a likelihood.
 For a class of problems where the relationship between the data and the observations follows a known probabilistic model, the likelihood function can be derived analytically.
-A canonical example are inverse problems, where we have observations $\by$ and we want to recreate $\bx$. We consider observations of the form:
+A canonical example are inverse problems, where we have observations $\mathbf{y}$ and we want to recreate $\mathbf{x}$. We consider observations of the form:
 
 $$
 \begin{equation}
-    \mathbf{y} = \mathcal{A}(\bx) + \mathbf{n} \quad \textrm{where} \quad \mathbf{y}, \mathbf{n} \in \mathbb{R}^m, \mathbf{x} \in \mathbb{R}^n.
+    \mathbf{y} = \mathcal{A}(\mathbf{x}) + \mathbf{n} \quad \textrm{where} \quad \mathbf{y}, \mathbf{n} \in \mathbb{R}^m, \mathbf{x} \in \mathbb{R}^n.
 \end{equation}
 $$
 
 Here $$\mathbf{y}$$ is our observation, $$\mathbf{x}$$ is the underlying clean data, $$\mathcal{A}:\mathbb{R}^n \mapsto \mathbb{R}^m$$ is the **forward operator** (which may be linear or nonlinear), and $\mathbf{n}$ is observation noise.
 
-For Gaussian noise $\mathbf{n} \sim \normal(\mathbf{0}, \sigma^2 \mathbf{I})$, the likelihood is defined by:
+For Gaussian noise $\mathbf{n} \sim \mathcal{N}(\mathbf{0}, \sigma^2 \mathbf{I})$, the likelihood is defined by:
 
 $$
   \begin{equation}
     \label{eq:y-given-x-gaussian-noise}
-    p(\by \mid \bx) = \normal(\by; \mathcal{A}(\bx), \sigma^2 \mathbf{I}) \propto \exp \left(-\frac{1}{2 \sigma^2} ||\by - \mathcal{A}(\bx)||^2 \right) .
+    p(\mathbf{y} \mid \mathbf{x}) = \mathcal{N}(\mathbf{y}; \mathcal{A}(\mathbf{x}), \sigma^2 \mathbf{I}) \propto \exp \left(-\frac{1}{2 \sigma^2} ||\mathbf{y} - \mathcal{A}(\mathbf{x})||^2 \right) .
   \end{equation}
 $$
 
@@ -405,36 +364,36 @@ Typical inverse problems are:
 
 ### Diffusion Posterior Sampling (DPS)
 
-Direct computation of the time-dependent likelihood gradient $\textcolor{#00a5cf}{\nabla_{\bz_t} \log p(\mathbf{y} \mid \bz_t)}$ poses significant computational challenges. Let's calculate the likelihood by marginalizing over $\bx$:
+Direct computation of the time-dependent likelihood gradient $\textcolor{#00a5cf}{\nabla_{\mathbf{z}_t} \log p(\mathbf{y} \mid \mathbf{z}_t)}$ poses significant computational challenges. Let's calculate the likelihood by marginalizing over $\mathbf{x}$:
 
 $$
   \begin{equation}
-    p(\by \mid \bz_t) = \int p(\by \mid \bx) \, p(\bx \mid \bz_t) d \bx = \E_{\bx \sim p(\bx \mid \bz_t)}[p(\by \mid \bx)] .
+    p(\mathbf{y} \mid \mathbf{z}_t) = \int p(\mathbf{y} \mid \mathbf{x}) \, p(\mathbf{x} \mid \mathbf{z}_t) d \mathbf{x} = \mathbb{E}_{\mathbf{x} \sim p(\mathbf{x} \mid \mathbf{z}_t)}[p(\mathbf{y} \mid \mathbf{x})] .
   \end{equation}
 $$
 
-The intractability arises from two sources: (1) the marginalization over the high-dimensional space of clean samples $\bx$, and (2) the dependence of $p(\by \mid \bz_t)$ on the reverse diffusion process, which requires integrating over all trajectories from time $t$ to $0$. DPS<d-cite key="chung2022diffusion"></d-cite> addresses this through an approximation that avoids explicit marginalization:
+The intractability arises from two sources: (1) the marginalization over the high-dimensional space of clean samples $\mathbf{x}$, and (2) the dependence of $p(\mathbf{y} \mid \mathbf{z}_t)$ on the reverse diffusion process, which requires integrating over all trajectories from time $t$ to $0$. DPS<d-cite key="chung2022diffusion"></d-cite> addresses this through an approximation that avoids explicit marginalization:
 
 $$
   \begin{equation}
-    p(\by \mid \bz_t) \approx p(\by \mid \hat{\bx}(\bz_t)),
+    p(\mathbf{y} \mid \mathbf{z}_t) \approx p(\mathbf{y} \mid \hat{\mathbf{x}}(\mathbf{z}_t)),
   \end{equation}
 $$
 
-where $$\hat{\bx}(\bz_t) = \E[\bx \mid \bz_t]$$.
+where $$\hat{\mathbf{x}}(\mathbf{z}_t) = \mathbb{E}[\mathbf{x} \mid \mathbf{z}_t]$$.
 By Tweedie's formula<d-cite key="efron2011tweedie,tweedie1957"></d-cite>, the posterior mean is given by
 
 $$
   \begin{equation}
-    \E[\bx \mid \bz_t] = \frac{1}{\alpha_t} (\bzt + \sigma_t^2 \nabla_{\bzt}  \log p(\bz_t)) .
+    \mathbb{E}[\mathbf{x} \mid \mathbf{z}_t] = \frac{1}{\alpha_t} (\mathbf{z}_t + \sigma_t^2 \nabla_{\mathbf{z}_t}  \log p(\mathbf{z}_t)) .
   \end{equation}
 $$
 
-Substituting $\nabla_{\bzt}  \log p(\bz_t)$ with the learned score function $s_\theta(\bzt;t)$ gives the estimator:
+Substituting $$\nabla_{\mathbf{z}_t}  \log p(\mathbf{z}_t)$$ with the learned score function $$s_\theta(\mathbf{z}_t;t)$$ gives the estimator:
 
 $$
   \begin{equation}
-    \bx_\theta(\bzt;t) = \frac{1}{\alpha_t} (\bzt + \sigma_t^2 s_\theta(\bzt;t)) .
+    \mathbf{x}_\theta(\mathbf{z}_t;t) = \frac{1}{\alpha_t} (\mathbf{z}_t + \sigma_t^2 s_\theta(\mathbf{z}_t;t)) .
   \end{equation}
 $$
 
@@ -442,11 +401,11 @@ Instead of learning the score function, we can train a network to predict the cl
 There are three main parameterizations: score prediction, data prediction, and noise prediction.
 These parameterizations are mathematically equivalent and allow seamless integration of all current diffusion model formulations into this framework. <d-cite key="kingma2023understanding"></d-cite> provides an extensive analysis.
 
-We can now combine the Gaussian likelihood from Eq. \eqref{eq:y-given-x-gaussian-noise} with the network’s data prediction, $$\bx_\theta(\bzt;t)$$, to analytically obtain the log-likelihood gradient:
+We can now combine the Gaussian likelihood from Eq. \eqref{eq:y-given-x-gaussian-noise} with the network's data prediction, $$\mathbf{x}_\theta(\mathbf{z}_t;t)$$, to analytically obtain the log-likelihood gradient:
 
 $$
   \begin{equation}
-    \nabla_{\bzt}  \log p(\by  \mid \bz_t) \approx -\frac{1}{\sigma^2} \nabla_{\bzt} ||\by - \mathcal{A}(\bx_\theta(\bzt;t))||^2_2 .
+    \nabla_{\mathbf{z}_t}  \log p(\mathbf{y}  \mid \mathbf{z}_t) \approx -\frac{1}{\sigma^2} \nabla_{\mathbf{z}_t} ||\mathbf{y} - \mathcal{A}(\mathbf{x}_\theta(\mathbf{z}_t;t))||^2_2 .
   \end{equation}
 $$
 
@@ -454,7 +413,7 @@ Again, we combine the prior and the likelihood term to obtain the score function
 
 $$
   \begin{equation}
-    \textcolor{#A125A1}{\nabla_{\bzt}  \log p(\bx  \mid \bz_t)} \approx \textcolor{#25a18e}{s_\theta(\bzt;t)} - \textcolor{#00a5cf}{\zeta \nabla_{\bzt} ||\by - \mathcal{A}(\bx_\theta(\bzt;t))||^2_2} .
+    \textcolor{#A125A1}{\nabla_{\mathbf{z}_t}  \log p(\mathbf{x}  \mid \mathbf{z}_t)} \approx \textcolor{#25a18e}{s_\theta(\mathbf{z}_t;t)} - \textcolor{#00a5cf}{\zeta \nabla_{\mathbf{z}_t} ||\mathbf{y} - \mathcal{A}(\mathbf{x}_\theta(\mathbf{z}_t;t))||^2_2} .
   \end{equation}
 $$
 
@@ -465,25 +424,25 @@ We define a linear forward operator $\mathcal{A}$ that performs a projection of 
 
 $$
   \begin{equation}
-    \by = \mathcal{A}(\bx) = \mathbf{A}\bx = \begin{bmatrix} 1 & 0 \\ 0 & 0 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}
+    \mathbf{y} = \mathcal{A}(\mathbf{x}) = \mathbf{A}\mathbf{x} = \begin{bmatrix} 1 & 0 \\ 0 & 0 \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}
   \end{equation}
 $$
 
 We sample observations from the ground-truth manifold but restrict them to the left side of the Swiss Roll.
-Next, for each observation $$\by$$, we sample from the posterior distribution $$p(\bx \mid \by)$$, which places the samples back on the spiral manifold.
+Next, for each observation $$\mathbf{y}$$, we sample from the posterior distribution $$p(\mathbf{x} \mid \mathbf{y})$$, which places the samples back on the spiral manifold.
 The results are displayed in the figure below, where we have:
 
-1. **Observations (Left)**: This plot shows the observations $p(\by \mid \bx)$. Since the operator projects everything onto the x-axis, the unique spiral structure of the Swiss Roll is entirely gone. This creates an ill-posed inverse problem: for any observed point on this line, there are multiple possible "correct" locations on the original spiral that could have produced the outcome.
+1. **Observations (Left)**: This plot shows the observations $p(\mathbf{y} \mid \mathbf{x})$. Since the operator projects everything onto the x-axis, the unique spiral structure of the Swiss Roll is entirely gone. This creates an ill-posed inverse problem: for any observed point on this line, there are multiple possible "correct" locations on the original spiral that could have produced the outcome.
 
-2. **Standard Sampling (Right)**: This represents the unconditional generation from our trained diffusion model. While these points perfectly inhabit the Swiss Roll manifold, they are random samples from the prior $p(\bx)$. They show us what the model "knows" about the data distribution, but they have no connection to the specific measurements we observed.
+2. **Standard Sampling (Right)**: This represents the unconditional generation from our trained diffusion model. While these points perfectly inhabit the Swiss Roll manifold, they are random samples from the prior $p(\mathbf{x})$. They show us what the model "knows" about the data distribution, but they have no connection to the specific measurements we observed.
 
-3. **DPS Sampling (Center)**: Here we show the reconstruction using Diffusion Posterior Sampling with $\zeta=0.25$. By using the measurement gradient to guide the generation process, DPS pushes $$\bx$$ to match the observation $$\by$$. It solves the ambiguity by finding points that are both consistent with the measurement $\by$ and highly probable under the learned prior $p(\bx)$, recovering the spiral shape despite information loss through the operator.
+3. **DPS Sampling (Center)**: Here we show the reconstruction using Diffusion Posterior Sampling with $\zeta=0.25$. By using the measurement gradient to guide the generation process, DPS pushes $$\mathbf{x}$$ to match the observation $$\mathbf{y}$$. It solves the ambiguity by finding points that are both consistent with the measurement $\mathbf{y}$ and highly probable under the learned prior $p(\mathbf{x})$, recovering the spiral shape despite information loss through the operator.
 
 <iframe src="{{ 'assets/html/2026-04-27-diffusion-guidance/measurements_dps_standard.html' | relative_url }}" frameborder='0' scrolling='no' height="400px" width="100%"></iframe>
 
 <br>
 
-We note that DPS is only one possible way to estimate the likelihood term $$\textcolor{#00a5cf}{\nabla_{\bz_t} \log p(\mathbf{y} \mid \bz_t)}$$. For interested readers, we recommend the excellent survey by Daras et al. <d-cite key="daras2024survey"></d-cite>, which compares a range of different approaches.
+We note that DPS is only one possible way to estimate the likelihood term $$\textcolor{#00a5cf}{\nabla_{\mathbf{z}_t} \log p(\mathbf{y} \mid \mathbf{z}_t)}$$. For interested readers, we recommend the excellent survey by Daras et al. <d-cite key="daras2024survey"></d-cite>, which compares a range of different approaches.
 
 ## Applications for Physical Sciences
 
@@ -497,8 +456,8 @@ We take the **Darcy flow** PDE equation as an example:
 
 $$
 \begin{aligned}
--\nabla \cdot \big(a(\bc)\nabla u(\bc)\big) &= q(\bc), \quad \bc \in \Omega, \\
-u(\bc) &= 0, \quad \bc \in \partial\Omega.
+-\nabla \cdot \big(a(\mathbf{c})\nabla u(\mathbf{c})\big) &= q(\mathbf{c}), \quad \mathbf{c} \in \Omega, \\
+u(\mathbf{c}) &= 0, \quad \mathbf{c} \in \partial\Omega.
 \end{aligned}
 $$
 
@@ -506,17 +465,17 @@ Defining the residual as an operator
 
 $$
 \begin{aligned}
-f(\bc) = \nabla \cdot \big(a(\bc)\nabla u(\bc)\big) + q(\bc),
+f(\mathbf{c}) = \nabla \cdot \big(a(\mathbf{c})\nabla u(\mathbf{c})\big) + q(\mathbf{c}),
 \end{aligned}
 $$
 
-so that valid solutions satisfy $f(\bc) = 0 $.
+so that valid solutions satisfy $f(\mathbf{c}) = 0 $.
 This residual is used to construct an additional physics-based guidance loss:
 
 $$
 \begin{aligned}
 \mathcal{L}_{\textrm{pde}}
-= ||\mathbf{0} - f(\hat{\bx}(\bz_t)) ||^2_2 .
+= ||\mathbf{0} - f(\hat{\mathbf{x}}(\mathbf{z}_t)) ||^2_2 .
 \end{aligned}
 $$
 
@@ -524,11 +483,11 @@ DiffusionPDE then augments the conditional score function as
 
 $$
   \begin{equation}
-    \textcolor{#A125A1}{\nabla_{\bz_t} \log p(\bz_t \mid \by, f)}
+    \textcolor{#A125A1}{\nabla_{\mathbf{z}_t} \log p(\mathbf{z}_t \mid \mathbf{y}, f)}
     \approx
-    \textcolor{#25a18e}{s_\theta(\bzt;t)}
-    \textcolor{#00a5cf}{+  \zeta \nabla_{\bz_t} \log p(\mathbf{y} \mid \bz_t)
-    - \zeta_{\text{pde}} \nabla_{\bz_t} \mathcal{L}_{\text{pde}}}.
+    \textcolor{#25a18e}{s_\theta(\mathbf{z}_t;t)}
+    \textcolor{#00a5cf}{+  \zeta \nabla_{\mathbf{z}_t} \log p(\mathbf{y} \mid \mathbf{z}_t)
+    - \zeta_{\text{pde}} \nabla_{\mathbf{z}_t} \mathcal{L}_{\text{pde}}}.
   \end{equation}
 $$
 
@@ -539,35 +498,35 @@ The sampling process is very similar to the one we saw before, combining the par
 Rare events play a central role in many scientific settings, yet they are often difficult to sample. This is evident in weather prediction, where extreme events such as floods are of particular concern.
 
 The work by Finzi et al. <d-cite key="finzi2023user"></d-cite> showed that operators can also be defined via inequality constraints.
-For a one-dimensional inequality constraint $$\mathcal{A}(\bx) > y$$, we want to sample from $$p(\mathcal{A}(\bx) > y \mid \bz_t)$$.
+For a one-dimensional inequality constraint $$\mathcal{A}(\mathbf{x}) > y$$, we want to sample from $$p(\mathcal{A}(\mathbf{x}) > y \mid \mathbf{z}_t)$$.
 
 This inequality constraint is defined by a Gaussian CDF function $$\Phi$$:
 
 $$
   \begin{equation}
-    p(\mathcal{A}(\bx) > y \mid \bz_t) \approx \Phi \left( \frac{\mathcal{A}(\bx_\theta(\bzt;t)) > y}{\sqrt{\nabla \mathcal{A}(\bx_\theta(\bzt;t))^T \hat{\Sigma}(\bz_t) \nabla \mathcal{A}(\bx_\theta(\bzt;t)) }} \right) ,
+    p(\mathcal{A}(\mathbf{x}) > y \mid \mathbf{z}_t) \approx \Phi \left( \frac{\mathcal{A}(\mathbf{x}_\theta(\mathbf{z}_t;t)) > y}{\sqrt{\nabla \mathcal{A}(\mathbf{x}_\theta(\mathbf{z}_t;t))^T \hat{\Sigma}(\mathbf{z}_t) \nabla \mathcal{A}(\mathbf{x}_\theta(\mathbf{z}_t;t)) }} \right) ,
   \end{equation}
 $$
 
-with the covariance of $$\bx$$ given $$\bz_t$$
+with the covariance of $$\mathbf{x}$$ given $$\mathbf{z}_t$$
 
 $$
-  \hat{\Sigma}(\bz_t)=\frac{\sigma_t^2}{\alpha_t^2} (\bI + \sigma_t^2 \nabla_{\bzt}^2 \log p(\bzt) )
+  \hat{\Sigma}(\mathbf{z}_t)=\frac{\sigma_t^2}{\alpha_t^2} (\mathbf{I} + \sigma_t^2 \nabla_{\mathbf{z}_t}^2 \log p(\mathbf{z}_t) )
 $$
 
 and
 
 $$
-  \nabla \mathcal{A}(\bx_\theta(\bzt;t))= \left. \nabla \mathcal{A}(\bx) \right|_{\bx = \bx_\theta(\bzt;t)} .
+  \nabla \mathcal{A}(\mathbf{x}_\theta(\mathbf{z}_t;t))= \left. \nabla \mathcal{A}(\mathbf{x}) \right|_{\mathbf{x} = \mathbf{x}_\theta(\mathbf{z}_t;t)} .
 $$
 
-Using the Gaussian CDF function assigns high probability to events with $$\mathcal{A}(\bx) > y$$.
+Using the Gaussian CDF function assigns high probability to events with $$\mathcal{A}(\mathbf{x}) > y$$.
 
 We can then sample from these event by using
 
 $$
   \begin{equation}
-    \textcolor{#A125A1}{\nabla_{\bz_t} \log \, p(\bz_t \mid \mathcal{A}(\bx) > y)} = \textcolor{#25a18e}{\nabla_{\bz_t} \log p(\bz_t)} + \textcolor{#00a5cf}{\zeta \nabla_{\bz_t} \log p(\mathcal{A}(\bx) > y \mid \bz_t)} .
+    \textcolor{#A125A1}{\nabla_{\mathbf{z}_t} \log \, p(\mathbf{z}_t \mid \mathcal{A}(\mathbf{x}) > y)} = \textcolor{#25a18e}{\nabla_{\mathbf{z}_t} \log p(\mathbf{z}_t)} + \textcolor{#00a5cf}{\zeta \nabla_{\mathbf{z}_t} \log p(\mathcal{A}(\mathbf{x}) > y \mid \mathbf{z}_t)} .
   \end{equation}
 $$
 
