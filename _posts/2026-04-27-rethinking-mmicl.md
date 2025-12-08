@@ -141,9 +141,9 @@ While the results presented in the previous section are surprising, these experi
 
 To address these issues, we propose to benchmark the MM-ICL ability of **modern VLMs** in a new setting, where we provide the model with information-enriched demonstrations to maximize the utility of each example. We achieve such information augmentation by introducing **reasoning process** into the demo, and each presented example would contain a detailed step-by-step thinking process instead of a single answer. By doing so, we lower the bar for models to learn from demonstrations by adding more explicit information to each support data. We also consider a variety of datasets related to both general perception and specialized reasoning to make the study more comprehensive and trustworthy. 
 
-<div id="tab-reasoning-models" style="display:flex; justify-content:center; width:100%;">
-  <table style="border-collapse:collapse; text-align:center; width:70%;">
-    <caption style="caption-side:top;">
+<div id="tab-reasoning-models" style="display:flex; justify-content:center;">
+  <table>
+    <caption style="caption-side: top; text-align: center;">
       Table 1: VLMs and their associated reasoner version used in the evaluation.
     </caption>
 
@@ -249,7 +249,7 @@ To ensure a fair comparison, we use **Pseudo Reasoning**, where the rationale co
 
 <div style="overflow-x:auto; max-width:100%; justify-content:center;" id="tab-compare-format">
   <table>
-    <caption style="caption-side:top;">Table 2: Comparison of inconsistent and consistent support-query format with VLM reasoners.</caption>
+    <caption style="caption-side: top; text-align: center;">Table 2: Comparison of inconsistent and consistent support-query format with VLM reasoners.</caption>
     <thead>
       <tr>
         <th rowspan="2" style="text-align:left;">Ablation</th>
@@ -408,7 +408,7 @@ With the best practice for MM-ICL with VLM reasoners established, we now proceed
 
 <div style="display:flex; justify-content:center;" id="tab-per-dataset-bolded">
   <table>
-    <caption style="caption-side:top;">Table 3: Perception datasets accuracy across models and shots. Best values across shots in <strong>bold</strong>.</caption>
+    <caption style="caption-side: top; text-align: center;">Table 3: Perception datasets accuracy across models and shots. Best values across shots in <strong>bold</strong>.</caption>
     <thead>
       <tr>
         <th rowspan="2" style="text-align:left;">Models</th>
@@ -489,7 +489,7 @@ With the best practice for MM-ICL with VLM reasoners established, we now proceed
 
 <div style="display:flex; justify-content:center" id="tab-reason-per-dataset-bolded">
   <table>
-    <caption style="caption-side:top;">Table 4: Reasoning datasets accuracy across models and shots. Higher accuracy between 0-shot and best few-shot is <strong>bolded</strong>.</caption>
+    <caption style="caption-side: top; text-align: center;">Table 4: Reasoning datasets accuracy across models and shots. Higher accuracy between 0-shot and best few(1,2,4,8)-shot is <strong>bolded</strong>.</caption>
     <thead>
       <tr>
         <th rowspan="2" style="text-align:left;">Models</th>
@@ -623,11 +623,11 @@ With the best practice for MM-ICL with VLM reasoners established, we now proceed
   </table>
 </div>
 
-The failure of VLMs in MM-ICL could stem from two factors: 1) the models lack the ability to learn from demonstrations, 2) the support rationales themselves are of low quality and therefore uninformative. To reduce the possibility of 2), we enhance the rational capability by filtering incorrect samples and injecting ground-truth rationales, as shown in [Table 5](#tab-quality-r) (full tables in the Appendix).
+The failure of VLMs in MM-ICL could stem from two factors: 1) the models lack the ability to learn from demonstrations, 2) the support rationales themselves are of low quality and therefore uninformative. To reduce the possibility of 2), we enhance the rational capability by filtering incorrect samples and injecting ground-truth rationales, as shown in [Table 5](#tab-quality-r).
 
 <div style="overflow-x:auto; max-width:100%; display:flex; justify-content:center;" id="tab-quality-r">
   <table>
-    <caption style="caption-side:top;">
+    <caption style="caption-side: top; text-align: center;">
       Table 5: Comparison of the quality of the rationales. Filter: filter out the incorrect support samples. gt R: add ground truth rationale as the input for support set reasoning generation.
     </caption>
     <thead>
