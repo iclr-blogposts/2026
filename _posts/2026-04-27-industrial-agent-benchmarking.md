@@ -1,6 +1,6 @@
 ---
 layout: distill
-title: "Industrial Agent Benchmarking  What 300+ Real Evaluations Reveal About the Limits of Agentic AI"
+title: "Industrial Agent Benchmarking - What 300+ Real Evaluations Reveal About the Limits of Agentic AI"
 description: A community-scale evaluation of multi-agent systems using AssetOpsBench and a privacy-preserving Codabench pipeline, exposing real-world failure modes and methodological gaps in industrial AI agent evaluation.
 date: 2026-04-27
 future: true
@@ -40,11 +40,10 @@ toc:
 ---
 
 # Introduction
-
 Large Language Model (LLM) agents have quickly become the default way researchers test “autonomous” reasoning, planning, and multi-step tool use. Yet almost all widely used benchmarks evaluate tasks that are far removed from real industrial systems such as web navigation, coding tasks, synthetic puzzles, or curated IT workflows. In practice, industrial operations demand something more difficult: **multi-agent coordination over heterogeneous telemetry, failure modes, work orders, and safety-critical tasks, all under privacy constraints.**
 To understand whether current agents can survive this environment, we built a two-part evaluation ecosystem:
 
-1. **AssetOpsBench** — a multi-modal industrial agent benchmark grounded in real sensor telemetry, failure models, and maintenance workflows [@assetopsbench2025].  
+1. **AssetOpsBench** — a multi-modal industrial agent benchmark grounded in real sensor telemetry, failure models, and maintenance workflows <d-cite key="assetopsbench2025"></d-cite>.  
 2. **AssetOpsBench-Live** — a real-time, privacy-preserving, Codabench-powered competition platform we deployed to 225+ users, yielding over 300 code-submitted agent evaluations [@assetopsbenchlive2026]. 
 
 This blog post presents what we learned after systematically evaluating LLM agents, not via prompt logs, but through **real code, real trajectories, and real industrial tasks**.
@@ -149,7 +148,7 @@ This transforms the benchmark into a **community-scale evaluation ecosystem**.
 AssetOpsBench-Live extends AssetOpsBench into an online, reproducible competition environment.
 
 ## Pipeline Architecture
-{% include figure.liquid path="assets/img/2026-04-27-industrial-agent-benchmarking/combined_architecture.png" class="img-fluid" %}
+{% include figure.liquid path="../assets/img/2026-04-27-industrial-agent-benchmarking/combined_architecture.png" class="img-fluid" %}
 Figure 2. AssetOpsBench-Live: (left) System architecture integrating AssetOpsBench with Codabench, showing local development, global evaluation, and feedback; (right) visualization of clustered failure modes.
 
 The full pipeline (see system diagram) includes a high-level description of the workflow, which consists of three key steps:
