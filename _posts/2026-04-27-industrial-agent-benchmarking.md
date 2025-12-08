@@ -1,10 +1,11 @@
 ---
 layout: distill
-title: Industrial Agent Benchmarking: What 300+ Real Evaluations Reveal About the Limits of Agentic AI
+title: "Industrial Agent Benchmarking  What 300+ Real Evaluations Reveal About the Limits of Agentic AI"
 description: A community-scale evaluation of multi-agent systems using AssetOpsBench and a privacy-preserving Codabench pipeline, exposing real-world failure modes and methodological gaps in industrial AI agent evaluation.
 date: 2026-04-27
 future: true
 htmlwidgets: true
+hidden: true
 
 authors:
   - name: Anonymous
