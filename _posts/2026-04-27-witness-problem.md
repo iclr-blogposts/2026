@@ -10,6 +10,7 @@ authors:
   - name: Anonymous
 
 bibliography: 2026-04-27-witness-problem.bib
+keywords: multi-agent cooperation, large language models, generative agents, Concordia, game master, mixed-motive games, cooperative AI, LLM agents, evaluation, social simulation
 
 toc:
   - name: What is Concordia?
