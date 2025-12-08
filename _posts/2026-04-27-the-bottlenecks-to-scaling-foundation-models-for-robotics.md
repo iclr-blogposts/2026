@@ -19,12 +19,6 @@ authors:
     affiliations:
       name: Anonymous
 
-# authors:
-  # - name: Gautham Vasan
-  #   url: "https://gauthamvasan.github.io/"
-  #   affiliations:
-  #     name: University of Alberta, Amii
-
 # must be the exact same name as your blogpost
 bibliography: 2026-04-27-the-bottlenecks-to-scaling-foundation-models-for-robotics.bib
 
@@ -102,9 +96,11 @@ A major challenge in current robot foundation models is computational efficiency
 
 
 **2. Passive Data Collection**
+
 Data collection presents an equally significant bottleneck. Robot data does not scale in the same way as internet-scale corpora; it is slow, costly, and often tied to specific environments. At present, most approaches rely on passive data collection, which depends heavily on humans in the loop—whether through scraping online resources, generating synthetic data, or providing expert demonstrations. This raises the question of whether data collection can be automated through active exploration.
 
 **3. Loss of Plasticity and Adaptation**
+
 Offline training seeks to achieve zero-shot generalization across tasks and environments, but performance often degrades once models are deployed. When this happens, practitioners typically collect additional data, either through synthetic augmentation with domain randomization or through new rounds of expert demonstrations. One option is to retrain from scratch, which requires expensive retraining cycles and substantial human supervision. 
 
 Another option is to fine-tune a larger base model using methods such as Low-Rank Adaptation (LoRA) <d-cite key="hu2021lora"></d-cite>. However, this approach often forgets aspects of the pre-training distribution and tends to be less robust in continual learning settings compared to full fine-tuning, as shown in Shuttleworth et al. (2024). As a result, adaptation is generally treated as an afterthought rather than a core design choice.
@@ -112,33 +108,33 @@ Another option is to fine-tune a larger base model using methods such as Low-Ran
 The real challenges—handling uncertainty and adapting to novel situations—live outside the imitation paradigm.
 
 
-# Natural Intelligence
+# Learning Like a Squirrel: Online Adaptation in Action
 
 <center>
 <iframe width="560" height="315" src="https://www.youtube.com/embed/DkmeZwsi3HA?si=J29yCdy35SU-f4d5" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 </center>
 
-The above video shows a Squirrel navigating an obstacle course to get to its target - hazelnuts. 
-There are two kinds of platforms, blue ones are rigid and stable. Red ones are attached to a slinky and unstable.
-Initially, we see Trial and Error Interactions With the World.
-Then we see a beautiful, brilliant learned strategy "Learned Strategy: 1 Step on Red, 2 Steps on Blue to Stabilize.
-Finally, Fast, Reactive Movements to Reach the Goal
+The above video shows a squirrel navigating an obstacle course to reach its target: hazelnuts. There are two types of platforms: blue ones, which are rigid and stable, and red ones, which are attached to a slinky and thus unstable.
+
+Initially, the squirrel engages in trial-and-error interactions with the world, testing different sequences of steps. Over time, we observe a brilliant learned strategy: stepping once on the red platform and twice on the blue platforms to stabilize its trajectory. Finally, the squirrel exhibits fast, reactive movements, executing the sequence efficiently and reaching the goal with minimal hesitation.
+
+This example illustrates key hallmarks of natural intelligence: the ability to react in milliseconds, learn from ongoing experience, dynamically update an internal model of the world, and plan actions based on predicted consequences.
+
+An intelligent robot aiming to emulate this level of adaptability should similarly be able to:
+- React in real time to changes in the environment
+- Learn on the fly, continuously updating its policy from new experiences
+- Maintain and update an internal model of the world to guide decisions
+- Plan sequences of actions toward a goal, using its world model to anticipate outcomes
+
+Recasting these ideas in reinforcement learning (RL) terms:
+- **Online learning:** Acting and learning are intertwined—the agent continuously updates its policy as it interacts with the environment.
+- **Planning with learned world models:** The agent maintains an internal predictive model to reason about consequences, simulate potential action sequences, and select actions that maximize expected reward.
+
+The squirrel’s performance highlights the difference between reactive trial-and-error learning and slow, memorization-drive behavior in large VLAs. For robots, achieving this level of natural intelligence requires integrating fast perception, online learning, and model-based planning in a single, adaptive system.
 
 
-An intelligent robot, similat to this squirrel, should be able to
-- react in milliseconds to achieve its goal
-- learn on the fly, in real time, from experience
-- dynamically update its internal model of the World
-- plan with its internal world model in pursuit of a goal
 
-Recasting these ideas in RL terms:
-- Online learning: Acting and learning are intertwined — the policy updates continuously from ongoing experience
-- Planning with learned world models: The agent maintains an internal model to predict, reason, and plan toward goals
-
-# Future Directions
-
-## Online RL 
-
+# From Passive Observation to Active Experience: The Role of Online Learning in VLAs
 
 <div class="row mt-3">
     <div class="col-sm mt-3 mt-md-0 text-center">
@@ -148,6 +144,8 @@ Recasting these ideas in RL terms:
 <div class="caption">
     The Data We Can Use in Robot Learning.
 </div>
+
+When considering how to integrate online reinforcement learning with VLAs, it helps to compare different sources of training data. Internet-scale datasets, scraped from images, videos, and text, provide broad coverage for vision and language but are passively collected and exhibit low environment fidelity. Simulation allows researchers to choose sensors and modalities freely, also in a passive manner, though the usefulness of the resulting data depends heavily on the sim-to-real gap. Expert demonstrations, collected by human pilots, offer high-fidelity experiences with the chosen sensors, but are still passively gathered. Finally, real robot experience represents the highest-fidelity data, collected actively through reinforcement learning with human-in-the-loop safeguards, enabling the agent to learn from direct interaction with the environment. Each source represents a trade-off between data scale, fidelity, and the ability to adapt online.
 
 
 ### How Do We Leverage Expert Demonstrations in Online RL?
