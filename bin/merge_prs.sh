@@ -15,7 +15,7 @@ git branch -D _tmp_deploy 2>/dev/null || true
 git checkout -b _tmp_deploy
 
 # 3. Get successful PRs
-prs=$(gh pr list --repo "$OWNER/$REPO" --state open --json number \
+prs=$(gh pr list --repo "$OWNER/$REPO" --state open -L 1000000 --json number \
   | jq -r '.[].number')
 
 for pr in $prs; do
