@@ -51,7 +51,7 @@ This blog post presents what we learned after systematically evaluating LLM agen
 The outcome is blunt: **current agentic AI is far less reliable than leaderboard scores suggest.** The challenge surfaces failure modes that traditional agent benchmarks simply never expose.
 
 <figure>
-<img src="../assets/img/assetopsbench.png" alt="Failure mode distribution" width="80%">
+<img src="../assets/img/2026-04-27-industrial-agent-benchmarking/assetopsbench.png" alt="Failure mode distribution" width="80%">
   <figcaption><b>Figure 1.</b>Architecture of the Multi-Agent System: Time Series Foundation Model (TSFM) Agent,
 Failure Mode Sensor Relations (FMSR) Agent,Work Order (WO) Agent</figcaption>
 </figure>
@@ -152,7 +152,7 @@ AssetOpsBench-Live extends AssetOpsBench into an online, reproducible competitio
 
 ## Pipeline Architecture
 <figure>
-  <img src="../assets/img/combined_architecture.png"
+  <img src="../assets/img/2026-04-27-industrial-agent-benchmarking/combined_architecture.png"
        alt="AssetOpsBench-Live System Architecture and Failure Mode Visualization"
        style="width:100%; max-width:1100px;">
 
@@ -399,7 +399,7 @@ If teams tie on Final Score:
 ## Observations from the Final Results
 
 <figure>
-  <img src="../assets/img/R1.png"
+  <img src="../assets/img/2026-04-27-industrial-agent-benchmarking/R1.png"
        alt="Final results"
        style="width:100%; max-width:1100px;">
 
@@ -419,7 +419,7 @@ If teams tie on Final Score:
 We analyzed how team performance evolved across submissions using first-vs-best score curves, submission count correlations, and improvement distributions.
 
 <figure>
-  <img src="../assets/img/R2.png"
+  <img src="../assets/img/2026-04-27-industrial-agent-benchmarking/R2.png"
        alt="Final results"
        style="width:100%; max-width:1100px;">
 
