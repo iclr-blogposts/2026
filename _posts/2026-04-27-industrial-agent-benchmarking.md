@@ -31,7 +31,7 @@ toc:
       - name: Observed Failure Patterns
       - name: Emergent Failure Modes
       - name: Evaluation and Ranking Methodology
-  - name: Case Study: Missing Clarifying Questions and Its Impact
+  - name: "Case Study: Missing Clarifying Questions and Its Impact"
   - name: What We Learned About Industrial Agents
   - name: Implications for Agentic AI
   - name: Future Directions
