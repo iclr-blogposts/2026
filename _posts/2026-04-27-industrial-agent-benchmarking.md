@@ -49,6 +49,7 @@ To understand whether current agents can survive this environment, we built a tw
 This blog post presents what we learned after systematically evaluating LLM agents, not via prompt logs, but through **real code, real trajectories, and real industrial tasks**.
 
 The outcome is blunt: **current agentic AI is far less reliable than leaderboard scores suggest.** The challenge surfaces failure modes that traditional agent benchmarks simply never expose.
+
 {% include figure.liquid path="../assets/img/2026-04-27-industrial-agent-benchmarking/assetopsbench.png" class="img-fluid" %} Figure 1. Architecture of the Multi-Agent System: Time Series Foundation Model (TSFM) Agent, Failure Mode Sensor Relations (FMSR) Agent,Work Order (WO) Agent
 
 ---
@@ -146,8 +147,8 @@ This transforms the benchmark into a **community-scale evaluation ecosystem**.
 AssetOpsBench-Live extends AssetOpsBench into an online, reproducible competition environment.
 
 ## Pipeline Architecture
-{% include figure.liquid path="../assets/img/2026-04-27-industrial-agent-benchmarking/combined_architecture.png" class="img-fluid" %}
-Figure 2. AssetOpsBench-Live: (left) System architecture integrating AssetOpsBench with Codabench, showing local development, global evaluation, and feedback; (right) visualization of clustered failure modes.
+
+{% include figure.liquid path="../assets/img/2026-04-27-industrial-agent-benchmarking/combined_architecture.png" class="img-fluid" %} Figure 2. AssetOpsBench-Live: (left) System architecture integrating AssetOpsBench with Codabench, showing local development, global evaluation, and feedback; (right) visualization of clustered failure modes.
 
 The full pipeline (see system diagram) includes a high-level description of the workflow, which consists of three key steps:
 
