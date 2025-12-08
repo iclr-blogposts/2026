@@ -15,12 +15,12 @@ bibliography: 2026-04-27-industrial-agent-benchmarking.bib
 toc:
   - name: Introduction
   - name: Why Industrial Agent Evaluation Needs a Rethink
-  - name: AssetOpsBench: A Foundation for Real-World Agent Evaluation
+  - name: "AssetOpsBench: A Foundation for Real-World Agent Evaluation"
     subsections:
       - name: Data Modalities and Scenario Design
       - name: The Six-Dimensional Evaluation Framework
   - name: Why Codabench Was Necessary
-  - name: Building AssetOpsBench-Live: From Offline Benchmarks to Real-Time Evaluation
+  - name: "Building AssetOpsBench-Live: From Offline Benchmarks to Real-Time Evaluation"
     subsections:
       - name: Pipeline Architecture
       - name: Hidden Scenarios and Privacy Constraints
