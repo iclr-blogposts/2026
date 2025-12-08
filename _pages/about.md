@@ -26,11 +26,13 @@ social: false # includes social icons at the bottom of the page
 
 ## Contents
 
+- [Key Dates](#key-dates)
+  - [Contents](#contents)
 - [ICLR 2026 Blogposts Track](#iclr-2026-blogposts-track)
   - [A Call for Blog Posts](#a-call-for-blog-posts)
-    - [Conflict of interest](#conflict-of-interest)
+      - [Conflict of interest](#conflict-of-interest)
   - [Publication](#publication)
-    - [Poster](#poster)
+      - [Poster](#poster)
   - [Submissions](#submissions)
   - [Contact](#contact)
   - [Organizers](#organizers)
@@ -80,7 +82,7 @@ We will only ask the authors to report if they have a conflict of interest. If s
 
 ## Publication
 
-The posts will be created and published under a unified template; see [the submission instructions]({{ '/submitting' | relative_url }}) and the [sample post]({% post_url 2026-04-27-distill-example %}) hosted on the blog of this website.
+The posts will be created and published under a unified template; see [the submission instructions]({{ '/submitting' | relative_url }}) and the [sample post]({% post_url 2026-04-27-rethinking-mmicl %}) hosted on the blog of this website.
 
 #### Poster
 
