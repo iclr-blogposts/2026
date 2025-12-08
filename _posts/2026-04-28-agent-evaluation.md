@@ -223,7 +223,7 @@ In addition, **execution-based evaluation** runs the tool calls to verify they p
 
 ## What Are the Big Open Problems & Research Questions in Agent Evaluation?
 
-Despite rapid progress, several fundamental challenges remain in agent evaluation.
+Despite rapid progress, several fundamental challenges remain in agent evaluatio<d-cite key="yehudai2025survey"></d-cite>.
 
 ### Scalability
 
