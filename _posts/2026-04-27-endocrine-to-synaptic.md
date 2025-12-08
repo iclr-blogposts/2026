@@ -51,8 +51,6 @@ toc:
   - name: References
 ---
 
-> Note: This blogpost closely follows the structure and content of the corresponding extended abstract and technical write-up, but is formatted for the ICLR blogposts template.
-
 ## Abstract
 
 Multi-agent reinforcement learning systems face fundamental challenges in communication protocol design, particularly around **scalability**, **adaptability**, and **robustness to network failures**. Existing approaches often rely on static topologies and rigid message-passing schemes that do not adapt well to dynamic environments or recover efficiently from component failures.
