@@ -8,18 +8,10 @@ date: 2026-04-27
 featured: true
 
 authors:
-  - name: Isabel Michel
-    url: "mailto:imichel@stanford.edu"
+  - name: Anonymous
+    url: "#"
     affiliations:
-      name: Stanford University
-  - name: Akshata Kishore Moharir
-    url: "mailto:akshatakishore5@gmail.com"
-    affiliations:
-      name: Microsoft
-  - name: Ratna Kandala
-    url: "mailto:ratnanirupama@gmail.com"
-    affiliations:
-      name: University of Kansas
+      name: ""
 
 bibliography: 2026-04-27-why-did-the-model-say-that.bib
 
