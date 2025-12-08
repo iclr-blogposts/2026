@@ -55,9 +55,9 @@ figcaption {
 
 ## Introduction
 
-Chasing absolute performance has paved the way of very large language model sizes, but there is still strong interest in language models of smaller sizes <d-cite key="lbelcak2025small"></d-cite> that has been fueled by the need for efficiency and accessibility in training, and even as ways to aid inference of their larger counterparts <d-cite key="chen2023accelerating"></d-cite>.
+Chasing absolute performance has paved the way of very large language model sizes, but there is still strong interest in language models of smaller sizes <d-cite key="belcak2025small"></d-cite> that has been fueled by the need for efficiency and accessibility in training, and even as ways to aid inference of their larger counterparts <d-cite key="chen2023accelerating"></d-cite>.
 
-However (this is the **big** but), when measuring capabilities, these models are often subjected to the same task as their larger counterparts. We argue this may not inherently yield useful information as many contemporary tasks are made as difficult as possible to avoid being quickly saturated or highlight frontier capabilities that many large language models are tested for.
+However these models are often subjected to the same tasks as their larger counterparts in order to try to measure their performance. We argue this may not inherently yield useful information as many contemporary tasks are made as difficult as possible to avoid being quickly saturated or highlight frontier capabilities that many large language models are tested for.
 
 Smaller language models' performance will typically be low and noisy, meaning it will be hard to know for sure which among a group of small language models perform better than the other expressed in "shakeups" or arbitrary changes in the ranking by performance score. In this blogpost, we show that this noisy signal is observable in MATH 500. By revisiting the Hendrcyks' Math as the original source of this popular task, we show that simple changes to the resampling strategies can produce an alternative "MATH 100" that is more informative in observing model performance of smaller language models.
 
