@@ -28,6 +28,7 @@ bibliography: 2026-04-27-interp-safety.bib
 #   - please use this format rather than manually creating a markdown table of contents.
 toc:
   - name: Introduction
+  - name: The Challenge of Model Interpretability
   - name: 'Exploring the Surface: Model Behavior Analysis'
   - name: 'Diving Deeper: Model Introspection'
     subsections:
@@ -56,9 +57,9 @@ _styles: >
 
 ## Introduction
 
-Let’s say we have an AI model that’s making an important decision: given a student’s college recommendation letter, output a numerical score (1-9) representing the student’s admissibility. If AI, and in particular LLMs, are going to be part of admission processes, how can we be confident in their behavior? Since our backgrounds are in AI safety (rather than education or AI policy), we leave it to experts in those domains to define acceptable behavior for this use case. Instead, our goal is to help readers understand some of the methods available to them, given such a definition. More specifically, we’ll describe a range of methods from the burgeoning field of interpretability that can help model developers and deployers enhance safety within AI systems.
+Let’s say we have an AI model that’s making an important decision: given a student’s college recommendation letter, output a numerical score (1-9) representing the student’s admissibility. LLMs and other AI models are on track to become part of admission processes. But how can we be confident in their behavior? In this article, we take the perspective of AI safety (rather than AI policy). Thus, instead of defining safe or ideal behaviour for this use case, our goal is to help readers understand some of the methods available to them, given such a definition. More specifically, we’ll describe a range of methods from the rapidly developing field of **interpretability** that can help model developers and deployers enhance safety within AI systems.
 
-Let’s assume that we built some kind of recommendation letter scoring model consisting of a fine-tuned LLM that inputs a recommendation letter and outputs a score as the next token. How do we make sure that this model doesn’t do something that we don’t want it to do, like basing students’ scores on whether or not their letters mention their love of Taylor Swift? 
+Let’s assume that we built some kind of recommendation letter scoring model consisting of a fine-tuned LLM that inputs a recommendation letter and outputs a score as the next token. How do we make sure that this model does not do anything that we don’t want it to do, like basing students’ scores on whether or not their letters mention their love of Taylor Swift? 
 
 <div class="row justify-content-center mt-3">
   <div class="col-10 col-sm-8 col-md-6 col-lg-4 mt-3 mt-md-0">
@@ -66,23 +67,27 @@ Let’s assume that we built some kind of recommendation letter scoring model co
   </div>
 </div>
 
+At a high level, there are three steps where we could intervene.
+
 First, we could try to prevent the model from learning that information in the first place. For example, we could filter the training data to make sure that Taylor Swift appeared in both positive and negative contexts. 
 
-Second, we could evaluate our model to see how it was doing after being trained. Do we actually observe a difference in scoring for students who do or don’t mention Taylor Swift? Since we probably don’t want a student’s musical taste to have any impact on their recommendation letter score, we’d also need to look at its internals. Here, internals refer to the mechanisms by which the model goes from inputs to outputs. In particular, we’re interested in the particular features or pieces of information that affect the scores being generated. Ideally, we wouldn’t detect music fandoms having any influence on our model's predictions! 
+Second, we could evaluate our model to see how it was doing after being trained. Do we actually observe a difference in scoring for students who do or don’t mention Taylor Swift? Since we don’t want a student’s musical taste to have any impact on their recommendation letter score, we’d also need to look at its internals. Here, internals refer to the mechanisms by which the model goes from inputs to outputs. In particular, we’re interested in the particular features or pieces of information that affect the scores being generated. Ideally, we wouldn’t detect music fandoms having any influence on our model's predictions! 
 
 Third, if we did find a negative behavior (or a problematic internal association), we would need to either a) perform additional training to correct it, b) take additional steps at deployment time to override the model, or c) simply not deploy the model. 
 
 Dataset filtering, runtime monitors, and other techniques address the first and third; however, the second remains highly challenging. For this reason, our article focuses on the second step, exploring some ways we can begin to “crack” model internals.
 
-When it comes to assessing a model’s behavior, we want to know not only _what_ it will do (which requires mapping a vast space of inputs to a vast space of outputs) but also _why_ it will do this (which requires interpreting a highly complex system). It’s not enough to know that our model scores different music fandoms identically. If we treated all the Taylor Swift fans the same as fans of any artist, but instead determined their scores based on alphabetical order of their first names, that would be bad! 
+## The Challenge of Model Interpretability
+
+When it comes to assessing a model’s behavior, we want to know not only _what_ it will do, i.e., directly relating inputs to outputs, but also _why_ it will do this, i.e., understanding the mechanisms behind how this relation occurred. For example, we may find that the model scores fans of Taylor Swift differently from students with other favorite artists. Is this because the model uses being a fan of Taylor Swift as a relevant feature for its output score, or is this merely a statistical artifact?
 
 <div class="row justify-content-center mt-3">
-  <div class="col-10 col-sm-8 col-md-6 col-lg-4 mt-3 mt-md-0">
-{% include figure.liquid path="assets/img/2026-04-27-interp-safety/seth_not_good.gif" class="img-fluid" %}
+  <div class="col-12 col-sm-10 col-md-8 col-lg-6 mt-3 mt-md-0">
+{% include figure.liquid path="assets/img/2026-04-27-interp-safety/billie_why.gif" class="img-fluid" %}
   </div>
 </div>
 
-Generally speaking, methods at the surface (i.e., ones that focus on the input/output space while treating the model as a black box) give us our _what_ answers. Methods at this level are precise, but don’t let us go beyond specific data points. 
+The idea of separating _what_ and _why_ questions naturally allows us to categorize interpretability methods. Generally speaking, methods that work with model inputs and outputs give us our _what_ answers. Methods at this level are precise, but don’t let us go beyond specific data points. 
 
 We have to dive deeper to learn about why the model does what it does. In this post, we present examples of methods that give general insights about a model’s internal representations, at the expense of precision.
 
