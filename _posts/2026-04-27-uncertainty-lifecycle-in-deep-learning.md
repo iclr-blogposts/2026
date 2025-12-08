@@ -80,7 +80,7 @@ These uncertainties exist either in data or in model or both.The uncertainty in 
 
 The different concepts in uncertainty as shown in Figure 1, are discussed and studied in the literature extensively <d-cite key="gawlikowski2023survey, abdar2021review, loquercio2020general, wang2024uncertainty, mucsanyi2024benchmarking"></d-cite> either individually or as a combination of one or two component. But there is no such work that highlight and represent their connection and flow in a single framework. 
 
-{% include figure.liquid path="assets/img/2026-04-27-uncertainty-lifecycle-in-deep-learning/Uncertainty_Concepts_2.png" class="img-fluid" %}
+{% include figure.liquid path="assets/img/2026-04-27-uncertainty-lifecycle-in-deep-learning/Uncertainty_Concepts_1.png" class="img-fluid" %}
 <div class="caption">
   Figure 1: Different Uncertainty Concepts in Deep Learning
 </div>
@@ -103,7 +103,7 @@ In Figure 2, we see the complete lifecycle of uncertainty flow. The inherent unc
 
 Further, the obtained total uncertainty or the decomposed uncertainty can be attributed by the uncertainty attribution concept, to its actual root cause which could be any specific input feature or the specific model layer. The attributed/identified region causing this uncertainty is obtained in form of an explanation/attribution map or importance score. Also, the sensitivity of these estimated uncertainties to the input or the model is analyzed by the uncertainty Sensitivity analysis concept. The sensitivity analysis can be further performed only for specific region in the input/model causing the uncertainty, as identified by the uncertainty attribution.
 
-{% include figure.liquid path="assets/img/2026-04-27-uncertainty-lifecycle-in-deep-learning/Uncertainty_Lifecycle_5.png" class="img-fluid" %}
+{% include figure.liquid path="assets/img/2026-04-27-uncertainty-lifecycle-in-deep-learning/Uncertainty_Lifecycle_4.png" class="img-fluid" %}
 <div class="caption">
   Figure 2: Uncertainty Lifecycle; This figure shows applicability of different concepts of uncertainty at different stages: Uncertainty propagation, Uncertainty Estimation, Uncertainty attribution and uncertainty Sensitivity.  It explains how data and model uncertainty propagate through the model and captured at the output in the form of total uncertainty by estimating the predictive distribution over output (sometimes you may get decomposed uncertainty directly). The total uncertainty can be decomposed into epistemic and aleatoric uncertainty. Uncertainty Attribution and Uncertainty sensitivity method explains the predictive uncertainty or decomposed uncertainty. It also shows how uncertainty attribution and uncertainty sensitivity method interact with each other.
 </div>
@@ -211,7 +211,7 @@ In the literature, uncertainty sensitivity and uncertainty attribution are relat
 
 In summary, the uncertainties in data and model flows through the model to the output, where **Propagation** tracks them, **Estimation/Quantification** measures them, **Decomposition** splits them into components, **Attribution** explain and localize uncertainty’s root cause and **Sensitivity** test robustness with respect to the input. Table 1 summarizes the same along with an example
 
-{% include figure.liquid path="assets/img/2026-04-27-uncertainty-lifecycle-in-deep-learning/Uncertainty_Summary_Table_2.png" class="img-fluid" %}
+{% include figure.liquid path="assets/img/2026-04-27-uncertainty-lifecycle-in-deep-learning/Uncertainty_Summary_Table.png" class="img-fluid" %}
 <div class="caption">
   Table 1: Summary of Uncertainty Lifecycle along with usecase and example
 </div>
