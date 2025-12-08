@@ -91,8 +91,13 @@ Purpose: examine how changing the embedded key influences detection stability an
 
 These videos showed a higher peak in *baseline bit accuracy* (≈0.75–0.87)
 
-<div class="l-page">
-  <iframe src="{{ 'assets/html/2026-04-27-inv-watermark-analysis/metrics_bb.png' | relative_url }}" frameborder='0' scrolling='no' height="600px" width="100%"></iframe>
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        <img class="img-fluid rounded z-depth-1" src="{{ '2026/assets/img/2026-04-27-inv-watermark-analysis/metrics_bb.png' | relative_url }}" alt="baskeball metrics">
+    </div>
+</div>
+<div class="caption">
+    Figure: Metrics for dunking basketball class.
 </div>
 
 
@@ -103,8 +108,13 @@ These videos showed a higher peak in *baseline bit accuracy* (≈0.75–0.87)
 
 *Baseline bit accuracy* stabilized under 0.76
 
-<div class="l-page">
-  <iframe src="{{ 'assets/html/2026-04-27-inv-watermark-analysis/metrics_spa.png' | relative_url }}" frameborder='0' scrolling='no' height="600px" width="100%"></iframe>
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        <img class="img-fluid rounded z-depth-1" src="{{ '2026/assets/img/2026-04-27-inv-watermark-analysis/metrics_spa.png' | relative_url }}" alt="Two flips">
+    </div>
+</div>
+<div class="caption">
+    Figure: Metrics for spaghetti class.
 </div>
 
 
@@ -129,8 +139,13 @@ We focused on three internal metrics to validate semantic integrity:
 **Functional Stability:** Analyzing Logit Margins. Does the watermark reduce the gap between the correct class and incorrect classes?
 By applying this framework to a "Best Case vs. Worst Case" dataset (High Survival vs. Low Survival), we uncovered the divergent mechanisms shown in Figure 1.
 
-<div class="l-page">
-  <iframe src="{{ 'assets/html/2026-04-27-inv-watermark-analysis/two_flips.png' | relative_url }}" frameborder='0' scrolling='no' height="600px" width="100%"></iframe>
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        <img class="img-fluid rounded z-depth-1" src="{{ '2026/assets/img/2026-04-27-inv-watermark-analysis/two_flips.png' | relative_url }}" alt="Two flips">
+    </div>
+</div>
+<div class="caption">
+    Figure: The Tale of Two Flips. Top (Case A): The watermark survives the flip, creating a "Red Spot" in the attention map (distraction) and lowering confidence. Bottom (Case B): The watermark is destroyed by the flip, leaving the attention map clean and confidence perfect.
 </div>
 
 ---
@@ -141,14 +156,26 @@ Our first mechanistic stop is the Direct Logit Attribution (DLA). This technique
 The Observation:
 We compared the layer-by-layer contribution of the Original, Watermarked, and Attacked videos
 
-<div class="l-page">
-  <iframe src="{{ 'assets/html/2026-04-27-inv-watermark-analysis/dla_bb.png' | relative_url }}" frameborder='0' scrolling='no' height="600px" width="100%"></iframe>
+
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        <img class="img-fluid rounded z-depth-1" src="{{ '2026/assets/img/2026-04-27-inv-watermark-analysis/dla_bb.png' | relative_url }}" alt="Mechanistic Validation of Dunking basketball">
+    </div>
 </div>
-<div class="l-page">
-  <iframe src="{{ 'assets/html/2026-04-27-inv-watermark-analysis/dla_spa.png' | relative_url }}" frameborder='0' scrolling='no' height="600px" width="100%"></iframe>
+<div class="caption">
+    Figure: Direct Logit Attribution of dunking basketball video.
 </div>
-Figure 2 (Drift): In the Semantic Drift analysis, we observed a massive spike in internal divergence at Layer 10. The model's internal state for the Attacked video was visibly different from the Original.
-Figure 3 (DLA): However, when projecting these states to the final class logit, the trajectories were nearly identical.
+
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        <img class="img-fluid rounded z-depth-1" src="{{ '2026/assets/img/2026-04-27-inv-watermark-analysis/dla_spa.png' | relative_url }}" alt="Mechanistic Validation of Dunking basketball">
+    </div>
+</div>
+<div class="caption">
+    Figure: Direct Logit Attribution of dunking basketball video.
+</div>
+
+Figure 2 (DLA): However, when projecting these states to the final class logit, the trajectories were nearly identical for both videos.
 
 ---
 
@@ -158,8 +185,13 @@ We visualized the Spatial Attention of Layer 10 to resolve this question. This c
 
 Case A: The Survivor (Dunking)
 
-<div class="l-page">
-  <iframe src="{{ 'assets/html/2026-04-27-inv-watermark-analysis/mechanistic_validation_bb.png' | relative_url }}" frameborder='0' scrolling='no' height="600px" width="100%"></iframe>
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        <img class="img-fluid rounded z-depth-1" src="{{ '2026/assets/img/2026-04-27-inv-watermark-analysis/mechanistic_validation_spa.png' | relative_url }}" alt="Mechanistic Validation of Dunking basketball">
+    </div>
+</div>
+<div class="caption">
+    Figure 1: Attention map of dunking basketball video.
 </div>
 
 Visualization: The difference map (Attacked - Original) reveals a distinct "Red Hotspot."
@@ -167,8 +199,13 @@ Interpretation: This confirms that the Layer 10 drift was not random. The model'
 
 Case B: The Casualty (Spaghetti)
 
-<div class="l-page">
-  <iframe src="{{ 'assets/html/2026-04-27-inv-watermark-analysis/mechanistic_validation_spa.png' | relative_url }}" frameborder='0' scrolling='no' height="600px" width="100%"></iframe>
+<div class="row mt-3">
+    <div class="col-sm mt-3 mt-md-0">
+        <img class="img-fluid rounded z-depth-1" src="{{ '2026/assets/img/2026-04-27-inv-watermark-analysis/mechanistic_validation_spa.png' | relative_url }}" alt="Mechanistic Validation of Eating Spaghetti">
+    </div>
+</div>
+<div class="caption">
+    Figure 1: Attention map of eating spaghetti video.
 </div>
 
 Visualization: The difference map shows Diffuse Noise (Blue/Green).
@@ -255,23 +292,23 @@ Conclusion: In the case where the watermark failed (Bit Acc ~50%), the semantic 
 
 SUMMARY COMPARISON :
 
-| Video | Top1_Class  | Top1_Prob |  Margin (P1-P2) |
-| -------- | --------- | ---------- |
-| Dunking Original playing basketball| 0.612679 | 0.349501
-| Dunking Watermarked playing basketball  | 0.588731 | 0.324213
-| Dunking Attacked (WM Survived) playing basketball  | 0.563726 | 0.281071
-| Spaghetti Original eating spaghetti  | 0.997102 | 0.994312
-| Spaghetti Watermarked eating spaghetti  | 0.997592 | 0.995283
-| Spaghetti Attacked (WM Destroyed) eating spaghetti  | 0.998113 | 0.996299
+| Video | Top1 Class | Top1 Prob | Margin (P1-P2) |
+| -------- | --------- | ---------- | ---------- |
+| Dunking Original playing basketball | 0.612679 | 0.349501 |
+| Dunking Watermarked playing basketball  | 0.588731 | 0.324213 |
+| Dunking Attacked (WM Survived) playing basketball  | 0.563726 | 0.281071 |
+| Spaghetti Original eating spaghetti  | 0.997102 | 0.994312 |
+| Spaghetti Watermarked eating spaghetti  | 0.997592 | 0.995283 |
+| Spaghetti Attacked (WM Destroyed) eating spaghetti  | 0.998113 | 0.996299 |
 
 
-<div class="row">
+<div class="row mt-3">
     <div class="col-sm mt-3 mt-md-0">
-        {% include figure path="assets/img/2026-04-27-inv-watermark-analysis/mechanistic_divergence.png" title="Bit Accuracy Analysis" class="img-fluid rounded z-depth-1" %}
+        <img class="img-fluid rounded z-depth-1" src="{{ '2026/assets/img/2026-04-27-inv-watermark-analysis/mechanistic_divergence.png' | relative_url }}" alt="Bit Accuracy Analysis">
     </div>
 </div>
 <div class="caption">
-    Figure 1: Here is your caption text explaining the visual.
+    Figure 1: Visualizing the attention divergence between original and attacked models.
 </div>
 
 ---
