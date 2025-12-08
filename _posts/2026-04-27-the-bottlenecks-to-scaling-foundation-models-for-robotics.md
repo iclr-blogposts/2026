@@ -28,13 +28,21 @@ bibliography: 2026-04-27-the-bottlenecks-to-scaling-foundation-models-for-roboti
 toc:
   - name: Will Scaling Solve Robotics?
   - name: The Common Recipe Behind Robot Foundation Models
-  - name: Challenges
+  - name: Can We Just Scale Our Way to Embodied Intelligence?
+    subsections:
+      - name: Limitations of Current VLA Approaches
+  - name: "Learning Like a Squirrel: Online Adaptation in Action"
+  - name: "From Passive Observation to Active Experience: The Role of Online Learning in VLAs"
+    subsections:
+    - name: "How Do We Leverage Expert Demonstrations in Online RL?"
+    - name: "Re-defining What We Mean by a World Model"
+  - name: Concluding Thoughts
 ---
 
 
 
 
-**Will Scaling Solve Robotics?** This question has been circulating widely in the robotics community in the last couple of years <d-cite key="Kumar_2024,icra2025debate"></d-cite>. When I first encountered it, I found it oddly vague. Scaling what - data, compute, memory, neural network capacity? And for which algorithms and settings? As I probed deeper, the roots of the question became clearer: it is shaped by two ideas that loom large in modern AI discussions - (i) the empirical success of increasingly large transformer models <d-cite key="vaswani2017attention"></d-cite> trained on internet-scale data at solving language understanding and generation tasks (e.g., the so-called scaling laws in large language models) <d-cite key="kaplan2020scaling"></d-cite> and (ii) the philosophy espoused in Richard Sutton’s influential blog post, The Bitter Lesson <d-cite key="sutton2019bitter"></d-cite> <d-footnote>Rich is actually vociferouly against LLMs, stating that as powerful as they might turn out to be, they will not lead to AGI. </d-footnote>. Simply put, the oversimplified narrative is that large data solved language, large data solved vision, and therefore large data will also solve robotics.
+**Will Scaling Solve Robotics?** This question has been circulating widely in the robotics community in the last couple of years <d-cite key="Kumar_2024,icra2025debate"></d-cite>. When I first encountered it, I found it oddly vague. Scaling what - data, compute, memory, neural network capacity? And for which algorithms and settings? As I probed deeper, the roots of the question became clearer: it is shaped by two ideas that loom large in modern AI discussions - (i) the empirical success of increasingly large transformer models <d-cite key="vaswani2017attention"></d-cite> trained on internet-scale data at solving language understanding and generation tasks (e.g., the so-called scaling laws in large language models) <d-cite key="kaplan2020scaling"></d-cite> and (ii) the philosophy espoused in Richard Sutton’s influential blog post, The Bitter Lesson <d-cite key="sutton2019bitter"></d-cite> <d-footnote>Rich is actually vociferouly against LLMs, stating that as powerful as they might turn out to be, they will not lead to AGI. He does mention that mimicking what people say is not really to build a model of the world at all. Source: <a href="https://www.dwarkesh.com/p/richard-sutton">Richard Sutton – Father of RL thinks LLMs are a dead end</a> </d-footnote>. Simply put, the oversimplified narrative is that large data solved language, large data solved vision, and therefore large data will also solve robotics.
 
 There are genuine concerns about large language models: the illusion of “thinking” <d-cite key="shojaee2025illusion"></d-cite>, their substantial carbon footprint <d-cite key="faiz2023llmcarbon"></d-cite>, and the looming limitation that we are quickly exhausting the scrapeable text on the public internet <d-cite key="villalobos2022will"></d-cite>. At the same time, there is countervailing optimism. Many expect training and inference costs to fall through improved model distillation techniques, more efficient architectures, and advances in hardware. Others believe that access to higher-quality data, synthetic data generation, or improved scaling practices will mitigate many of the current shortcomings. More details around this can also be found in the excellent article by Nishanth. 
 
@@ -147,35 +155,21 @@ The squirrel’s performance highlights the difference between reactive trial-an
 
 When considering how to integrate online reinforcement learning with VLAs, it helps to compare different sources of training data. Internet-scale datasets, scraped from images, videos, and text, provide broad coverage for vision and language but are passively collected and exhibit low environment fidelity. Simulation allows researchers to choose sensors and modalities freely, also in a passive manner, though the usefulness of the resulting data depends heavily on the sim-to-real gap. Expert demonstrations, collected by human pilots, offer high-fidelity experiences with the chosen sensors, but are still passively gathered. Finally, real robot experience represents the highest-fidelity data, collected actively through reinforcement learning with human-in-the-loop safeguards, enabling the agent to learn from direct interaction with the environment. Each source represents a trade-off between data scale, fidelity, and the ability to adapt online.
 
+## How Do We Leverage Expert Demonstrations in Online RL?
+In VLAs, imitation typically involves directly predicting the next action or token in a sequence. By contrast, animals often imitate outcomes, inferring the underlying actions needed to achieve them. In online reinforcement learning, expert demonstrations (i.e., expert trajectories) can guide the agent toward desirable behavior using off-policy RL methods such as SAC <d-cite key="haarnoja2018soft"></d-cite> or TD3 <d-cite key="fujimoto2018addressing"></d-cite>. Specifically, demonstrations can be incorporated into the replay buffer alongside online experience, allowing learning updates to sample both demonstration data and newly collected experience. This approach enables the agent to adapt online while retaining knowledge from expert demonstrations. Existing batch methods already support this approach effectively (e.g., Ball et al., 2023 <d-cite key="ball2023efficient"></d-cite>).
 
-### How Do We Leverage Expert Demonstrations in Online RL?
+## Re-defining What We Mean by a World Model
 
-When VLAs imitate, they directly imitate actions — predicting the next token in a sequence
-When animals imitate, they imitate outcomes and must infer the underlying actions
-In online RL, demonstrations (expert trajectories) can be leveraged to infer desirable actions via off-policy RL methods such as SAC or TD3:
-Demonstrations can be added to replay alongside online experience
-Learning updates sample both demonstration data and newly collected data, enabling online adaptation without forgetting expert demonstrations
-**This is technically possible in the streaming setting as well, but would require the development novel, off-policy streaming algorithms with robust performance
-Existing batch methods are already capable (e.g., Ball et al. 2023)
+In control theory and reinforcement learning, a world model represents the system dynamics, capturing the probability of the next state given the current state and action: 
+$P(S_{t+1}∣S_t,A_t)$. Essentially, it predicts how the environment will change in response to actions. Examples include: (i) RL algorithms such as Dyna <d-cite key="sutton1991dyna"></d-cite>, Dreamer <d-cite key="hafner2025mastering"></d-cite>, and TD-MPC <d-cite key="hansen2023td"></d-cite>; and (ii) physics-based models used in model-predictive control (MPC) algorithms, such as MPPI <d-cite key="williams2016aggressive"></d-cite>.
 
-## Teacher Student Distillation, Multiple Expert Policies and Large Transformers
+World models support learning and planning “in imagination” by simulating potential outcomes internally. When these models are lightweight enough for real-time operation, they enable decision-time planning that allows:
+- Safer exploration in real-world environments
+- Robust performance under uncertainty
 
+In contrast, LLM- or VLM-style world models capture associations between vision and language via next-token prediction $P(S_{t+1}∣S_{\leq t})$. They model correlations rather than explicit system dynamics. Unlike RL world models, they are not explicitly conditioned on actions.
 
-## Re-defining what we mean by a World Model
+This raises an important question: would we benefit from action-conditioned world models for dexterous manipulation? Addressing this would require designing and training large-scale model-based RL methods—akin to Dyna—tailored for robotic control.
 
-In control theory and RL, a world model represents the system dynamics:  ￼
-predicts next state given current state and action
-Examples:  (i) Dyna, Dreamer and TD-MPC algorithms in RL; (ii) Physics-based models in model-predictive control (MPC) algorithms such as MPPI
-These models support learning and planning in imagination — by simulating outcomes within the model
-If the models are lightweight enough for real-time operation, they enable decision-time planning for:
-Safer exploration in real-world environments
-Robust performance under uncertainty
-
-### What “World Models” Mean in LLMs and VLMs Today
-LLM- or VLM-style world models capture associations between vision and language via next token prediction
-They model ￼ rather than ￼
-Unlike world models in RL, they are not explicitly conditioned on actions
-Would we benefit from action-conditioned world models in dexterous manipulation?
-This requires the design and large-scale training of model-based RL methods like Dyna for controlling robots
-
-
+# Concluding Thoughts
+In summary, while scaling Vision-Language-Action models using large pre-trained VLMs and imitation learning has driven impressive short-term results, fundamental bottlenecks remain. Passive data collection, limited online adaptation, and frozen perceptual representations constrain generalization and real-world robustness, highlighting that imitation alone cannot achieve true embodied intelligence. Drawing lessons from natural learners and reinforcement learning, the path forward lies in integrating online, interactive learning with action-conditioned world models. By combining high-fidelity expert demonstrations, real-world interaction, and lightweight predictive models capable of planning and adaptation, future VLAs can move beyond narrow task replication toward the flexible, goal-directed behavior needed for general-purpose robotics.
