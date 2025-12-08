@@ -1,7 +1,7 @@
 ---
 layout: distill
 title: Beyond Attention as a Graph
-description: We extend our graph-based perspective on attention to higher-order topological structures, exploring 2-simplicial attention and its implications for transformer depth and expressivity.
+description: We extend a graph-based perspective on attention to higher-order topological structures, exploring 2-simplicial attention and its implications for transformer depth and expressivity.
 date: 2026-04-29
 future: true
 htmlwidgets: true
