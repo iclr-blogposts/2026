@@ -540,7 +540,8 @@ Rare events play a central role in many scientific settings, yet they are often 
 
 The work by Finzi et al. <d-cite key="finzi2023user"></d-cite> showed that operators can also be defined via inequality constraints.
 For a one-dimensional inequality constraint $$\mathcal{A}(\bx) > y$$, we want to sample from $$p(\mathcal{A}(\bx) > y \mid \bz_t)$$.
-This inequality constraint be defined using a Gaussian CDF function $$\Phi$$,
+
+This inequality constraint is defined by a Gaussian CDF function $$\Phi$$:
 
 $$
   \begin{equation}
@@ -581,4 +582,4 @@ To sum it up, guidance enables us to adapt the sampling process of diffusion mod
 - **Applications in Physical Sciences:**
   By defining forward operators for PDE residuals, or inequality constraints, guidance can steer the sampler toward solutions that are not only data-consistent but also physically more plausible.
 
-The approaches we discussed are only a small subset of what’s possible and are meant to provide an intuition of the landscape. We see, that there is currently increasing interest in new guidance strategies. A particularly exciting avenue is the prospect of learning strong universal priors in the physics domain and leveraging them across a variety of downstream tasks.
+The approaches we discussed, represent just a small part of the full landscape and we see that there is currently growing interest in new guidance strategies. A particularly exciting path is the idea of learning strong universal priors in the physics domain and using them across various downstream tasks.
