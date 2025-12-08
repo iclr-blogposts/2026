@@ -1,11 +1,7 @@
 ---
 layout: distill
 title: "Learning Function Space Maps: A Red Herring?"
-description: Much interest has been generated in the space of learning
-  function space maps, such as in deep operator networks and neural
-  operators. In this post, we explore whether viewing data in their
-  underlying, infinite-dimensional form offers benefits in the manner
-  professed or whether this is a fad.
+description: Much interest has been generated in the space of learning function space maps, such as in deep operator networks and neural operators. In this post, we explore whether viewing data in their underlying, infinite-dimensional form offers benefits in the manner professed or whether this is a fad.
 date: 2026-04-27
 future: true
 htmlwidgets: true
@@ -120,7 +116,15 @@ To answer this question, it is worthwhile investigating the use of neural operat
 
 This makes the value proposition of neural operators fundamentally different from AlphaFold: the question is, are there settings where the rapid solution of PDEs justifies a potential loss in accuracy in using this learned surrogate in place of the numerical solver? A common application is in the rapid evalution of engineering designs. For instance, in the design of aircraft or vehicles, an engineer will propose a potential shape of the aircraft wing or car chassis, for instance, which then gets evaluated by running a computational fluid dynamics (CFD) solver to estimate the drag expected of the proposed design.
 
-{% include figure.liquid path="assets/img/2026-04-27-function-space-maps/cfd.png" class="img-cfd" %}
+{% include figure.liquid
+     path="assets/img/2026-04-27-function-space-maps/cfd.png"
+     class="img-cfd"
+%}
+
+<p class="figcaption">
+  CFD simulation of flow around an airfoil.
+  <d-cite key="krishnamurthy2018meshCFD"></d-cite>
+</p>
 
 Naturally, such simulations will often reveal deficiencies in the proposed design, revealing regions of the original design producing especially high drag. With such insights, engineers can then improve the design, iteratively producing more and more efficient or cost-effective designs. This, however, brings us back to the major deficiency of numerical methods: since the cost of running a solver both high and is not amortized across runs, iterating over designs becomes slow. In contrast, neural operators allow for rapid estimation of the quality of a design, in turn allowing engineers to far more rapidly iterate on designs or even do so in an automated fashion.
 
@@ -144,6 +148,11 @@ In this case, there is no temporal dependency and one may wish instead to learn 
 Suppose one has a spatial domain where a field is rapidly varying: using a fixed discretization $\Delta x$ for such regions as well as those that vary more gradually would result in poor approximations of the spatial gradient. For this reason, the spatial discretization is oftentimes non-uniform and adjusted to closely follow where it is expected more rapidly fluctuations of the solution field will exist, such as around sharp curves of a car or wing design in a fluids simulation.
 
 {% include figure.liquid path="assets/img/2026-04-27-function-space-maps/mesh.jpg" class="img-mesh" %}
+
+<p class="figcaption">
+  Non-uniform discretization is often necessary to capture high frequency variation in the fields over the spatial domain.
+  <d-cite key="centaur2025MeshRefinement"></d-cite>
+</p>
 
 The discretization invariance of the surrogate, therefore, is useful in settings where the meshing will need to adapt as a result of the design iteration. This is necessarily true in settings of shape optimization, where the domain shape is precisely the variable of optimiation, and even in many other cases of source property optimization, as such cases often require variable meshes to align well with each design iterate.
 
