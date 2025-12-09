@@ -88,7 +88,7 @@ The contrast between the reverse KL and forward KL introduces the tension betwee
 
 In this section, we provide a more precise characterization of the trilemma. First, we set up a definition of a "mode-covering" metric via sensitivity analysis. We then offer a short proof of the aforementioned dilemma between mode-covering and importance weights for single-model evaluation metrics. We then consider pairwise model comparison evaluation metrics, which can achieve both mode-covering and stability, but at the cost of the third item of the trilemma.
 
-Technical note: While our setting is access only to the unnormalized density of $p$, in the remainder of this note, we focus on comparing samplers for a fixed target distribution, where we can safely ignore the unknown normalizing constant $Z$.
+Technical note: Our introduced setting assumes access only to the unnormalized density of $p$. However, in the remainder of this note, we focus on comparing samplers for a fixed target distribution, where we can safely ignore the unknown normalizing constant $Z$. Thus, for notation simplicity, we work directly with $p$ instead of introducing a different symbol for its unnormalized density.
 
 ### Characterizing mode-covering with sensitivity analysis
 
@@ -129,7 +129,7 @@ As an aside, we can apply the same analysis to Stein discrepancy, and find that 
 
 First, let's focus on evaluation metrics that consider one model at a time. These can be written $\mathcal{D}(p, q)$, in contrast to pairwise comparators $\mathcal{D}(p, q_1, q_2)$ which we will consider later.
 
-**Lemma**: Let the evaluation metric be a function $\mathcal{D}(p, q)$ defined as an integral over the domain, for any inte:
+**Lemma**: Let the evaluation metric be a function $\mathcal{D}(p, q)$ defined as an integral over the domain, for any integrand:
 
 $$
 \mathcal{D}(p, q) = \int \phi(x, p(x), q(x)) ~dx
@@ -177,7 +177,7 @@ $$
 For stability, let's focus on the set of points with non-vanishing probability under the mixture:
 
 $$
-\Omega_\epsilon = \{ x : q_1(x) > \epsilon \text{~~or~~} q_2(x) > \epsilon \}
+\Omega_\epsilon = \{ x : q_1(x) > \epsilon ~~ \text{or} ~~ q_2(x) > \epsilon \}
 $$
 
 Consider this pairwise comparator $\mathcal{D}(p, q_1, q_2)$ that compares two models $q_1$ and $q_2$. 
@@ -229,7 +229,13 @@ are all jointly satisfied if and only if the pairwise comparator can be decompos
 
 In our example above, we studied a particular pairwise comparator where the evaluation set depended on the support of the mixture distribution, which violates the single-model decomposition, and thereby breaks the guarantee of transitivity, as well as pool independence (as the exact score depends on the opponent).
 
-For a leaderboard ranking of a set of models, we can improve transitivity among the model set by evaluating using the joint support of all models. Then, among models on the leaderboard, transitivity is retained. However, we still lack pool independence, as leaderboard rankings can flip if new models are added to the leaderboard.
+For a leaderboard ranking of a set of models, we can improve transitivity among the model set by evaluating using the joint support of all models. Then, among models on the leaderboard, transitivity is retained. However, we still lack pool independence, so whether A>B can flip when a new model C is added to the leaderboard.
+
+## Limitations
+
+Our analysis has only considered single-model eval metrics expressible as integrals over the domain. While this family is fairly broad and such metrics are directly compatible with evaluation with iid model samples, it is possible that other families of single-model eval metrics can exist with improved properties.
+
+Our working definition of "mode-covering" considers point-wise partial derivatives $O(p/q)$, which matches that of the forward KL. It could be possible that more mathematically relaxed definitions of mode-covering could still be useful for scoring mode discovery, and could lead to sampler eval metrics with improved properties that may "bypass" the trilemma as proved here.
 
 ## Discussion
 
