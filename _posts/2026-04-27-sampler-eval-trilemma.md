@@ -47,6 +47,7 @@ toc:
     - name: Pairwise comparators
     - name: Loss of transitivity
     - name: General properties of pairwise comparators
+  - name: Limitations
   - name: Discussion
   - name: Code
 ---
