@@ -1,7 +1,7 @@
 ---
 layout: distill
-title: Trilemma for data-free sampler evaluation
-description: Neural samplers like diffusion samplers aim to learn to sample a target unnormalized energy potential, which is known but considered challenging to sample from. Evaluation of learned sampler quality is a critical aspect for research progress, with mode-covering metrics of particular importance. Two general approaches are common: i) data-free, using only model samples and the target potential, and ii) data-driven, which use additional data about the target distribution such as known modes, experimental observables, summary statistics, and/or reference MCMC samples as a gold standard. While data-driven eval is valuable, data-free eval has compelling conceptual advantages, raising the question of how well data-free eval could work. Here, we prove an impossibility trilemma for data-free sampler evaluation; we can only have two among i) mode-covering metric, ii) stable with finite variance, iii) no dominance cycles. We situate the implications of this trilemma in the broader conceptual landscape of data-driven and data-free sampler evaluation.
+title: An Impossibility Trilemma for Data-Free Sampler Evaluation
+description: Neural samplers aim to learn to sample a target unnormalized energy potential. Sampler quality can be evaluated in a data-free manner, using only the model and the target potential, or in a data-driven manner, with additional data about the target distribution such as known modes, summary statistics, and reference MCMC samples. While data-driven eval is valuable, data-free eval has compelling conceptual advantages, raising the question of how well data-free eval could work. Here, we prove an impossibility trilemma for data-free sampler evaluation; we can only have two among i) mode-covering metric, ii) stable with finite variance, iii) transitivity guarantee (if A>B and B>C, then A>C). We situate the implications of this trilemma in the broader conceptual landscape of data-driven and data-free sampler evaluation.
 date: 2026-04-27
 future: true
 htmlwidgets: true
@@ -40,35 +40,14 @@ bibliography: 2026-04-27-sampler-eval-trilemma.bib
 toc:
   - name: Introduction
   - name: Informal overview of trilemma
-  - name: Stein discrepancy
+  - name: Trilemma
     subsections:
-      - name: Mode-coverage pressure analysis via gradient norm
-      - name: Experiment
+    - name: Characterizing mode-covering with sensitivity analysis
+    - name: Proof of dilemma for single-model data-free eval
+    - name: Pairwise comparators
+  - name: Stein discrepancy
   - name: Citations
   - name: Footnotes
-#   - name: Code Blocks
-#   - name: Diagrams
-#   - name: Tweets
-#   - name: Layouts
-
-# Below is an example of injecting additional post-specific styles.
-# This is used in the 'Layouts' section of this post.
-# If you use this post as a template, delete this _styles block.
-# _styles: >
-#   .fake-img {
-#     background: #bbb;
-#     border: 1px solid rgba(0, 0, 0, 0.1);
-#     box-shadow: 0 0px 4px rgba(0, 0, 0, 0.1);
-#     margin-bottom: 12px;
-#   }
-#   .fake-img p {
-#     font-family: monospace;
-#     color: white;
-#     text-align: left;
-#     margin: 12px 0;
-#     text-align: center;
-#     font-size: 16px;
-#   }
 ---
 
 <!-- # Trilemma for data-free sampler evaluation -->
@@ -84,18 +63,25 @@ These models aim to learn a generative model distribution $q_\theta(x)$ that app
 
 There are two main approaches for evaluating how well a sampler matches the target distribution: data-free, and data-driven. In data-free sampler eval, we only have the target unnormalized density, and consider metrics like KL divergence, kernelized maximum mean discrepancy, and Stein discrepancy. 
 
-In data-driven sampler eval, we have access to additional data about $p$ beyond its unnormalized density. For example, synthetic eval settings can be constructed with a known number of modes and locations, which can be used to count how many modes neural samplers recover. In molecular dynamics, molecules like alanine dipeptide (~20 atoms) and chignolin (~200 atoms) are deeply understood with known modes. For more complex molecules, experimental observables such as X can be used for evaluation [cite bioemu], but this can conflate sampler evaluation with misalignments between the target potential's model of reality and actual reality. For example, we might sample the target potential perfectly, but still fit observables poorly, because the target potential is imperfect with respect to reality. In other cases, for instance molecules that are less well understood, samplers may be evaluated using reference MCMC samples used as a "gold standard". However, it can be unclear how accurate these reference MCMC samples are, especially for target densities that are highly challenging to sample. In the most challenging sampling problems with no prior knowledge, data-driven eval faces a "catch-22" situation where we need trustworthy samples to evaluate whether our samples are trustworthy, making it impossible to self-bootstrap off the ground. 
+In data-driven sampler eval, we have access to additional data about $p$ beyond its unnormalized density. For example, synthetic eval settings can be constructed with a known number of modes and locations, which can be used to count how many modes neural samplers recover. In molecular dynamics, molecules like alanine dipeptide (~20 atoms) and chignolin (~200 atoms) are deeply understood with known modes. For more complex molecules, experimental observables such as X can be used for evaluation [cite bioemu], but this can conflate sampler evaluation with misalignments between the target potential's model of reality and actual reality. For example, we might sample the target potential perfectly, but still fit observables poorly, because the target potential is imperfect with respect to reality. In other cases, for instance molecules that are less well understood, samplers may be evaluated using reference MCMC samples used as a "gold standard". However, it can be unclear how accurate these reference MCMC samples are, especially for target densities that are highly challenging to sample. In the most challenging sampling problems with no prior knowledge, data-driven eval faces a "catch-22" situation where we need trustworthy samples to evaluate whether our samples are trustworthy, making it difficult to self-bootstrap off the ground. 
 
 While data-driven eval is valuable, the upsides of data-free sampler eval are appealing. In an ideal world where data-free sampler eval worked perfectly, research on neural samplers could be performed in gym-like environments with little overhead for supporting a huge diversity of target potentials, like with virtual environments or video games in reinforcement learning research.
 These considerations motivate asking how well data-free sampler eval could work.
 
 Here, we prove an impossibility trilemma for data-free sampler evaluation; we can only have two among: i) mode-covering metric, ii) stable with finite variance, iii) allows sampler ranking without cyclic dominance (disallows A>B>C>A).
 
-Data-free sampler evaluation is challenging because we have samples only from the model, and not from the target distribution (otherwise the sampling problem is solved). With model samples and likelihoods, we can stably estimate the reverse KL $$ \mathbb{E}_{q}[\log(q/p)] $$, but this is mode-seeking -- the reverse KL strongly rewards $q$ matching $$ p $$ among model samples, and does not strongly penalize missing modes in $$ p $$. This means the reverse KL is not a very useful sampler evaluation metric because it ignores the problem of mode discovery.
+## Informal overview of trilemma
+
+Data-free sampler evaluation is challenging because we have samples only from the model, and not from the target distribution (otherwise the sampling problem is solved). With model samples and likelihoods, we can stably estimate the reverse KL $$ \mathbb{E}_{q}[\log(q/p)] $$, but this is mode-seeking -- the reverse KL strongly rewards $q$ matching $$ p $$ among model samples, and does not strongly penalize missing modes in $$ p $$. If we hill-climb the reverse KL as an evaluation metric, we would generally reward samplers that fit a subset of modes very well, even if they are missing other important target modes, over samplers that discovered more target modes. This means the reverse KL is not a very useful sampler evaluation metric because it ignores the problem of mode discovery.
 
 The forward KL $$ \mathbb{E}_{p}[\log(p/q)] $$ is mode-covering: it strongly rewards the model for covering modes of $$ p $$, making it ideal for evaluating mode discovery. Unfortunately, it is unstable to estimate. With access only to model samples, we require importance reweighting to estimate it as $$ \mathbb{E}_{q}[(p/q) \log(p/q)] $$. This theoretically does not have bounded, finite variance, and in practice is prohibitively high variance in high-dimensional settings of interest to be a useful evaluation metric.
 
-The contrast between the reverse KL and forward KL introduce the tension between items i) mode-covering metric, and ii) stable with finite variance, in our trilemma. By thinking beyond $f$-divergences to pairwise comparators, such as
+{% include figure.liquid path="assets/img/2026-04-27-sampler-eval-trilemma/rkl-fkl.png" class="img-fluid" %}
+<div class="caption">
+    Reverse KL is mode-seeking, while forward KL is mode-covering. Axes depict mean and std parameters for a Gaussian. Values plot discrepancy to a two-Gaussian mixture with mean, std depicted with the red x's.
+</div>
+
+The contrast between the reverse KL and forward KL introduces the tension between items i) mode-covering metric, and ii) stable with finite variance, in our trilemma. By thinking beyond $f$-divergences to pairwise comparators, such as
 
 $$
 \int m(x) \sigma\left( \log \frac{ p(x)}{ m(x)} \right) \log \frac{p(x)}{ q(x)} ~dx, \quad m(x) = 0.5 q_1(x) + 0.5q_2(x)
@@ -103,123 +89,128 @@ $$
 
 we can achieve a metric stably estimated with only model samples, that is also mode-covering among the modes within the mixture $m$. This pairwise comparator could thus score if a sampler $q_1$ is more mode-covering than $q_2$ head-to-head, while ignoring target modes that are unseen by both samplers. Unfortunately, such pairwise comparators introduce the third element of the trilemma: they may not be proper for $p$, and/or could introduce dominance cycles, and/or do not have pool independence.
 
-## Informal overview of trilemma
+## Trilemma
 
-<!-- TODO - add definition of O(p/q) mode covering pressure -->
+In this section, we provide a more precise characterization of the trilemma. First, we set up a definition of a "mode-covering" metric via sensitivity analysis. We then offer a short proof of the aforementioned dilemma between mode-covering and importance weights for single-model evaluation metrics. We then consider pairwise model comparison evaluation metrics, which can achieve both mode-covering and stability, but at the cost of the third item of the trilemma.
 
-<!-- TODO - add class of functions considered -->
+### Characterizing mode-covering with sensitivity analysis
 
-Unfortunately, satisfying the following two properties is provably impossible:
+What does it mean for a metric to be mode-covering or mode-seeking? One natural approach is to consider how much the metric changes when the model likelihood shrinks to zero at a target mode. A small change shows the metric does not penalize a model for dropping modes -- less mode-covering -- while a large change represents more mode-covering behavior.
 
-1. No importance sampling, when estimating the metric as an expectation under $q$, meaning no importance weight factors like $p(x)/q(x)$.
-2. $O(p/q)$ mode-covering pressure, like forward KL
+To quantify how much a metric changes when the model likelihood shrinks to zero at a target mode, we can take its derivative with respect to $q(x)$, and study its form as $q(x) \to 0$ at some $x$ that is a target mode (i.e., with $p(x) > 0$).
 
-Proof:
+For the Forward KL, at a given $x$:
 
-The proof follows by understanding where the $O(p/q)$ mode-covering pressure comes from mathematically in the forward KL definition. In short, it comes from the term $p \log (q)$ in the integrand, because:
+$$
+-\frac{\partial p(x) \log\frac{p(x)}{q(x)} }{\partial q(x)} = \frac{p(x)}{q(x)} = O\left( \frac{p}{q} \right)
+$$
+
+For the reverse KL, at a given $x$:
+
+$$
+\begin{align}
+-\frac{\partial q(x) \log\frac{q(x)}{p(x)} }{\partial q(x)} &= 
+-\frac{\partial}{\partial q(x)} q(x) \log q(x) + \frac{\partial}{\partial q(x)} q(x) \log p(x) \\
+&= -\left( 1 \log q(x) + q(x) \frac{1}{q(x)} \right) + \log p(x) \\
+&= \log \frac{p(x)}{q(x)} + 1 \\
+&= O \left(\log \frac{p}{q} \right)
+\end{align}
+$$
+
+We can see that the reverse KL is exponentially less sensitive to $q \to 0$ than the forward KL. This provides a more quantitative way to characterize that the forward KL is more mode-seeking. For this work, we will operate with this definition:
+
+**Definition**: A metric is mode-covering if its partial derivative with respect to $q(x)$ is $O(p/q)$.
+
+As an aside, we can apply the same analysis to Stein discrepancy, and find that the partial derivative is $O(\|\nabla_x \log p(x) \|)$, which is constant in terms of $q$. Thus, the Stein discrepancy is even less mode-seeking than the reverse KL, which we can visualize experimentally.
+
+{% include figure.liquid path="assets/img/2026-04-27-sampler-eval-trilemma/stein_discrepancy_experiment.png" class="img-fluid" %}
+<div class="caption">
+    Stein discrepancy vs. reverse and forward KL. Axes depict mean and std parameters for a Gaussian. Values plot discrepancy to a two-Gaussian mixture with mean, std depicted with the red x's.
+</div>
+
+### Proof of dilemma for single-model data-free eval
+
+First, let's focus on evaluation metrics that consider one model at a time. These can be written $\mathcal{D}(p, q)$, in contrast to pairwise comparators $\mathcal{D}(p, q_1, q_2)$ which we will consider later.
+
+**Lemma**: Let the evaluation metric be a function $\mathcal{D}(p, q)$ defined as an integral over the domain, for any inte:
+
+$$
+\mathcal{D}(p, q) = \int \phi(x, p(x), q(x)) ~dx
+$$
+
+$\mathcal{D}(p, q)$ cannot satisfy both properties:
+
+1. Mode-covering
+2. No importance sampling, when estimating the metric as an expectation under $q$, meaning no importance weight factors like $p(x)/q(x)$.
+
+**Proof**. The proof follows by understanding that the $O(p/q)$ term arises if and only if the integrand has a leading term $p \log (q)$, because:
 
 $$
 \frac{\partial}{\partial q} p\log(q) = p \frac{1}{q} = O(p/q)
 $$
 
-Thus, it is necessary to have $p \log (q)$ in the integrand to achieve $O(p/q)$ mode-covering pressure.
-
-In contrast, consider what happens when we estimate a metric as an expectation under $q$: the integrand is multiplied by a factor $q(x)$. If we have a term $q \log(q)$ in the integrand, its derivative by the product rule becomes:
+Importantly, the term must be $p \log q$. For example, $q p \log q$ does not work, because the $q$ cancels the desired $1/q$ term by the product rule:
 
 $$
-\frac{\partial}{\partial q} q \log(q) = q\frac{1}{q} + 1 \log(1/q) = O(\log(1/q)
+\frac{\partial}{\partial q} q p \log(q) = q\frac{1}{q}p + p \log(1/q) = O(p\log(1/q))
 $$
 
-Having an expectation w.r.t. $q$ significantly dampens the mode-covering pressure by the product rule. We can see that the desired $1/q$ term, which is the gradient of $\log(q)$ is canceled by the front term $q$. The only way to keep the forward KL-like pressure is to importance weight by $p/q$.
+When the integrand has a leading term proportional to $p \log q$, if we wish to estimate the integral as an expectation under $q$, we must incur importance weights $\frac{p}{q}$. This shows the two conditions are incompatible.
 
-This completes the proof.
+#### Importance weights incur unbounded variance
 
-## Stein discrepancy
-
-Previously, we pinned down a definition for mode-covering vs. mode-seeking behavior for distributional divergences. When fitting $q$ to a target $p$, we studied the derivative norm of the divergence wrt $q(x)$ where $p(x) > 0$ and $q(x) \to 0$. 
-
-> Mode-covering pressure means that when $p(x) > 0$ and $q(x) \to 0$, the gradient of the divergence w.r.t. $q(x)$ diverges strongly (at least $O(p/q)$), pushing $q$ to cover that region.
-
-The forward KL has $O(p/q)$ mode-covering pressure, which is exponentially stronger than the reverse KL with $O(\log(p/q))$ pressure.
-
-Next, we'll apply our gradient analysis to the Stein discrepancy. We will show that the Stein discrepancy has $O(1)$ pressure (wrt $q$), so mathematically it is even less mode-covering than the reverse KL! Experimentally, we show that Stein discrepancy has a similar loss landscape as reverse KL, and not forward KL.
-
-The Stein discrepancy is a measure of distributional similarity which can be used as a sampler evaluation metric, as it does not require iid samples from the target $p$, or its normalized density. Instead, we can compute it using:
-
-- $\nabla_x \log p(x)$, the data score
-- iid samples from $q$
-
-The core object in the Stein discrepancy is the Stein operator, which acts on a vector test function $g(x)$. Using the data score, the Stein operator is:
+Our estimator is an expectation under model samples. Its stability depends on its variance, which is governed by the second moment $\mathbb{E}_{x \sim q}[(...)^2]$. If the estimator contains importance weights, its variance depends on:
 
 $$
-\mathcal{T}_p g(x) = \nabla_x \log p(x) \cdot g(x) + \text{div}~g(x)
+\mathbb{E}_{x \sim q} \left[ \left( \frac{p}{q} \right)^2 \right] = \int \frac{p^2}{q} ~dx
 $$
 
-This is constructed to satisfy the key property that:
+This integral diverges when $p$ has heavier tails than $q$, i.e., when there are missing modes, so the importance weights have unbounded variance.
+
+### Pairwise comparators
+
+We saw that achieving both stability and mode-covering is impossible for evaluation metrics that compare one model to the target. However, to drive progress in machine learning research, we don't need a "global" measure of sampler quality; it can suffice instead to just have a relative, or local measure, of whether one sampler is better than the other. In this section, we'll show that pairwise comparators can achieve both stability and mode-covering, but at the cost of other desirable attributes.
+
+A key challenge with sampler evalution is that with only model samples, it's challenging to know what target modes we've missed. However, when we compare two samplers, it becomes easy to tell if one sampler missed modes that the other sampler found, by comparing samplers with the mixture distribution.
 
 $$
-\mathbb{E}_{p}[\mathcal{T}_p g(x)] = 0
+m(x) = 0.5 q_1(x) + 0.5q_2(x)
 $$
 
-for all test functions $g$.
-
-The Stein discrepancy is then defined as:
+For stability, let's focus on the set of points with non-vanishing probability under the mixture:
 
 $$
-S(q||p) \triangleq \sup_{g \in G} | \mathbb{E}_{x \sim q} [\mathcal{T}_p g(x)] |
+\Omega_\epsilon = \{ x : q_1(x) > \epsilon \text{~~or~~} q_2(x) > \epsilon \}
 $$
 
-where $\mathcal{G}$ must be constrained to keep the supremum finite. One common choice is $\mathcal{G}$ as the unit ball in a reproducing kernel Hilbert space, which corresponds to kernel Stein discrepancy. Another choice is neural Stein discrepancy, where $\mathcal{G}$ is chosen to be the set of functions learnable by a (regularized) neural network.
-
-### Mode-coverage pressure analysis via gradient norm
-
-Let's denote $g_q^*$ as the $g$ that achieves the supremum. Then,
+Consider this pairwise comparator $\mathcal{D}(p, q_1, q_2)$ that compares two models $q_1$ and $q_2$. 
 
 $$
-S(q||p) = \mathbb{E}_{q} [ \nabla_x \log p(x) \cdot g^*_q(x) + \text{div}~g^*_q(x) ]
+\int_{ \Omega_\epsilon } p(x) \log \frac{q_1(x)}{ q_2(x)} ~dx
 $$
 
-Differentiating wrt q, the multiplicative factor of $q$ from the expectation disappears, and we keep the integrand:
+which can be estimated from samples $x_i \sim m(x)$ as:
 
 $$
-\frac{\partial}{\partial q(x)} S(q||p) = \nabla_x \log p(x) \cdot g^*_q(x) + \text{div}~g^*_q(x)
+\sum_{i=1}^N \left[ \mathbb{1} \left( m(x_i) > \epsilon \right) \frac{p(x_i)}{m(x_i)} \log \frac{q_1(x_i)}{q_2(x_i)} \right]
 $$
 
-*Note: This is justified by Danskin's theorem / the envelope theorem, which says that for some $f(x) = \max_{z} \phi(x,z)$, if the maximizer $$ z^* $$ is unique, then $$ \frac{\partial}{\partial x} f(x) = \frac{\partial}{\partial x} \phi(x, z^*)$$.*
-
-Suppose $\mathcal{G}$ imposes bounds $\|g\|_{\infty} \leq B$ and $\| \nabla g \|_{\infty} \leq D$, which is a loose assumption satisfied by kernel and neural Stein discrepancies. Then, for any $g$ and all $x$,
+On the shared support $\Omega_\epsilon$, this estimates the true difference in the forward KL. It is thus proper for $p$ within $\Omega_\epsilon$, meaning that $p$ is an optima of our pairwise comparator; no model can score better than $p$ if it is different than $p$ in $\Omega_\epsilon$. Because it estimates the forward KL difference, it is mode-covering in the mixture support, as the sensitivity of the integrand to a mode of $p$ found by $q_1$ is:
 
 $$
-\begin{align}
-| \nabla_x \log p(x) \cdot g(x) + \text{div}~g(x) | &\leq \| \nabla \cdot g(x) \| + \| g(x) \| \| \nabla_x \log p(x) \| \\
-&\leq dD + B \| \nabla_x \log p(x) \|,
-\end{align}
+-\frac{\partial p(x) \log(q_1(x) / q_2(x)) }{\partial q_2(x)} = O\left( \frac{p}{q_2} \right)
 $$
 
-where $d$ is the dimension, and we use the triangle inequality and $| \text{div}~ g| \leq d \|\nabla g\|_{\infty}$.
+Note that this pairwise comparator is blind to modes missed by both models, though this is a reasonable property in an evaluation metric. Further, by limiting importance weights to $\Omega_\epsilon$ such that $m(x_i) > \epsilon/2$, the importance weights are capped and do not explode to infinity. The estimator thus has bounded variance, improving the stability of this metric.
 
-In particular,
+Sounds great, right? This pairwise comparator is both stable and mode-covering. What is the cost of this? Our pairwise comparator is no longer decomposable into the difference of single model evaluation metrics: $\mathcal{D}(p, q_1, q_2) \neq h(p, q_1) - h(p, q_2)$. In this situation, we lose a guarantee on transitivity. There can exist sets of samplers where $A>B>C>A$, forming a dominance cycle. This happens because the "evaluation set" $\Omega_\epsilon$ is dynamic and depends on the comparison participants.
 
-$$
-\frac{\partial}{\partial q(x)} S(q||p)
-\leq dD + B \| \nabla_x \log p(x) \|.
-$$
+**Lemma**: There exists a set of samplers that form a dominance cycle when scored by this pairwise comparator.
 
-This is independent of $q(x)$. The pressure term is $O(\|\nabla_x \log p(x) \|)$.
+**Proof**. We provide a proof by construction. 
 
-Thus, the supremum Stein discrepancy, is not mode-covering: it exerts bounded, location-dependent pressure that does not increase when $q(x) \to 0$ in regions where $p(x) > 0$.
 
-Interestingly, the Stein discrepancy at $O(1)$ pressure (wrt q) is even less mode-covering than the reverse KL at $O(\log(p/q))$ pressure!
+## Limitations
 
-### Experiment
+## Discussion
 
-We repeat the common experiment, where our target $p$ is a mixture of two Gaussians with means -4, +4, and std 1. We consider a model distribution $q$ that is a single Gaussian with free parameters mean and std, and plot the divergence/discrepancy between $p, q$ as the mean and std of $q$ vary.
-
-We compute the reverse and forward KL for comparison, and computed Stein discrepancy using kernel Stein discrepancy with an IMQ kernel with $\beta=0.5$, $c=1$, which are common hyperparameter choices.
-
-{% raw %}{% include figure.liquid path="assets/img/2026-04-27-sampler-eval-trilemma/divergence_landscapes_with_stein-min.png" class="img-fluid" %}{% endraw %}
-
-Yellow indicates lower (better) divergence values. The red X's denote the mean and std of the two Gaussians in the target mixture, while the red + denotes the true mean and std of the target mixture, when fitting a single Gaussian to it. 
-
-The top row depicts the reverse and forward KL, and the bottom row depicts the Stein discrepancy and log Stein discrepancy.
-Visually, the Stein discrepancy's landscape is similar to the reverse KL: The brightest yellow is at the mode-seeking solutions; the mode-covering solution (red +) is less bright yellow. This relation is more clearly seen on the log scale plot.
