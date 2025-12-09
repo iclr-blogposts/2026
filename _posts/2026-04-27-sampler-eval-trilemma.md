@@ -1,7 +1,7 @@
 ---
 layout: distill
 title: An Impossibility Trilemma for Data-Free Sampler Evaluation
-description: Neural samplers aim to learn to sample a target unnormalized energy potential. Sampler quality can be evaluated in a data-free manner, using only the model and the target potential, or in a data-driven manner, with additional data about the target distribution such as known modes, summary statistics, and reference MCMC samples. While data-driven eval is valuable, data-free eval has compelling conceptual advantages, raising the question of how well data-free eval could work. Here, we prove an impossibility trilemma for data-free sampler evaluation; we can only have two among i) mode-covering metric, ii) stable with finite variance, iii) transitivity guarantee (if A>B and B>C, then A>C). We situate the implications of this trilemma in the broader conceptual landscape of data-driven and data-free sampler evaluation.
+description: Neural samplers aim to learn to sample a target unnormalized energy potential. Sampler quality can be evaluated in a data-free manner, using only the model and the target potential, or in a data-driven manner, with additional data about the target distribution such as known modes, summary statistics, and reference MCMC samples. While data-driven eval is valuable, data-free eval has compelling conceptual advantages, raising the question of how well data-free eval could work. Here, we prove an impossibility trilemma for data-free sampler evaluation; we can only have two among i) mode-covering metric, ii) stable with finite variance, iii) universal ranking (dominance transitivity guarantee / model score does not depend on other models). This note surveys underexplored design space of data-free sampler eval metrics, and asks the community which eval properties we are willing to sacrifice in the face of the impossibility of satisfying all of them.
 date: 2026-04-27
 future: true
 htmlwidgets: true
@@ -45,9 +45,10 @@ toc:
     - name: Characterizing mode-covering with sensitivity analysis
     - name: Proof of dilemma for single-model data-free eval
     - name: Pairwise comparators
-  - name: Stein discrepancy
-  - name: Citations
-  - name: Footnotes
+    - name: Loss of transitivity
+    - name: General properties of pairwise comparators
+  - name: Discussion
+  - name: Code
 ---
 
 <!-- # Trilemma for data-free sampler evaluation -->
@@ -58,12 +59,12 @@ Neural samplers like diffusion samplers aim to learn to sample a target unnormal
 
 ## Introduction
 
-Sampling from unnormalized energy potentials is a key problem in probabilistic inference, statistical physics, and molecular dynamics. In recent years, deep generative modeling approaches for sampling has been investigated in diffusion samplers, adjoint Schrodinger bridge sampler [cite], as well as generative flow networks and normalizing flows. 
+Sampling from unnormalized energy potentials is a key problem in probabilistic inference, statistical physics, and molecular dynamics. In recent years, deep generative modeling approaches for sampling has been investigated in diffusion samplers<d-cite key="liu2025adjoint"></d-cite> as well as generative flow networks<d-cite key="towardsunderstandinggflownets"></d-cite> and normalizing flows<d-cite key="schopmans2025temperatureannealed"></d-cite>. 
 These models aim to learn a generative model distribution $q_\theta(x)$ that approximates a known unnormalized density. For instance, in molecular dynamics, the energy potential $U(x)$ of molecular conformations is known analytically in closed-form, and we aim to sample the Boltzmann distribution $p(x) \propto \exp(-U(x))$. Mode discovery, possibly by generalizing from known modes to efficiently discover new modes, is a critical aspect to evaluate in neural samplers, because traditional MCMC methods can mix poorly for rugged, high dimensional densities.
 
 There are two main approaches for evaluating how well a sampler matches the target distribution: data-free, and data-driven. In data-free sampler eval, we only have the target unnormalized density, and consider metrics like KL divergence, kernelized maximum mean discrepancy, and Stein discrepancy. 
 
-In data-driven sampler eval, we have access to additional data about $p$ beyond its unnormalized density. For example, synthetic eval settings can be constructed with a known number of modes and locations, which can be used to count how many modes neural samplers recover. In molecular dynamics, molecules like alanine dipeptide (~20 atoms) and chignolin (~200 atoms) are deeply understood with known modes. For more complex molecules, experimental observables such as X can be used for evaluation [cite bioemu], but this can conflate sampler evaluation with misalignments between the target potential's model of reality and actual reality. For example, we might sample the target potential perfectly, but still fit observables poorly, because the target potential is imperfect with respect to reality. In other cases, for instance molecules that are less well understood, samplers may be evaluated using reference MCMC samples used as a "gold standard". However, it can be unclear how accurate these reference MCMC samples are, especially for target densities that are highly challenging to sample. In the most challenging sampling problems with no prior knowledge, data-driven eval faces a "catch-22" situation where we need trustworthy samples to evaluate whether our samples are trustworthy, making it difficult to self-bootstrap off the ground. 
+In data-driven sampler eval, we have access to additional data about $p$ beyond its unnormalized density. For example, synthetic eval settings can be constructed with a known number of modes and locations, which can be used to count how many modes neural samplers recover. In molecular dynamics, molecules like alanine dipeptide (~20 atoms) and chignolin (~200 atoms) are deeply understood with known modes. For more complex molecules, experimental observables such as protein folding stability can be used for evaluation<d-cite key="doi:10.1126/science.adv9817"></d-cite>, but this can conflate sampler evaluation with misalignments between the target potential's model of reality and actual reality. For example, we might sample the target potential perfectly, but still fit observables poorly, because the target potential is imperfect with respect to reality. In other cases, for instance molecules that are less well understood, samplers may be evaluated using reference MCMC samples used as a "gold standard". However, it can be unclear how accurate these reference MCMC samples are, especially for target densities that are highly challenging to sample. In the most challenging sampling problems with no prior knowledge, data-driven eval faces a "catch-22" situation where we need trustworthy samples to evaluate whether our samples are trustworthy, making it difficult to self-bootstrap off the ground. 
 
 While data-driven eval is valuable, the upsides of data-free sampler eval are appealing. In an ideal world where data-free sampler eval worked perfectly, research on neural samplers could be performed in gym-like environments with little overhead for supporting a huge diversity of target potentials, like with virtual environments or video games in reinforcement learning research.
 These considerations motivate asking how well data-free sampler eval could work.
@@ -81,17 +82,13 @@ The forward KL $$ \mathbb{E}_{p}[\log(p/q)] $$ is mode-covering: it strongly rew
     Reverse KL is mode-seeking, while forward KL is mode-covering. Axes depict mean and std parameters for a Gaussian. Values plot discrepancy to a two-Gaussian mixture with mean, std depicted with the red x's.
 </div>
 
-The contrast between the reverse KL and forward KL introduces the tension between items i) mode-covering metric, and ii) stable with finite variance, in our trilemma. By thinking beyond $f$-divergences to pairwise comparators, such as
-
-$$
-\int m(x) \sigma\left( \log \frac{ p(x)}{ m(x)} \right) \log \frac{p(x)}{ q(x)} ~dx, \quad m(x) = 0.5 q_1(x) + 0.5q_2(x)
-$$
-
-we can achieve a metric stably estimated with only model samples, that is also mode-covering among the modes within the mixture $m$. This pairwise comparator could thus score if a sampler $q_1$ is more mode-covering than $q_2$ head-to-head, while ignoring target modes that are unseen by both samplers. Unfortunately, such pairwise comparators introduce the third element of the trilemma: they may not be proper for $p$, and/or could introduce dominance cycles, and/or do not have pool independence.
+The contrast between the reverse KL and forward KL introduces the tension between items i) mode-covering metric, and ii) stable with finite variance, in our trilemma. By thinking beyond single-model eval metrics to pairwise comparators, which evaluate whether one model is better than the other, we can design metrics that are stable and mode-covering (among the support of both models). This pairwise comparator could thus score if a sampler $q_1$ is more mode-covering than $q_2$ head-to-head, while ignoring target modes that are unseen by both samplers. Unfortunately, we will show that such pairwise comparators introduce the third element of the trilemma: they lose universal ranking, which means they can introduce dominance cycles, and/or do not have pool independence.
 
 ## Trilemma
 
 In this section, we provide a more precise characterization of the trilemma. First, we set up a definition of a "mode-covering" metric via sensitivity analysis. We then offer a short proof of the aforementioned dilemma between mode-covering and importance weights for single-model evaluation metrics. We then consider pairwise model comparison evaluation metrics, which can achieve both mode-covering and stability, but at the cost of the third item of the trilemma.
+
+Technical note: While our setting is access only to the unnormalized density of $p$, in the remainder of this note, we focus on comparing samplers for a fixed target distribution, where we can safely ignore the unknown normalizing constant $Z$.
 
 ### Characterizing mode-covering with sensitivity analysis
 
@@ -203,14 +200,216 @@ $$
 
 Note that this pairwise comparator is blind to modes missed by both models, though this is a reasonable property in an evaluation metric. Further, by limiting importance weights to $\Omega_\epsilon$ such that $m(x_i) > \epsilon/2$, the importance weights are capped and do not explode to infinity. The estimator thus has bounded variance, improving the stability of this metric.
 
+### Loss of transitivity
+
 Sounds great, right? This pairwise comparator is both stable and mode-covering. What is the cost of this? Our pairwise comparator is no longer decomposable into the difference of single model evaluation metrics: $\mathcal{D}(p, q_1, q_2) \neq h(p, q_1) - h(p, q_2)$. In this situation, we lose a guarantee on transitivity. There can exist sets of samplers where $A>B>C>A$, forming a dominance cycle. This happens because the "evaluation set" $\Omega_\epsilon$ is dynamic and depends on the comparison participants.
 
 **Lemma**: There exists a set of samplers that form a dominance cycle when scored by this pairwise comparator.
 
-**Proof**. We provide a proof by construction. 
+**Proof**. We provide a proof by construction. Consider a target $p$ with three equal Gaussian modes at -5, 0, and +5. We have three samplers A, B, C, each with the same shape. Sampler A places large mass on the mode -5, small mass on mode 0, and no mass on mode +5. Sampler B and C are like sampler A but rotated on the modes (see figure). Here, epsilon masks no mass and small mass.
 
+Comparing A to B, the union support is modes -5 and 0, with equal target $p$ mass on both, but A beats B on -5 more than B beats A on 0. Thus overall, A wins. Applying the same argument, B>C, and C>A. This yields A>B>C>A, a dominance cycle. We confirmed this argument holds experimentally by simulation, and provide code in the appendix.
 
-## Limitations
+{% include figure.liquid path="assets/img/2026-04-27-sampler-eval-trilemma/cycle_plot.png" class="img-fluid" %}
+<div class="caption">
+    A constructed example of a dominance cycle, with three samplers A>B>C>A.
+</div>
+
+We remark that losing the guarantee of transitivity does not mean that the pairwise comparator will commonly encounter dominance cycles. For realistic evaluation settings, dominance cycles are likely rare, or if they do occur due to "merry-go-round" mode discovery, this cause can be identified and understood to build better samplers. Furthermore, non-transitive pairwise comparisons can still be usefully ranked in a leaderboard via ELO scores<d-cite key="chiang2024chatbotarenaopenplatform"></d-cite>.
+
+### General properties of pairwise comparators
+
+Three properties of a pairwise comparator:
+
+- Transitivity guarantee (no dominance cycles)
+- Completeness (all pairs are comparable)
+- Pool independence (results do not depend on the identity of all opponents)
+
+are all jointly satisfied if and only if the pairwise comparator can be decomposed into single-model evaluation metrics: $\mathcal{D}(p, q_1, q_2) = h(p, q_1) - h(p, q_2)$. The connections between preference relations and utility functions has been studied in microeconomics Debreu's theorems<d-cite key="Debreu2008-dd"></d-cite>, Luce's Choice Axiom, and Bradley-Terry models<d-cite key="Bradley1952-tn"></d-cite>.
+
+In our example above, we studied a particular pairwise comparator where the evaluation set depended on the support of the mixture distribution, which violates the single-model decomposition, and thereby breaks the guarantee of transitivity, as well as pool independence (as the exact score depends on the opponent).
+
+For a leaderboard ranking of a set of models, we can improve transitivity among the model set by evaluating using the joint support of all models. Then, among models on the leaderboard, transitivity is retained. However, we still lack pool independence, as leaderboard rankings can flip if new models are added to the leaderboard.
 
 ## Discussion
 
+In this work, we investigated the design space of data-free sampler evaluation metrics.
+We first showed that for single-model eval, there is an impossibility dilemma between stability and mode-covering.
+We then showed that by moving from single-model eval to pairwise comparators, we can achieve both stability and mode-covering, but lose universal ranking, which can manifest in losing some or all of: transitivity guarantee, completeness, and pool independence.
+
+In particular, we studied a specific pairwise comparator that estimates the forward KL difference on the support of the mixture distribution with non-vanishing probability from either model. We showed that this pairwise comparator loses the transitivity guarantee, by constructing an example target where three samplers beat each other in a rock-paper-scissors cycle. Nevertheless, we expect that such dominance cycles might be rare in practice. Furthermore, ELO rankings can be used to convert pairwise scores into leaderboard rankings, even if dominance cycles exist.
+
+We further discussed the possibility of a leaderboard that compares models on the joint support of all models submitted to the leaderboard. In this option, we ensure that transitivity holds for models in the leaderboard, but we still violate pool independence, wherein model rankings can flip when new models are added to the leaderboard.
+
+Evaluation is an important engine for driving research progress, and sampler evaluation is a particularly challenging area to set up evaluations. In this note, we proved the impossibility of simultaneously achieving many desirable properties for an eval metric, which are easily achieved, and perhaps taken for granted, in other subfields. For example in computer vision, FID is stable, relevant to image quality (the analogue to mode-covering for sampler eval), and produces leaderboards with universal ranking, guaranteeing transitivity, pool independence, and completeness.
+
+We hope that this note highlights underexplored aspects of the design space of data-free sampler evaluation methods, and may spur the community to think and discuss more about eval design, as well as desiderata on the best subset of properties, and agreement on which properties to sacrifice, for improved eval metrics to drive research progress.
+
+## Code
+
+This code demonstrates three samplers with a dominance cycle using our pairwise comparator.
+
+{% highlight python linenos %}
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import norm
+
+class GaussianMixture:
+    def __init__(self, means, stds, weights):
+        self.means = np.array(means)
+        self.stds = np.array(stds)
+        self.weights = np.array(weights) / np.sum(weights)
+        
+    def pdf(self, x):
+        prob = np.zeros_like(x)
+        for m, s, w in zip(self.means, self.stds, self.weights):
+            prob += w * norm.pdf(x, loc=m, scale=s)
+        return prob
+    
+    def sample(self, n_samples):
+        # Choose component indices
+        indices = np.random.choice(len(self.weights), size=n_samples, p=self.weights)
+        # Sample from selected components
+        samples = np.random.normal(
+            loc=self.means[indices],
+            scale=self.stds[indices]
+        )
+        return samples
+
+def pairwise_snis_score(q1, q2, target_p, n_samples=50000, epsilon_threshold=1e-3):
+    """
+    Computes the Pairwise SNIS score: Score(q1) - Score(q2)
+    Positive value means q1 is better than q2.
+    """
+    # 1. Sample from the mixture m = 0.5*q1 + 0.5*q2
+    # We simulate this by sampling n/2 from q1 and n/2 from q2
+    n_half = n_samples // 2
+    samples_q1 = q1.sample(n_half)
+    samples_q2 = q2.sample(n_half)
+    x = np.concatenate([samples_q1, samples_q2])
+    
+    # 2. Evaluate densities
+    prob_p = target_p.pdf(x)
+    prob_q1 = q1.pdf(x)
+    prob_q2 = q2.pdf(x)
+    
+    # 3. Compute mixture density m(x)
+    prob_m = 0.5 * prob_q1 + 0.5 * prob_q2
+    
+    # 4. Filter by Threshold (The "Blindness" condition)
+    # Only keep samples where the mixture density is significant
+    mask = prob_m > epsilon_threshold
+    
+    if np.sum(mask) == 0:
+        return 0.0 # No visible overlap
+        
+    x_valid = x[mask]
+    prob_p_valid = prob_p[mask]
+    prob_m_valid = prob_m[mask]
+    prob_q1_valid = prob_q1[mask]
+    prob_q2_valid = prob_q2[mask]
+    
+    # 5. Compute Self-Normalized Importance Weights
+    # w = p / m
+    log_weights = np.log(prob_p_valid + 1e-10) - np.log(prob_m_valid + 1e-10)
+    weights = np.exp(log_weights)
+    
+    # Normalize weights (SNIS step)
+    norm_weights = weights / np.sum(weights)
+    
+    # 6. Compute Weighted Difference of Log Likelihoods
+    # Delta = log(q1) - log(q2)
+    # Add tiny constant to avoid log(0)
+    log_diff = np.log(prob_q1_valid + 1e-10) - np.log(prob_q2_valid + 1e-10)
+    
+    score = np.sum(norm_weights * log_diff)
+    
+    return score
+
+def run_simulation():
+    np.random.seed(42)
+    
+    # --- Configuration ---
+    # Target P: 3 Equal Modes at -5, 0, 5
+    means = [-5, 0, 5]
+    std = 0.6
+    p = GaussianMixture(means, [std]*3, [1/3, 1/3, 1/3])
+    
+    # --- The "Leakage" Cycle Construction ---
+    # We design the weights such that:
+    # A dominates B on Mode 1.
+    # B dominates A on Mode 2 (but less severely because A leaks there).
+    # Mode 3 is "invisible" to the A vs B metric (below threshold).
+    
+    # Weights format: [Mode 1, Mode 2, Mode 3]
+    # A: High on 1, Leaks on 2, Blind on 3
+    w_a = [0.85, 0.15, 0.00] 
+    
+    # B: High on 2, Leaks on 3, Blind on 1 (Cyclic Shift)
+    w_b = [0.00, 0.85, 0.15]
+    
+    # C: High on 3, Leaks on 1, Blind on 2 (Cyclic Shift)
+    w_c = [0.15, 0.00, 0.85]
+    
+    q_a = GaussianMixture(means, [std]*3, w_a)
+    q_b = GaussianMixture(means, [std]*3, w_b)
+    q_c = GaussianMixture(means, [std]*3, w_c)
+    
+    # --- Threshold Selection ---
+    # Max density of a single gaussian ~0.66.
+    # Mixture density at Main mode ~ 0.5 * 0.85 * 0.66 ≈ 0.28
+    # Mixture density at Leak mode ~ 0.5 * (0.85 + 0.15) * 0.66 ≈ 0.33
+    # Mixture density at Blind mode ~ 0.5 * (0.00 + 0.15) * 0.66 ≈ 0.05
+    # We need a threshold roughly between 0.05 and 0.28 to hide the Blind mode.
+    # Let's pick 0.1.
+    epsilon = 0.1
+
+    print(f"--- Running Validation (Threshold = {epsilon}) ---")
+    
+    # --- Run Comparisons ---
+    # 1. A vs B
+    score_ab = pairwise_snis_score(q_a, q_b, p, epsilon_threshold=epsilon)
+    print(f"Match 1 (A vs B): Score = {score_ab:.4f}  => {'A Wins' if score_ab > 0 else 'B Wins'}")
+    
+    # 2. B vs C
+    score_bc = pairwise_snis_score(q_b, q_c, p, epsilon_threshold=epsilon)
+    print(f"Match 2 (B vs C): Score = {score_bc:.4f}  => {'B Wins' if score_bc > 0 else 'C Wins'}")
+    
+    # 3. C vs A
+    score_ca = pairwise_snis_score(q_c, q_a, p, epsilon_threshold=epsilon)
+    print(f"Match 3 (C vs A): Score = {score_ca:.4f}  => {'C Wins' if score_ca > 0 else 'A Wins'}")
+    
+    print("-" * 30)
+    if score_ab > 0 and score_bc > 0 and score_ca > 0:
+        print("RESULT: Strict Dominance Cycle Confirmed (A > B > C > A)")
+    else:
+        print("RESULT: Cycle not found (Check parameters)")
+
+    # --- Visualization ---
+    x_plot = np.linspace(-8, 8, 1000)
+    plt.figure(figsize=(12, 5))
+    
+    # Plot Target
+    plt.plot(x_plot, p.pdf(x_plot), 'k--', linewidth=2, label='Target p', alpha=0.3)
+    
+    # Plot Samplers
+    plt.plot(x_plot, q_a.pdf(x_plot), 'r-', label='Sampler A (High 1, Leak 2)')
+    plt.plot(x_plot, q_b.pdf(x_plot), 'g-', label='Sampler B (High 2, Leak 3)')
+    plt.plot(x_plot, q_c.pdf(x_plot), 'b-', label='Sampler C (High 3, Leak 1)')
+    
+    # Plot Threshold visualizer for A vs B
+    m_ab = 0.5*q_a.pdf(x_plot) + 0.5*q_b.pdf(x_plot)
+    plt.fill_between(x_plot, 0, 0.05, where=(m_ab < epsilon), color='gray', alpha=0.3, label='Blind Spot (A vs B)')
+    
+    plt.axhline(y=epsilon, color='orange', linestyle=':', label='Threshold Epsilon')
+    
+    plt.title("The Leakage Cycle Construction")
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.savefig('leakage_cycle_plot.png')
+    print("\nPlot saved to 'leakage_cycle_plot.png'")
+
+if __name__ == "__main__":
+    run_simulation()
+{% endhighlight %}
