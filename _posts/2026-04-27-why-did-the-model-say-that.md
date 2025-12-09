@@ -1,6 +1,6 @@
 ---
 layout: distill
-title: "Why Did the Model Say That? A Methodological Practical Guide for Explaining Multimodal Medical Decisions"
+title: "Why Did the AI Model Say That? A Methodological Practical Guide for Explaining Multimodal Medical Decisions"
 description: A methodological guide that summarizes key explainability techniques for understanding multimodal medical AI systems, addressing the critical challenge of understanding what these systems have learned and how they'll behave in real-world clinical settings.
 tags: explainable-ai xai multimodal-ai medical-ai healthcare-ai interpretability
 giscus_comments: true
