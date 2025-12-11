@@ -193,13 +193,15 @@ $$
 \sum_{i=1}^N \left[ \mathbb{1} \left( m(x_i) > \epsilon \right) \frac{p(x_i)}{m(x_i)} \log \frac{q_1(x_i)}{q_2(x_i)} \right]
 $$
 
-On the shared support $\Omega_\epsilon$, this estimates the true difference in the forward KL. It is thus proper for $p$ within $\Omega_\epsilon$, meaning that $p$ is an optima of our pairwise comparator; no model can score better than $p$ if it is different than $p$ in $\Omega_\epsilon$. Because it estimates the forward KL difference, it is mode-covering in the mixture support, as the sensitivity of the integrand to a mode of $p$ found by $q_1$ is:
+On the shared support $\Omega_\epsilon$, this estimate is related to the difference in  forward KL. It is mode-covering in the mixture support, as the sensitivity of the integrand to a mode of $p$ found by $q_1$ is:
 
 $$
 -\frac{\partial p(x) \log(q_1(x) / q_2(x)) }{\partial q_2(x)} = O\left( \frac{p}{q_2} \right)
 $$
 
 Note that this pairwise comparator is blind to modes missed by both models, though this is a reasonable property in an evaluation metric. Further, by limiting importance weights to $\Omega_\epsilon$ such that $m(x_i) > \epsilon/2$, the importance weights are capped and do not explode to infinity. The estimator thus has bounded variance, improving the stability of this metric.
+
+Finally, we note that this pairwise comparator is presented primarily for exposition, and should not be considered a bullet proof proposal, until its properties such as being proper (optimal) for a scaled version of $p$<d-footnote>For any fixed $\Omega$ (determined by the choice of two models), the optimal distribution scored by the pairwise comparator is a scaled version of $p$ on $\Omega$ with zero density outside of $\Omega$.</d-footnote>, and its computation on un-normalized truncated model densities<d-footnote>Denote $\tilde{p}, \tilde{q_1}, \tilde{q_2}$ as the normalized densities on $\Omega$. Then, the true forward KL difference on the restricted set $KL(\tilde{p}\|\tilde{q_1}) - KL(\tilde{p}\|\tilde{q_2}) = \frac{1}{Z_p} \mathcal{D}(p, q_1, q_2) + \log(\frac{Z_{q_1}}{Z_{q_2}})$, where $Z_p = \int_{\Omega} p(x)~dx$ and similarly for $Z_{q_1}, Z_{q_2}$. Overall, the pairwise comparator favors models that put more total probability mass into $\Omega$, which is a reasonable property.</d-footnote> are more deeply studied.
 
 ### Loss of transitivity
 
