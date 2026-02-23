@@ -13,14 +13,14 @@ mermaid:
   zoomable: false
 
 # Anonymize when submitting
-authors:
-  - name: Anonymous
-
 # authors:
-#   - name: Antonin Raffin
-#     url: https://araffin.github.io/
-#     affiliations:
-#       name: German Aerospace Center (DLR)
+#  - name: Anonymous
+
+authors:
+   - name: Antonin Raffin
+     url: https://araffin.github.io/
+     affiliations:
+       name: German Aerospace Center (DLR)
 
 # must be the exact same name as your blogpost
 bibliography: 2026-04-27-sac-massive-sim.bib
