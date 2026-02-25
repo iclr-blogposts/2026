@@ -14,7 +14,15 @@ mermaid:
 
 # Anonymize when submitting
 authors:
-  - name: Anonymous
+  - name: Abhijay Rana
+    affiliations:
+        name: Agentic Labs
+  - name: Gokul Prabhakaran
+    affiliations:
+        name: Agentic Labs
+  - name: Maksim Ivanov
+    affiliations:
+        name: Agentic Labs
 
 # must be the exact same name as your blogpost
 bibliography: 2026-04-27-coding-agents.bib
