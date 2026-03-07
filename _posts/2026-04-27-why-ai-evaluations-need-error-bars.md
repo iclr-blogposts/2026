@@ -1,6 +1,6 @@
 ---
 layout: distill
-title: "Why AI Evaluations Need Error Bars"
+title: "Why AI Evaluations Need Statistical Rigor"
 description: "AI evaluations often rely on single-run scores even though models, agents, and judges are inherently stochastic, making many reported differences unstable. This post surveys statistical tools—error bars, reliability measures, Bayesian models—that show and help manage this variance. Overall, it highlights how incorporating established statistical practices can make evaluations more trustworthy and informative."
 date: 2026-04-27
 future: true
