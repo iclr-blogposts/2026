@@ -5,7 +5,9 @@ description: "AI evaluations often rely on single-run scores even though models,
 date: 2026-04-27
 future: true
 authors:
-  - name: Anonymous
+  - name: Zairah Mustahsan
+  - affiliations:
+      name: You.com
 
 tags: [evaluation, statistics, llms, agents, benchmarking]
 math: true
