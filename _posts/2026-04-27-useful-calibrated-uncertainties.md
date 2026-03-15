@@ -561,7 +561,7 @@ $$
 d(c;\tau) := \begin{cases} 0, & s(c) \ge \tau,\\[4pt] 1, & s(c) < \tau, \end{cases}
 $$
 
-and the loss $\mathcal{L}$ does not depend on $\pi$, so what determines performance is how well the score/model *orders* examples by their true event probability, i.e. its discrimination ability.<d-footnote>For losses where $\pi$ matters, given $\pi$ from the model, the optimal decision rule can still be found with any order-preserving map of the true distribution.</d-footnote>
+and the loss $\mathcal{L}$ does not depend on $\pi$, so what determines performance $R$ is how well the score/model *orders* examples by their true event probability, i.e. its discrimination ability.<d-footnote>For losses where $\pi$ matters, given $\pi$ from the model, the optimal decision rule can still be found with any order-preserving map of the true distribution.</d-footnote>
 
 Finally, if the reader is interested in exploring further theory related to the above, <d-cite key="PerezLebel2023GroupingLoss,Chidambaram2025reassessing"></d-cite> discuss the limitations of calibration from the perspective of proper scoring rules. 
 
