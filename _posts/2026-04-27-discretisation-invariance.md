@@ -273,17 +273,17 @@ We have seen the definition of discretisation invariance and typical numerical d
 ### Arguments against discretisation invariance
 The main problem is the tension between the infinite-dimensional setting, where discretisation invariance is relevant, and the fixed resolution setting used in practice. Several manifestations of this problem are described below.
 
-**Discretisation invariance is an asymptotic property.**
+**Discretisation invariance is an asymptotic property**
 
 Both the formal definition and the typical evaluation strategies frame discretisation invariance as a statement about convergence <d-cite key="azizzadenesheli2024neural"></d-cite>. Convergence is, undeniably, crucial in classical scientific computing, as it theoretically allows one to reach arbitrary accuracy on paper and very high precision on a digital computer <d-cite key="bailey2012high"></d-cite>. However, the benefit is limited in operator learning. Test error rarely drops below a certain floor (e.g., $10^{-4}$), and given that training data always has finite resolution, it is unlikely that accuracy will increase significantly beyond what was achieved during training. Indeed, in our experiments above, we did not observe a palpable increase in accuracy  tied to this property. The related claim on "zero-shot superresolution" made in <d-cite key="li2020fourier"></d-cite> has similarly remained unverified in subsequent research <d-cite key="fanaskov2023spectral"></d-cite>, <d-cite key="sakarvadia2025false"></d-cite>.
 
-**Functional Data Analysis and fixed-resolution setting.**
+**Functional Data Analysis and fixed-resolution setting**
 
 Functional Data Analysis (FDA) is a long-established field <d-cite key="ramsay1991some"></d-cite>. FDA literature focuses on functions as objects of interest, examining classification, regression and interpolation within Banach spaces. This focus makes FDA highly related to both discretisation invariance and operator learning. Peculiarly, researchers in FDA and operator learning rarely reference each other. If we look at the modern application of machine learning, it becomes clear that the FDA is not widely popular. Some reasons for this are summarised in [the illuminating discussion on StackExchange](https://stats.stackexchange.com/a/564607). A key argument is that since all observations are finite, it is often possible to develop an algorithm for finite data that outperforms FDA algorithms.
 
 Fixed resolution setting is so convenient and versatile that it is applied even when the problem has conspicuously multiresolution structure. A clear example is the deterministic weather forecast. The typical setup is fixed-resolution training and evaluation on the ERA5 dataset, where transformer-based models dominate the leaderboard <d-cite key="liu2024evaluation"></d-cite>. To be fair, discretisation-invariant architectures (like FourCastNet <d-cite key="pathak2022fourcastnet"></d-cite>) are also comparable or superior to classical weather prediction models, but whether discretisation invariance itself is a key driver of their success remains unclear.
 
-**Discretisation invariance is not a good indicator of performance.**
+**Discretisation invariance is not a good indicator of performance**
 
 In <d-cite key="berner2025principled"></d-cite>, the authors argue that essentially any architecture can be made discretisation invariant. An interesting consequence of this finding is that discretisation invariance ceases to be a good guiding principle for architecture design. Architectures perform well or poorly independently of this property, since any design can be made discretisation invariant after mild adjustments. Let's consider FNO as a prime example.
 
@@ -292,15 +292,15 @@ FNO is certainly a high-performing architecture, but why? Is its success attribu
 ### Arguments in favour of discretisation invariance
 Several failure modes we described above happen when one is trying to infer data at a higher resolution than was available during training. We argue that a more productive strategy is to leverage downsampling - that is, to intentionally decrease input resolution for computational gains. Several powerful applications based on this downsampling approach are described below.
 
-**Hyperparameter optimization.**
+**Hyperparameter optimization**
 
 Discretisation invariance can significantly decrease the cost of a grid search <d-cite key="fanaskov2025deep"></d-cite>. The strategy involves first decreasing the dataset resolution to the smallest scale the architecture allows. A standard grid search is then performed, and the $K$ configurations with the highest validation accuracy are recorded. Finally, these $K$ configurations are tested again on the full resolution dataset. The authors of <d-cite key="fanaskov2025deep"></d-cite> report a reduction in grid search time by a factor of $7$, using this strategy.
 
-**Multiresolution inference.**
+**Multiresolution inference**
 
 In <d-cite key="yao2025guided"></d-cite> authors combine denoising diffusion probabilistic model with discretisation-agnostic neural operator. A natural sampling approach for such a combined model is to perform most denoising steps in low resolution and then transition to high resolution only toward the end of the process. Authors report that such strategies speed up the overall process by a factor of $2$.
 
-**Pretraining and finetuning.**
+**Pretraining and finetuning**
 
 Neural operators can be efficiently trained on multiresolution datasets <d-cite key="li2024multi"></d-cite>. For a given parametric PDE problem, one selects a desired high resolution $N\_x\times N\_y$ and generates a small set of train samples. These high-resolution samples are then supplemented by a large number of low resolution samples generated on a coarse grid $n\_x\times n\_y$. The neural operator is initially pretrained on the large low-resolution dataset and subsequently finetuned on the small high-resolution dataset, optimizing training efficiency.
 
