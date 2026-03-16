@@ -623,6 +623,12 @@ Although not all papers mix calibration and discrimination/per-sample decision m
 
 Readers mainly interested in practical takeaways can skim this section; it’s here to provide some historical context to the rest of the blogpost.
 
+{% include figure.liquid path="assets/img/2026-04-27-useful-calibrated-uncertainties/timeline.png" class="img-fluid z-depth-1" %}
+
+<div class="caption">
+A summarised timeline of calibration in the literature.
+</div>
+
 So, how did we get here? Originally calibration was very much grounded in the idea that it was a property of models averaged over many predictions. Early papers (around the 80s) <d-cite key="degroot1983comparison,Dawid1982"></d-cite> pose calibration as simply one potential way to evaluate the quality of probabilistic forecasting models and don't link it to per-sample decision making or notions of safety. Moreover, good calibration was already emphasised as not being sufficient, with the example of a useless but well-calibrated model that always predicts the base rate already present <d-cite key="degroot1983comparison"></d-cite>.
 
 Around the 2000s, with the increase in popularity of machine learning models such as SVMs, decision trees and neural networks, calibration begins to be emphasised as important for enabling reliable downstream decision making <d-cite key="NiculescuMizilCaruana2005,Platt1999,ZadroznyElkan2001"></d-cite>. The motivation here is generally to do with being able to trust the probabilities to set decision rules based on average performance (without validation labels), e.g. <d-cite key="NiculescuMizilCaruana2005"></d-cite> define a fixed decision threshold that assumes calibrated probabilities and evaluate downstream profits much like in our interactive example. Interestingly, the distinction between discrimination and calibration is not really emphasised, however, since research at this time generally focuses on binary models, the importance of discrimination is already implicitly baked in as a key part of the performance of the model. The line of thought is "by default we already measure discrimination via accuracy/AUROC, we should also measure calibration".
