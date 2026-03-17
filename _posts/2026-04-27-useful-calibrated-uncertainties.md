@@ -191,7 +191,7 @@ In the binary case, how well calibrated a model is can be visualised using a rel
 {% include figure.liquid path="assets/img/2026-04-27-useful-calibrated-uncertainties/reliability_diagrams.png" class="img-fluid z-depth-1" %}
 
 <div class="caption">
-Left: Reliability diagram showing over and under-confident models. Right: Practical reliability diagram where empirical frequencies are estimated using bins.
+<strong>Left: Reliability diagram showing over and under-confident models. Right: Practical reliability diagram where empirical frequencies are estimated using bins.</strong>
 </div>
 
 A well-calibrated model's reliability diagram will align with $y=x$ (Eq. \ref{eq:calib-natlang} is satisfied). Deviation below indicates "overconfidence" (real frequency < predicted probability); deviation above indicates "underconfidence" (real frequency > predicted probability). Note that the notion of over/under-confidence is much more specific here than in colloquial usage; we will return to this point later. Also, a model can be overconfident for a certain range of probabilities and underconfident on a different range (i.e. both at the same time), however, for simplicity's sake we'll limit discussion in this blog to models that are either over- or under-confident. The results naturally extend to more general cases.
@@ -211,7 +211,7 @@ $$
 \tag{4}\label{eq:conf-calib-natlang}
 $$
 </div>
-or mathematically for true label $y$, input $x$ and predicted label (top class) $\hat y=f_\phi(x)$ of classifier $f_\phi$ with parameters $\phi$,
+or mathematically for true label $y$, input $x$ ($\text{conditions}$) and predicted label (top class) $\hat y=f_\phi(x)$ of classifier $f_\phi$ with parameters $\phi$,
 <!-- =\arg \max_\omega P_{\theta}(\omega\mid x)$, -->
 <div class="equation-box">
 $$
@@ -248,7 +248,8 @@ Consider confidence calibration where for some image classifier our binary model
 {% include figure.liquid path="assets/img/2026-04-27-useful-calibrated-uncertainties/calibration_illust.png" class="img-fluid z-depth-1" %}
 
 <div class="caption">
-Illustration of how a confidence-calibrated model allows estimation of expected accuracy from only inputs/conditions without needing events/labels.
+<strong>
+Illustration of how a confidence-calibrated model allows estimation of expected accuracy from only inputs/conditions without needing events/labels.</strong>
 </div>
 
 Once we have a reliable estimate of the expected loss/reward we can make downstream decisions, e.g. for a certain deployment scenario the image classifier is not accurate enough and will lead to profit loss from misclassifications, so we decide not to deploy it. Additionally, humans can often reason intuitively about probabilistic information <d-cite key="CosmidesTooby1996IntuitiveStat"></d-cite>,<d-footnote>Imagine you are told a weighted coin returns heads 80% of the time. It's easy to visualise and reason about.</d-footnote> so human decision making can be performed naturally and reliably if model outputs are calibrated probabilities.
@@ -381,7 +382,9 @@ Recall the motivating paragraph from *On Calibration of Modern Neural Networks* 
 {% include figure.liquid path="assets/img/2026-04-27-useful-calibrated-uncertainties/selective_classification.png" class="img-fluid z-depth-1" %}
 
 <div class="caption">
+<strong>
 Illustration of automated medical diagnosis with selective classification where a prediction should be deferred to an expert if it is likely to be incorrect.
+</strong>
 </div>
 
 The task the authors are describing here is selective classification <d-cite key="Geifman2017SelectiveClassification,Jaeger2023FailureDetection,Xia2024SelectiveOOD"></d-cite> (or classification with abstention). In selective classification, if a classifier is likely to make an error on a specific input, then a useful uncertainty estimate should reflect this by indicating low confidence, triggering abstention, e.g. deferring a diagnosis to a human doctor. Here, **per-sample decisions** are made based on the model $P_\theta(\text{event}\mid \text{conditions})$, and we want it to be able to separate inputs where $\text{event}$ occurs (correct prediction) from inputs where $\text{no event}$ (error) occurs, i.e. **good discrimination**. This is an intuitively desirable property for uncertainty estimates, however, **a well-calibrated model is not one that is necessarily better for per-sample decision making**, in tasks such as selective classification. 
@@ -391,7 +394,9 @@ Consider again our previously discussed well-calibrated image classifier. Here w
 {% include figure.liquid path="assets/img/2026-04-27-useful-calibrated-uncertainties/calibration_discrimination.png" class="img-fluid z-depth-1" %}
 
 <div class="caption">
+<strong>
 Illustration of how abstention can improve accuracy by rejecting uncertain predictions.
+</strong>
 </div>
 
 However, if we consider another well-calibrated model that predicts the average accuracy $\pi=0.5$ for *all* images, then all predictions have tied confidence and we have no way to discriminate between correct and incorrect predictions, even though for selective classification we would like our model to be more uncertain on errors. **The model is well-calibrated but its uncertainties are *useless* for abstaining on potential errors!** The key here is that *calibration is related to the accuracy* ***averaged*** *over different inputs* $x$, and does not interrogate the model for each input individually. It only examines $\pi$ with respect to true probability $P(\text{event}\mid \pi)$, not with respect to the per-sample true probability $P(\text{event}\mid \text{conditions})$ (Eq. \ref{eq:calib-math-avg}).
@@ -400,17 +405,21 @@ However, if we consider another well-calibrated model that predicts the average 
 {% include figure.liquid path="assets/img/2026-04-27-useful-calibrated-uncertainties/cal_bad_disc.png" class="img-fluid z-depth-1" %}
 
 <div class="caption">
+<strong>
 Illustration of how a well-calibrated model with no discrimination ability cannot improve accuracy via abstention.
+</strong>
 </div>
 
-Conversely, if a different well-calibrated model for $\text{event}$ "correct prediction" is able to predict $\pi=0.8$ for a subset of half of the images where the classifier has accuracy $80\%$ (different to previous subsets) and $\pi=0.2$ for the other half where accuracy is $20\%$, then the selected images will have an accuracy of $80\%$ when setting $\tau=0.5$. This model is better at discriminating between correct and incorrect events on a per-sample basis.
+Conversely, if a different well-calibrated model for $\text{event}$ "correct prediction" is able to predict $\pi=0.8$ for a subset of half of the images where the classifier has accuracy $80\%$ (different to previous subsets) and $\pi=0.2$ for the other half where accuracy is $20\%$, then the selected images will have an accuracy of $80\%$ when setting $\tau=0.5$. **This model makes better per-sample decisions as it is better at discriminating between correct and incorrect events.**
 
 **You can think of calibration and discrimination as two orthogonal axes**: calibration controls the relationship between predicted probabilities and average frequencies, whilst discrimination controls how well the model is able to *rank* individual inputs by their true likelihood of $\text{event}$ occurring.
 
 {% include figure.liquid path="assets/img/2026-04-27-useful-calibrated-uncertainties/cal_better_disc.png" class="img-fluid z-depth-1" %}
 
 <div class="caption">
+<strong>
 Illustration of how a well-calibrated model with better discrimination ability can improve accuracy via abstention.
+</strong>
 </div>
  
 Finally, if we consider an uncalibrated (overconfident) model that predicts $\pi=0.9$ for the same subset of size 50% as above where the classifier has accuracy $80\%$ and $\pi=0.7$ for the other half where accuracy is $20\%$, then the selected images will have an accuracy of $80\%$ when setting $\tau=0.8$. In this case, despite being *uncalibrated*, the model is still able to effectively discriminate between correct and incorrect predictions and abstain on samples it is more likely to be incorrect on. 
@@ -420,9 +429,10 @@ However, in order to estimate the accuracy of selected images and then reliably 
  
 {% include figure.liquid path="assets/img/2026-04-27-useful-calibrated-uncertainties/uncal_better_disc.png" class="img-fluid z-depth-1" %}
 
-
 <div class="caption">
+<strong>
 Illustration of how an uncalibrated model with good discrimination ability can improve accuracy via abstention, if there is access to validation labels to choose the threshold and validate the accuracy. 
+</strong>
 </div>
 
 We note that the above example is purposely reductive as generally speaking $\pi$ will take many possible values rather than just two, and that downstream decisions may involve many possible actions. However, the intuition extends naturally to the general case.
@@ -626,7 +636,9 @@ Readers mainly interested in practical takeaways can skim this section; it’s h
 {% include figure.liquid path="assets/img/2026-04-27-useful-calibrated-uncertainties/timeline.png" class="img-fluid z-depth-1" %}
 
 <div class="caption">
+<strong>
 A summarised timeline of calibration in the literature.
+</strong>
 </div>
 
 So, how did we get here? Originally calibration was very much grounded in the idea that it was a property of models averaged over many predictions. Early papers (around the 80s) <d-cite key="degroot1983comparison,Dawid1982"></d-cite> pose calibration as simply one potential way to evaluate the quality of probabilistic forecasting models and don't link it to per-sample decision making or notions of safety. Moreover, good calibration was already emphasised as not being sufficient, with the example of a useless but well-calibrated model that always predicts the base rate already present <d-cite key="degroot1983comparison"></d-cite>.
