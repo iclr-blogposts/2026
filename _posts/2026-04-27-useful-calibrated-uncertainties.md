@@ -174,7 +174,7 @@ $$
 $$
 
 Importantly, $P(\text{event} \mid  \pi  )$ is **not** given $\text{conditions}$. It is the probability of the $\text{event}$ *on average* over the distribution of possible $\text{conditions}$,
-
+<div class="equation-box">
 $$
 P(\text{event} \mid  \pi)
 = \sum_{\text{conditions}}
@@ -182,7 +182,7 @@ P(\text{event} \mid  \text{conditions})\,
 P\bigl(\text{conditions} \mid  \pi\bigr).
 \tag{3}\label{eq:calib-math-avg}
 $$
-
+</div>
 **Calibration is concerned with average behaviour over many inputs with the same predicted probability $\pi$, and not with any single individual prediction.**
 
 In the binary case, how well calibrated a model is can be visualised using a reliability diagram <d-cite key="degroot1983comparison,NiculescuMizilCaruana2005"></d-cite> which plots the empirical frequency of $\text{event}$ (on average over $\text{conditions}$) given the predicted model probability $\pi$, i.e. visually comparing the left and right hand sides of Eq. \ref{eq:calib-natlang}. Practically, by binning predicted probabilities $\pi$, $P(\text{event} \mid  \pi  )$ can be estimated using the empirical frequency of $\text{event}$ within each bin.
