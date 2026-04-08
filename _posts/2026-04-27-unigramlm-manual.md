@@ -10,8 +10,8 @@ enable_math: true
 # anonymize when submitting
 authors:
   - name: Clara Meister
-  - url: https://cimeister.github.io/
-  - affiliations:
+    url: https://cimeister.github.io/
+    affiliations:
         name: EPFL
 
 # do not fill this in until your post is accepted and you're publishing your camera-ready post!
