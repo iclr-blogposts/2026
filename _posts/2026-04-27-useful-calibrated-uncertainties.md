@@ -10,7 +10,7 @@ htmlwidgets: true
 authors:
   - name: "Guoxuan Xia"
     affiliations:
-      name: "Department of Electrical and Electronic Engineering, Imperial College London · email: g [dot] xia21 [at] imperial [dot] ac [dot] uk"
+      name: "Department of Electrical and Electronic Engineering, Imperial College London"
 
 # do not fill this in until your post is accepted and you're publishing your camera-ready post!
 # authors:
