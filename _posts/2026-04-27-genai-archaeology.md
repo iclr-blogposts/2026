@@ -5,6 +5,7 @@ description: We document the rise of the Generative AI Archaeologist, whose tool
 future: true
 htmlwidgets: true
 hidden: true
+date: 2026-04-27
 
 # Mermaid diagrams
 mermaid:
