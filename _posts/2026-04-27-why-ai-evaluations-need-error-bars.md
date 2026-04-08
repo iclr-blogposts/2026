@@ -6,7 +6,7 @@ date: 2026-04-27
 future: true
 authors:
   - name: Zairah Mustahsan
-  - affiliations:
+    affiliations:
       name: You.com
 
 tags: [evaluation, statistics, llms, agents, benchmarking]
