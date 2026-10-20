@@ -89,14 +89,18 @@
             return (R_q / N) * 100;
         }
 
-        function compute() {
-            const N = Number(document.getElementById("N").value);
-            const R = Number(document.getElementById("R").value);
-            const K = Number(document.getElementById("K").value);
+        function $(selector) {
+            return document.getElementById(selector);
+        }
 
-            document.getElementById("N_val").textContent = N;
-            document.getElementById("R_val").textContent = R;
-            document.getElementById("K_val").textContent = K;
+        function compute() {
+            const N = Number($("N").value);
+            const R = Number($("R").value);
+            const K = Number($("K").value);
+
+            $("N_val").textContent = N;
+            $("R_val").textContent = R;
+            $("K_val").textContent = K;
 
             const lambda = calculate_lambda(K, R, N);
             const p_exact = calculate_p_rand_exact(K, R, N);
@@ -104,13 +108,13 @@
             const bor = calculate_bor_max(p_exact);
             const ratio = calculate_ratio(R, N);
 
-            document.getElementById("lambda").textContent = lambda.toFixed(6);
-            document.getElementById("p_exact").textContent = p_exact.toFixed(6);
-            document.getElementById("p_poisson").textContent = p_poisson.toFixed(6);
-            document.getElementById("bor").textContent = bor.toFixed(6);
-            document.getElementById("ratio").textContent = ratio.toFixed(3) + "%";
+            $("lambda").textContent = lambda.toFixed(6);
+            $("p_exact").textContent = p_exact.toFixed(6);
+            $("p_poisson").textContent = p_poisson.toFixed(6);
+            $("bor").textContent = bor.toFixed(6);
+            $("ratio").textContent = ratio.toFixed(3) + "%";
 
-            const status = document.getElementById("status");
+            const status = $("status");
             if (lambda >= 3) {
                 status.textContent = "⚠ COLLAPSE ZONE: Random chance overwhelms retrieval.";
                 status.style.color = "red";
@@ -121,7 +125,7 @@
         }
 
         ["N", "R", "K"].forEach(id =>
-            document.getElementById(id).addEventListener("input", compute)
+            $(id).addEventListener("input", compute)
         );
 
         compute();
