@@ -5,7 +5,7 @@ nav: true
 nav_order: 99
 dropdown: true
 children:
-  - title: <strong>2027</strong>
+  - title: 2027
     permalink: https://iclr-blogposts.github.io/2027/
   - title: divider
   - title: <strong>2026</strong>
